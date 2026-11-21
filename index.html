@@ -4,6 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>お会計ピッタリマン - 3D小銭スッキリ暗算パズル</title>
+<!-- OGP / リンクプレビュー設定 -->
+  <meta name="description" content="端数を合わせてお釣りをまとめろ！3Dのカルトンに硬貨・紙幣を出して小銭枚数最小を目指す爽快暗算パズル。通常・ハード・EX・消費税暗算のルナティックや2〜10人のオンライン対戦にも対応！">
+  <meta name="theme-color" content="#16120e">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="お会計ピッタリマン">
+  <meta property="og:title" content="お会計ピッタリマン - 3D小銭スッキリ暗算パズル">
+  <meta property="og:description" content="端数を合わせてお釣りをまとめろ！3Dのカルトンに硬貨・紙幣を出して小銭枚数最小を目指す爽快暗算パズル。通常・ハード・EX・消費税暗算のルナティックや2〜10人のオンライン対戦にも対応！">
+  <meta property="og:url" content="https://okane-lyart.vercel.app/">
+  <meta property="og:image" content="https://okane-lyart.vercel.app/assets/img/ogp.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="お会計ピッタリマンの3Dプレイ画面。青いカルトンに硬貨と紙幣、レジの金額表示と店員のキャラクター">
+  <meta property="og:locale" content="ja_JP">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="お会計ピッタリマン - 3D小銭スッキリ暗算パズル">
+  <meta name="twitter:description" content="端数を合わせてお釣りをまとめろ！3Dのカルトンに硬貨・紙幣を出して小銭枚数最小を目指す爽快暗算パズル。">
+  <meta name="twitter:image" content="https://okane-lyart.vercel.app/assets/img/ogp.png">
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js r128 -->
@@ -2129,7 +2148,23 @@
           </button>
         </div>
       </div>
-
+<!-- SNS共有エリア（ソロ結果） -->
+        <div class="mt-2 pt-2 border-t border-dashed border-slate-400">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+            <button id="btn-share-solo-x" type="button" class="btn-3d min-h-[48px] bg-slate-950 hover:bg-slate-800 text-white font-black text-xs sm:text-sm py-2.5 px-3 rounded-xl border-b-4 border-slate-700 flex items-center justify-center gap-1.5 shadow-md">
+              <span class="text-base leading-none">𝕏</span>
+              <span>Xで成果を共有</span>
+            </button>
+            <button id="btn-share-solo-native" type="button" class="btn-3d min-h-[48px] bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-slate-950 font-black text-xs sm:text-sm py-2.5 px-3 rounded-xl border-b-4 border-amber-700 flex items-center justify-center gap-1.5 shadow-md">
+              <span>📤</span>
+              <span id="btn-share-solo-native-label">画像つきで共有 / 保存</span>
+            </button>
+          </div>
+          <p id="share-solo-guide" class="hidden mt-1.5 text-[10px] sm:text-xs font-extrabold text-emerald-700 bg-emerald-100/90 border border-emerald-300 rounded-lg px-2.5 py-1.5 text-center"></p>
+          <div id="share-solo-preview-wrap" class="hidden mt-2 text-center">
+            <img id="share-solo-preview-img" alt="共有用結果画像プレビュー" class="w-full max-w-[320px] mx-auto rounded-lg border-2 border-slate-300 shadow" />
+          </div>
+        </div>
       <!-- 4-Category Ranking Board Section inside Result Screen -->
       <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-2.5 sm:p-3 mb-3 shrink-0 flex flex-col text-left">
         <div class="flex items-center justify-between mb-1.5 flex-wrap gap-1">
@@ -2584,7 +2619,23 @@
           <span>📋</span><span>画像をコピー</span>
         </button>
       </div>
-
+<!-- SNS共有エリア（オンライン対戦結果） -->
+      <div class="mb-2.5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <button id="btn-share-vs-x" type="button" class="btn-3d min-h-[48px] bg-slate-950 hover:bg-slate-800 text-white font-black text-xs sm:text-sm py-2.5 px-3 rounded-xl border-2 border-slate-600 flex items-center justify-center gap-1.5 shadow-md">
+            <span class="text-base leading-none">𝕏</span>
+            <span>Xで対戦結果を共有</span>
+          </button>
+          <button id="btn-share-vs-native" type="button" class="btn-3d min-h-[48px] bg-gradient-to-r from-fuchsia-500 to-pink-500 hover:from-fuchsia-400 hover:to-pink-400 text-white font-black text-xs sm:text-sm py-2.5 px-3 rounded-xl border-b-4 border-fuchsia-900 flex items-center justify-center gap-1.5 shadow-md">
+            <span>📤</span>
+            <span id="btn-share-vs-native-label">画像つきで共有 / 保存</span>
+          </button>
+        </div>
+        <p id="share-vs-guide" class="hidden mt-1.5 text-[10px] sm:text-xs font-extrabold text-amber-200 bg-slate-950/90 border border-amber-400/60 rounded-lg px-2.5 py-1.5 text-center"></p>
+        <div id="share-vs-preview-wrap" class="hidden mt-2 text-center">
+          <img id="share-vs-preview-img" alt="対戦共有用画像プレビュー" class="w-full max-w-[320px] mx-auto rounded-lg border-2 border-fuchsia-400/70 shadow" />
+        </div>
+      </div>
       <div class="text-[11px] font-bold text-slate-400 bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-1.5 mb-3">
         ※リアルタイム対戦モードのスコアはランキングおよび自己ベスト・解放条件には影響しません。
       </div>
@@ -14496,6 +14547,487 @@
 
       requestAnimationFrame(animate);
     });
+  </script>
+<script>
+    /*************************************************************************
+     * SNS共有機能 ＆ 1200×630px 成果カード画像生成モジュール
+     *************************************************************************/
+    (function () {
+      const SHARE_CONFIG = {
+        siteName: 'お会計ピッタリマン',
+        siteUrl: 'https://okane-lyart.vercel.app/',
+        shortUrl: 'okane-lyart.vercel.app',
+        hashtags: 'お会計ピッタリマン,暗算パズル'
+      };
+
+      // 文字数チェック（URLは23文字換算・ハッシュタグ込みで140字以内に収める）
+      function trimToXLimit(text, hashtagsStr) {
+        const tagText = hashtagsStr
+          ? ' ' + hashtagsStr.split(',').map((t) => '#' + t.trim()).filter((t) => t.length > 1).join(' ')
+          : '';
+        const reserved = 23 + 1 + tagText.length; // URL(23) + 改行/空白 + ハッシュタグ
+        const maxBody = Math.max(40, 140 - reserved);
+        if (text.length <= maxBody) return text;
+        return text.slice(0, maxBody - 1) + '…';
+      }
+
+      // 長い文字列や桁数の大きいスコアでもはみ出さない自動縮小テキスト描画
+      function drawFittedText(ctx, text, x, y, maxWidth, baseSize, minSize, fontWeight, fontFamily) {
+        const str = String(text || '');
+        let size = baseSize;
+        ctx.font = `${fontWeight} ${size}px ${fontFamily}`;
+        while (size > minSize && ctx.measureText(str).width > maxWidth) {
+          size -= 2;
+          ctx.font = `${fontWeight} ${size}px ${fontFamily}`;
+        }
+        let drawStr = str;
+        if (ctx.measureText(drawStr).width > maxWidth) {
+          while (drawStr.length > 1 && ctx.measureText(drawStr + '…').width > maxWidth) {
+            drawStr = drawStr.slice(0, -1);
+          }
+          drawStr += '…';
+        }
+        ctx.fillText(drawStr, x, y);
+      }
+
+      function getTodayString() {
+        const d = new Date();
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}/${m}/${day}`;
+      }
+
+      // 現在のソロ結果画面から成果データを取得（個人情報なし）
+      function collectSoloResultData() {
+        const getText = (id, fallback = '') => {
+          const el = document.getElementById(id);
+          return el ? el.textContent.trim() : fallback;
+        };
+        const rawScore = getText('res-score', '0').replace(/[^\d,]/g, '') || '0';
+        const rankTitle = getText('res-rank-title', 'レジ打ちチャレンジャー');
+        const modeLabel = getText('res-mode-label', '通常モード');
+        const customers = getText('res-customers', '0人');
+        const perfectRate = getText('res-perfect-rate', '0%');
+        const dateStr = getText('res-receipt-date', getTodayString()) || getTodayString();
+        const rankBadgeEl = document.getElementById('res-rank-in-badge');
+        const rankBadge = rankBadgeEl && !rankBadgeEl.classList.contains('hidden')
+          ? rankBadgeEl.textContent.trim()
+          : '';
+        let playerName = getText('res-player-name-Tag', '').replace(/^プレイヤー[:：]\s*/, '').replace(/さん$/, '').trim();
+        if (!playerName) {
+          try {
+            playerName = (localStorage.getItem('pittariman_player_name_v3') || '').trim();
+          } catch (e) {}
+        }
+        if (!playerName) playerName = 'プレイヤー';
+
+        return {
+          type: 'solo',
+          score: rawScore,
+          rankTitle,
+          modeLabel,
+          customers,
+          perfectRate,
+          rankBadge,
+          playerName,
+          dateStr
+        };
+      }
+
+      // 現在のオンライン対戦結果画面から成果データを取得
+      function collectVersusResultData() {
+        const getText = (id, fallback = '') => {
+          const el = document.getElementById(id);
+          return el ? el.textContent.trim() : fallback;
+        };
+        const banner = getText('vs-res-banner', '⚔️ 対戦終了');
+        const reason = getText('vs-res-reason', 'オンライン対戦結果');
+        const rows = [];
+        let myRank = '';
+        let myMetric = '';
+        let playerName = 'プレイヤー';
+
+        const standingsEl = document.getElementById('vs-res-standings');
+        if (standingsEl) {
+          Array.from(standingsEl.children).slice(0, 3).forEach((child, idx) => {
+            const text = child.textContent.replace(/\s+/g, ' ').trim();
+            rows.push(text);
+            if (text.includes('YOU') || text.includes('あなた') || child.className.includes('cyan') || child.className.includes('amber')) {
+              if (!myRank) myRank = `${idx + 1}位`;
+            }
+          });
+        }
+        try {
+          const saved = (localStorage.getItem('pittariman_player_name_v3') || '').trim();
+          if (saved) playerName = saved;
+        } catch (e) {}
+
+        const myScoreEl = document.getElementById('ui-score');
+        if (myScoreEl) {
+          myMetric = `${myScoreEl.textContent.trim()}pt`;
+        }
+
+        return {
+          type: 'versus',
+          banner,
+          reason,
+          rows,
+          myRank: myRank || (banner.includes('WIN') ? '1位' : ''),
+          myMetric,
+          playerName,
+          dateStr: getTodayString()
+        };
+      }
+
+      // 共有文章の生成（140字以内・成果が一目でわかる構成）
+      function buildSoloShareText(data) {
+        const cleanTitle = data.rankTitle.replace(/^[\p{Emoji}\s]+/u, '').trim() || data.rankTitle;
+        const line1 = `🏆 ${SHARE_CONFIG.siteName}で ${data.score}pt・称号「${cleanTitle}」達成！`;
+        const line2 = `処理${data.customers}・PERFECT率${data.perfectRate}（${data.modeLabel}）✨`;
+        const line3 = 'あなたも神会計に挑戦しよう👇';
+        return trimToXLimit(`${line1}\n${line2}\n${line3}`, SHARE_CONFIG.hashtags);
+      }
+
+      function buildVersusShareText(data) {
+        const cleanBanner = data.banner.replace(/^[\p{Emoji}\s]+/u, '').trim() || data.banner;
+        const rankPart = data.myRank ? `${data.myRank}・` : '';
+        const line1 = `⚔️ ${SHARE_CONFIG.siteName} オンライン対戦で ${rankPart}${cleanBanner}！`;
+        const line2 = `${data.reason}${data.myMetric ? `（${data.myMetric}）` : ''}✨`;
+        const line3 = 'あなたも神会計バトルに挑戦👇';
+        return trimToXLimit(`${line1}\n${line2}\n${line3}`, SHARE_CONFIG.hashtags);
+      }
+
+      // 1200×630px の成果共有画像を Canvas で生成（結果画面のレシート＆ダークデザインと統一）
+      function renderShareCardCanvas(data) {
+        const W = 1200;
+        const H = 630;
+        const canvas = document.createElement('canvas');
+        canvas.width = W;
+        canvas.height = H;
+        const ctx = canvas.getContext('2d');
+
+        // 背景（本体と同じダークブラウン〜スレート調）
+        const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+        bgGrad.addColorStop(0, '#1c1510');
+        bgGrad.addColorStop(0.55, '#121826');
+        bgGrad.addColorStop(1, '#090d16');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, W, H);
+
+        // 背景アクセント光彩
+        const glow = ctx.createRadialGradient(340, 315, 30, 340, 315, 420);
+        glow.addColorStop(0, data.type === 'versus' ? 'rgba(217, 70, 239, 0.22)' : 'rgba(251, 191, 36, 0.22)');
+        glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, W, H);
+
+        // 外枠（アンバー／フューシャ）
+        ctx.strokeStyle = data.type === 'versus' ? '#e879f9' : '#fbbf24';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.roundRect(22, 22, W - 44, H - 44, 28);
+        ctx.stroke();
+
+        // 左エリア：タイトル・メイン成果（画像の中で最大の文字）
+        const leftX = 68;
+        const leftMaxW = 630;
+
+        // タイトルバッジ
+        ctx.fillStyle = data.type === 'versus' ? '#a21caf' : '#f59e0b';
+        ctx.beginPath();
+        ctx.roundRect(leftX, 56, 320, 42, 21);
+        ctx.fill();
+
+        ctx.fillStyle = data.type === 'versus' ? '#ffffff' : '#0f172a';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        drawFittedText(
+          ctx,
+          data.type === 'versus' ? '⚔️ ONLINE VERSUS RESULT' : '🪙 3D小銭スッキリ暗算パズル',
+          leftX + 160,
+          77,
+          290,
+          20,
+          14,
+          '900',
+          '"M PLUS Rounded 1c", sans-serif'
+        );
+
+        // プロジェクト名
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#ffffff';
+        drawFittedText(ctx, SHARE_CONFIG.siteName, leftX, 140, leftMaxW, 48, 32, '900', '"M PLUS Rounded 1c", sans-serif');
+
+        // モード・日付・プレイヤー名
+        ctx.fillStyle = '#cbd5e1';
+        const subMeta = data.type === 'versus'
+          ? `👤 ${data.playerName}   📅 ${data.dateStr}`
+          : `🎮 ${data.modeLabel}   👤 ${data.playerName}   📅 ${data.dateStr}`;
+        drawFittedText(ctx, subMeta, leftX, 188, leftMaxW, 22, 15, '700', '"M PLUS Rounded 1c", sans-serif');
+
+        // メイン成果パネル（POSレジ風ダークグリーンLCD）
+        ctx.fillStyle = '#07140e';
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.roundRect(leftX, 224, leftMaxW, 250, 22);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.textAlign = 'left';
+        if (data.type === 'solo') {
+          ctx.fillStyle = '#34d399';
+          ctx.font = '800 22px "M PLUS Rounded 1c", sans-serif';
+          ctx.fillText('FINAL SCORE', leftX + 30, 266);
+
+          ctx.fillStyle = '#fbbf24';
+          ctx.shadowColor = 'rgba(251, 191, 36, 0.55)';
+          ctx.shadowBlur = 18;
+          drawFittedText(ctx, `${data.score} pt`, leftX + 30, 344, leftMaxW - 60, 88, 42, '900', '"Share Tech Mono", monospace');
+          ctx.shadowBlur = 0;
+
+          ctx.fillStyle = '#f8fafc';
+          drawFittedText(ctx, data.rankTitle, leftX + 30, 428, leftMaxW - 60, 38, 22, '900', '"M PLUS Rounded 1c", sans-serif');
+        } else {
+          ctx.fillStyle = '#e879f9';
+          ctx.font = '800 22px "M PLUS Rounded 1c", sans-serif';
+          ctx.fillText('MATCH RESULT', leftX + 30, 266);
+
+          ctx.fillStyle = '#fbbf24';
+          ctx.shadowColor = 'rgba(251, 191, 36, 0.55)';
+          ctx.shadowBlur = 18;
+          drawFittedText(ctx, data.banner, leftX + 30, 344, leftMaxW - 60, 74, 36, '900', '"M PLUS Rounded 1c", sans-serif');
+          ctx.shadowBlur = 0;
+
+          ctx.fillStyle = '#f8fafc';
+          drawFittedText(ctx, data.reason, leftX + 30, 428, leftMaxW - 60, 28, 18, '800', '"M PLUS Rounded 1c", sans-serif');
+        }
+
+        // 左下キャッチ
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '700 20px "M PLUS Rounded 1c", sans-serif';
+        ctx.fillText('端数を合わせてお釣りを最小に！神会計を目指そう', leftX, 524);
+
+        // 右エリア：レシート風内訳カード
+        const rx = 742;
+        const ry = 56;
+        const rw = 390;
+        const rh = 490;
+
+        ctx.save();
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
+        ctx.shadowBlur = 20;
+        ctx.shadowOffsetY = 8;
+        const paperGrad = ctx.createLinearGradient(0, ry, 0, ry + rh);
+        paperGrad.addColorStop(0, '#fffdf7');
+        paperGrad.addColorStop(1, '#f4ede0');
+        ctx.fillStyle = paperGrad;
+        ctx.beginPath();
+        ctx.roundRect(rx, ry, rw, rh, 16);
+        ctx.fill();
+        ctx.restore();
+
+        // レシート上部ヘッダー
+        ctx.fillStyle = '#1e293b';
+        ctx.textAlign = 'center';
+        ctx.font = '900 22px "M PLUS Rounded 1c", sans-serif';
+        ctx.fillText('🧾 プレイ結果レシート', rx + rw / 2, ry + 42);
+
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 5]);
+        ctx.beginPath();
+        ctx.moveTo(rx + 24, ry + 68);
+        ctx.lineTo(rx + rw - 24, ry + 68);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // 内訳項目（最大3項目に絞って見やすく）
+        const items = data.type === 'solo'
+          ? [
+              { label: '処理人数', value: data.customers, color: '#0f172a' },
+              { label: 'PERFECT率', value: data.perfectRate, color: '#047857' },
+              { label: 'ランキング', value: data.rankBadge || 'フリープレイ', color: '#b45309' }
+            ]
+          : [
+              { label: '順位', value: data.myRank || '対戦完了', color: '#7e22ce' },
+              { label: 'スコア', value: data.myMetric || '---', color: '#b45309' },
+              { label: '上位結果', value: (data.rows[0] || 'オンライン対戦').slice(0, 18), color: '#0f172a' }
+            ];
+
+        let iy = ry + 114;
+        items.forEach((item) => {
+          ctx.fillStyle = '#e2e8f0';
+          ctx.beginPath();
+          ctx.roundRect(rx + 24, iy - 28, rw - 48, 86, 12);
+          ctx.fill();
+
+          ctx.textAlign = 'left';
+          ctx.fillStyle = '#475569';
+          ctx.font = '800 18px "M PLUS Rounded 1c", sans-serif';
+          ctx.fillText(item.label, rx + 40, iy + 2);
+
+          ctx.textAlign = 'right';
+          ctx.fillStyle = item.color;
+          drawFittedText(ctx, item.value, rx + rw - 40, iy + 36, rw - 96, 30, 18, '900', '"M PLUS Rounded 1c", sans-serif');
+          iy += 104;
+        });
+
+        // バーコード装飾
+        ctx.fillStyle = '#1e293b';
+        let bx = rx + 58;
+        for (let i = 0; i < 36; i++) {
+          const bw = (i * 5 + 3) % 4 === 0 ? 5 : 2;
+          ctx.fillRect(bx, ry + rh - 64, bw, 32);
+          bx += bw + 4;
+          if (bx > rx + rw - 58) break;
+        }
+
+        // 右下隅：サイトURL短縮表示
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = '700 22px "Share Tech Mono", monospace';
+        ctx.fillText(SHARE_CONFIG.shortUrl, W - 56, H - 46);
+
+        return canvas;
+      }
+
+      function canvasToPngBlob(canvas) {
+        return new Promise((resolve) => {
+          canvas.toBlob((blob) => resolve(blob || null), 'image/png');
+        });
+      }
+
+      function downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+      }
+
+      function showPreviewAndGuide(prefix, blob, guideText) {
+        const wrap = document.getElementById(`share-${prefix}-preview-wrap`);
+        const img = document.getElementById(`share-${prefix}-preview-img`);
+        const guide = document.getElementById(`share-${prefix}-guide`);
+
+        if (wrap && img && blob) {
+          if (img.dataset.objUrl) URL.revokeObjectURL(img.dataset.objUrl);
+          const url = URL.createObjectURL(blob);
+          img.src = url;
+          img.dataset.objUrl = url;
+          wrap.classList.remove('hidden');
+        }
+        if (guide) {
+          if (guideText) {
+            guide.textContent = guideText;
+            guide.classList.remove('hidden');
+          } else {
+            guide.classList.add('hidden');
+          }
+        }
+      }
+
+      async function handleShare(mode, preferXIntent) {
+        try {
+          const data = mode === 'versus' ? collectVersusResultData() : collectSoloResultData();
+          const shareText = mode === 'versus' ? buildVersusShareText(data) : buildSoloShareText(data);
+          const canvas = renderShareCardCanvas(data);
+          const blob = await canvasToPngBlob(canvas);
+          const filename = mode === 'versus' ? 'okane_pittariman_vs_result.png' : 'okane_pittariman_result.png';
+
+          // 1. スマホなど端末の共有機能（画像つき共有）が使える場合は優先
+          if (blob && typeof navigator !== 'undefined' && typeof navigator.share === 'function' && typeof File !== 'undefined') {
+            const file = new File([blob], filename, { type: 'image/png' });
+            const sharePayload = {
+              title: SHARE_CONFIG.siteName,
+              text: `${shareText}\n${SHARE_CONFIG.siteUrl}`,
+              files: [file]
+            };
+            if (!preferXIntent && typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
+              showPreviewAndGuide(mode === 'versus' ? 'vs' : 'solo', blob, '');
+              await navigator.share(sharePayload);
+              return;
+            }
+            // スマホでXボタンを押した場合も画像つき共有が可能ならそちらを優先
+            if (preferXIntent && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) && typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
+              showPreviewAndGuide(mode === 'versus' ? 'vs' : 'solo', blob, '');
+              await navigator.share(sharePayload);
+              return;
+            }
+          }
+
+          // 2. PC・非対応環境：画像をダウンロード保存＋案内表示＋X投稿画面を開く
+          if (blob) {
+            downloadBlob(blob, filename);
+            showPreviewAndGuide(
+              mode === 'versus' ? 'vs' : 'solo',
+              blob,
+              preferXIntent
+                ? '📷 結果画像を保存しました！開いたXの投稿画面に画像を添付してポストしてください。'
+                : '📷 共有用の結果画像（1200×630px）を保存しました！SNS投稿に添付して使えます。'
+            );
+          }
+
+          if (preferXIntent) {
+            const xUrl =
+              'https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText) +
+              '&url=' + encodeURIComponent(SHARE_CONFIG.siteUrl) +
+              '&hashtags=' + encodeURIComponent(SHARE_CONFIG.hashtags);
+            window.open(xUrl, '_blank', 'noopener,noreferrer');
+          }
+        } catch (err) {
+          // ユーザーによるキャンセル・ブロック時はエラー表示せず静かに元へ戻る
+        }
+      }
+
+      // ボタンイベント紐付け
+      function bindShareButtons() {
+        const pairs = [
+          { id: 'btn-share-solo-x', mode: 'solo', xIntent: true },
+          { id: 'btn-share-solo-native', mode: 'solo', xIntent: false },
+          { id: 'btn-share-vs-x', mode: 'versus', xIntent: true },
+          { id: 'btn-share-vs-native', mode: 'versus', xIntent: false }
+        ];
+        pairs.forEach(({ id, mode, xIntent }) => {
+          const btn = document.getElementById(id);
+          if (!btn) return;
+          btn.addEventListener('click', () => {
+            if (typeof sound !== 'undefined' && sound && typeof sound.playClick === 'function') {
+              sound.playClick();
+            }
+            handleShare(mode, xIntent);
+          });
+        });
+
+        // 結果画面が閉じたときにプレビュー案内をリセット
+        const resetOnHide = (screenId, prefix) => {
+          const screenEl = document.getElementById(screenId);
+          if (!screenEl || typeof MutationObserver === 'undefined') return;
+          const obs = new MutationObserver(() => {
+            if (screenEl.classList.contains('hidden')) {
+              const g = document.getElementById(`share-${prefix}-guide`);
+              const p = document.getElementById(`share-${prefix}-preview-wrap`);
+              if (g) g.classList.add('hidden');
+              if (p) p.classList.add('hidden');
+            }
+          });
+          obs.observe(screenEl, { attributes: true, attributeFilter: ['class'] });
+        };
+        resetOnHide('screen-result', 'solo');
+        resetOnHide('screen-versus-result', 'vs');
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindShareButtons);
+      } else {
+        bindShareButtons();
+      }
+    })();
   </script>
 </body>
 </html>

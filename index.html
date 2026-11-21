@@ -14936,38 +14936,25 @@
         try {
           const data = mode === 'versus' ? collectVersusResultData() : collectSoloResultData();
           const shareText = mode === 'versus' ? buildVersusShareText(data) : buildSoloShareText(data);
-          const canvas = renderShareCardCanvas(data);
-          const filename = mode === 'versus' ? 'okane_pittariman_vs_result.png' : 'okane_pittariman_result.png';
-          const prefix = mode === 'versus' ? 'vs' : 'solo';
+          const xUrl =
+            'https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText) +
+            '&url=' + encodeURIComponent(SHARE_CONFIG.siteUrl) +
+            '&hashtags=' + encodeURIComponent(SHARE_CONFIG.hashtags);
 
-          // ①「𝕏 Xで成果を共有」ボタン：ポップアップブロックを避けるためクリック直後に同期でXを開く
+          // ①「𝕏 Xで成果を共有」：Xの投稿画面を開くだけ（画像保存なし）
           if (preferXIntent) {
-            const xUrl =
-              'https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText) +
-              '&url=' + encodeURIComponent(SHARE_CONFIG.siteUrl) +
-              '&hashtags=' + encodeURIComponent(SHARE_CONFIG.hashtags);
             window.open(xUrl, '_blank', 'noopener,noreferrer');
-
-            const blob = await canvasToPngBlob(canvas);
-            if (blob) {
-              downloadBlob(blob, filename);
-              showPreviewAndGuide(
-                prefix,
-                blob,
-                '📷 結果画像を保存しました！開いたXの投稿画面に画像を添付してポストしてください。'
-              );
-            }
             return;
           }
 
-          // ②「📤 画像つきで共有 / 保存」ボタン：端末共有（スマホ等）を優先、非対応なら保存のみ
+          // ②「📤 画像つきで共有」：端末の共有メニューで画像つき共有（画像保存なし）
+          const canvas = renderShareCardCanvas(data);
           const blob = await canvasToPngBlob(canvas);
-          if (!blob) return;
+          const filename = mode === 'versus' ? 'okane_pittariman_vs_result.png' : 'okane_pittariman_result.png';
 
-          if (typeof navigator !== 'undefined' && typeof navigator.share === 'function' && typeof File !== 'undefined') {
+          if (blob && typeof navigator !== 'undefined' && typeof navigator.share === 'function' && typeof File !== 'undefined') {
             const file = new File([blob], filename, { type: 'image/png' });
             if (typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
-              showPreviewAndGuide(prefix, blob, '');
               await navigator.share({
                 title: SHARE_CONFIG.siteName,
                 text: `${shareText}\n${SHARE_CONFIG.siteUrl}`,
@@ -14977,12 +14964,8 @@
             }
           }
 
-          downloadBlob(blob, filename);
-          showPreviewAndGuide(
-            prefix,
-            blob,
-            '📷 共有用の結果画像（1200×630px）を保存しました！SNS投稿に添付して使えます。'
-          );
+          // 端末共有が使えない環境（一部PC等）は保存せずXを開く
+          window.open(xUrl, '_blank', 'noopener,noreferrer');
         } catch (err) {
           // ユーザーによるキャンセル・ブロック時は静かに元へ戻る
         }

@@ -11691,9 +11691,74 @@
         }
       }
 
+      ensureIosHapticSwitch() {
+        if (this._iosHapticLabel && document.body.contains(this._iosHapticLabel)) {
+          return this._iosHapticLabel;
+        }
+        try {
+          const input = document.createElement('input');
+          input.type = 'checkbox';
+          input.setAttribute('switch', '');
+          input.id = 'ios-haptic-switch-helper';
+          input.setAttribute('aria-hidden', 'true');
+          input.tabIndex = -1;
+          input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0.001;pointer-events:none;margin:0;padding:0;';
+
+          const label = document.createElement('label');
+          label.setAttribute('for', input.id);
+          label.setAttribute('aria-hidden', 'true');
+          label.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0.001;pointer-events:none;margin:0;padding:0;';
+
+          document.body.appendChild(input);
+          document.body.appendChild(label);
+          this._iosHapticInput = input;
+          this._iosHapticLabel = label;
+          return label;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      triggerIosHaptic(pattern = 80) {
+        const label = this.ensureIosHapticSwitch();
+        if (!label) return;
+        const pulse = () => {
+          try { label.click(); } catch (e) {}
+        };
+        if (Array.isArray(pattern)) {
+          // 配列パターン [振動, 休止, 振動, ...] の最初の振動はタップ同期で即発火
+          let elapsed = 0;
+          let count = 0;
+          for (let i = 0; i < pattern.length && count < 5; i++) {
+            const ms = Math.max(0, Number(pattern[i]) || 0);
+            if (i % 2 === 0 && ms > 0) {
+              if (elapsed === 0) {
+                pulse();
+              } else {
+                setTimeout(pulse, elapsed);
+              }
+              count++;
+            }
+            elapsed += ms;
+          }
+        } else {
+          pulse();
+          if (Number(pattern) >= 120) {
+            setTimeout(pulse, 70);
+          }
+        }
+      }
+
       vibrate(pattern = 80) {
         if (!this.vibrationEnabled) return;
-        try { navigator.vibrate?.(pattern); } catch (e) {}
+        try {
+          if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+            navigator.vibrate(pattern);
+            return;
+          }
+        } catch (e) {}
+        // iOS Safari (navigator.vibrate 非対応) 用：HTML switch 経由の触覚フィードバック
+        this.triggerIosHaptic(pattern);
       }
 
       toggleVibration() {
@@ -16389,3 +16454,8 @@
   </script>
 </body>
 </html>
+
+
+
+
+

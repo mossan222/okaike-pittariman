@@ -1805,44 +1805,46 @@
     <!-- ULTRA-COMPACT TOP HUD & POS BAR -->
     <header id="game-top-header" class="w-full max-w-3xl mx-auto px-1.5 pt-1 sm:px-3 sm:pt-1.5 pointer-events-auto">
       <div class="bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl px-2 py-1 sm:px-3 sm:py-1.5 shadow-lg">
-        <div class="flex items-center justify-between gap-1 mb-0.5">
-          <!-- Left: Mode Badge, Score, Combo & Customer Count -->
-          <div class="flex items-center gap-1 sm:gap-1.5 flex-wrap">
-            <span id="ui-mode-badge" class="text-[9px] sm:text-[11px] font-black px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950 leading-none">
-              NORMAL
-            </span>
-            <span id="ui-rule-badge" class="text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded bg-cyan-500/25 text-cyan-200 border border-cyan-400/60 leading-none">
-              👛財布最小
-            </span>
-            <div id="ui-score-box" class="relative bg-slate-800/90 px-1.5 py-0.5 rounded-lg border border-slate-700 flex items-baseline gap-1">
-              <span class="text-[8px] sm:text-[10px] text-amber-300 font-bold tracking-wider uppercase">SCORE</span>
-              <span id="ui-score" class="font-digital text-sm sm:text-lg font-bold text-white leading-none">0</span>
-              <div id="ui-score-delta-anchor" class="absolute -bottom-5 left-1/2 -translate-x-1/2 pointer-events-none z-30"></div>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-1">
+          <!-- Row 1 (Mobile) / Left (PC): Mode Badge, Score, Combo, Customer & Time -->
+          <div class="flex items-center justify-between sm:justify-start gap-1 sm:gap-1.5 flex-wrap min-w-0">
+            <div class="flex items-center gap-1 sm:gap-1.5 flex-wrap min-w-0">
+              <span id="ui-mode-badge" class="text-[9px] sm:text-[11px] font-black px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950 leading-none">
+                NORMAL
+              </span>
+              <span id="ui-rule-badge" class="text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded bg-cyan-500/25 text-cyan-200 border border-cyan-400/60 leading-none">
+                👛財布最小
+              </span>
+              <div id="ui-score-box" class="relative bg-slate-800/90 px-1.5 py-0.5 rounded-lg border border-slate-700 flex items-baseline gap-1">
+                <span class="text-[8px] sm:text-[10px] text-amber-300 font-bold tracking-wider uppercase">SCORE</span>
+                <span id="ui-score" class="font-digital text-sm sm:text-lg font-bold text-white leading-none">0</span>
+                <div id="ui-score-delta-anchor" class="absolute -bottom-5 left-1/2 -translate-x-1/2 pointer-events-none z-30"></div>
+              </div>
+
+              <div id="ui-combo-badge" class="hidden bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 px-1.5 py-0.5 rounded-lg font-black text-[9px] sm:text-[11px] leading-none shadow">
+                <span id="ui-combo-text">2連鎖</span>
+              </div>
+
+              <div id="ui-zone-badge" class="hidden bg-gradient-to-r from-fuchsia-500 via-indigo-500 to-cyan-400 text-white px-2 py-0.5 rounded-lg font-black text-[9px] sm:text-[11px] leading-none shadow animate-pulse border border-white/50">
+                ⚡ 神域ZONE ×2.5
+              </div>
+
+              <div class="flex items-center gap-0.5 text-[10px] sm:text-xs text-slate-300 bg-slate-800/80 px-1.5 py-0.5 rounded-lg border border-slate-700 leading-none">
+                <span>👤</span>
+                <span id="ui-customer-count" class="font-bold text-amber-300">1</span><span class="text-[9px]">人目</span>
+              </div>
             </div>
 
-            <div id="ui-combo-badge" class="hidden bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 px-1.5 py-0.5 rounded-lg font-black text-[9px] sm:text-[11px] leading-none shadow">
-              <span id="ui-combo-text">2連鎖</span>
-            </div>
-
-            <div id="ui-zone-badge" class="hidden bg-gradient-to-r from-fuchsia-500 via-indigo-500 to-cyan-400 text-white px-2 py-0.5 rounded-lg font-black text-[9px] sm:text-[11px] leading-none shadow animate-pulse border border-white/50">
-              ⚡ 神域ZONE ×2.5
-            </div>
-
-            <div class="flex items-center gap-0.5 text-[10px] sm:text-xs text-slate-300 bg-slate-800/80 px-1.5 py-0.5 rounded-lg border border-slate-700 leading-none">
-              <span>👤</span>
-              <span id="ui-customer-count" class="font-bold text-amber-300">1</span><span class="text-[9px]">人目</span>
-            </div>
-          </div>
-
-          <!-- Right: Time Left, Change Toggle, BGM, SE, Mode & Title Buttons -->
-          <div class="flex items-center gap-1">
-            <div class="relative flex items-center bg-slate-800/90 px-1.5 py-0.5 rounded-lg border border-slate-700">
+            <div class="relative flex items-center bg-slate-800/90 px-1.5 py-0.5 rounded-lg border border-slate-700 shrink-0">
               <span class="text-[9px] sm:text-[10px] text-emerald-300 font-bold mr-0.5">残</span>
               <span id="ui-time-text" class="font-digital text-sm sm:text-lg font-bold text-white leading-none">60.0</span>
               <span id="ui-time-unit" class="text-[8px] sm:text-[10px] text-slate-400 ml-0.5">s</span>
               <div id="ui-time-bonus-anchor" class="absolute -bottom-5 right-0 pointer-events-none z-30"></div>
             </div>
+          </div>
 
+          <!-- Row 2 (Mobile) / Right (PC): Control Buttons (Wrapped safely so Home button never clips) -->
+          <div class="flex items-center justify-end gap-1 flex-wrap">
             <!-- Change Display ON/OFF Toggle Button -->
             <button id="btn-hud-change-toggle" class="btn-3d bg-emerald-900/90 hover:bg-emerald-800 border border-emerald-400 text-emerald-200 font-extrabold text-[9px] sm:text-[10px] px-1.5 h-6 sm:h-7 rounded-lg flex items-center justify-center gap-0.5 shadow shrink-0" title="お釣り表示 ON/OFF">
               <span id="hud-change-icon">👁️</span>
@@ -1861,8 +1863,8 @@
               <span id="hud-dopa-label" class="hidden sm:inline">ドパOFF</span>
             </button>
 
-            <!-- Popup Opacity Quick Toggle Button -->
-            <button id="btn-hud-popup-opacity" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-amber-400/70 text-amber-200 font-black text-[9px] sm:text-[10px] px-1.5 h-6 sm:h-7 rounded-lg flex items-center justify-center gap-0.5 shadow shrink-0" title="ポップ透明度を切り替え（50% / 30% / 15% / 0% / 80% / 100%）">
+            <!-- Popup Transparency Quick Toggle Button (0%=不透明, 100%=完全透明) -->
+            <button id="btn-hud-popup-opacity" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-amber-400/70 text-amber-200 font-black text-[9px] sm:text-[10px] px-1.5 h-6 sm:h-7 rounded-lg flex items-center justify-center gap-0.5 shadow shrink-0" title="ポップ透明度を切り替え（0%=クッキリ / 50%=半透明 / 100%=完全透明）">
               <span>👻</span>
               <span id="hud-popup-opacity-label" class="font-digital">50%</span>
             </button>
@@ -1882,8 +1884,8 @@
               📳
             </button>
 
-            <!-- PC Key Config Button -->
-            <button id="btn-hud-keyconfig" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-sky-400/70 w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center text-xs shadow shrink-0" title="PCキー設定変更">
+            <!-- PC Key Config Button (PC only so mobile HUD stays clean) -->
+            <button id="btn-hud-keyconfig" class="hidden sm:flex btn-3d bg-slate-800 hover:bg-slate-700 border border-sky-400/70 w-6 h-6 sm:w-7 sm:h-7 rounded-lg items-center justify-center text-xs shadow shrink-0" title="PCキー設定変更">
               ⌨️
             </button>
 
@@ -1936,6 +1938,24 @@
         </div>
         <!-- 3人以上対戦時のリアルタイム上位ミニランキング帯 -->
         <div id="vs-multi-mini-board" class="hidden mt-1 pt-1 border-t border-fuchsia-500/30 flex items-center gap-1.5 overflow-x-auto text-[9px] sm:text-[10px] leading-none"></div>
+      </div>
+
+      <!-- VERSUS JAMMER MODE ULTRA-SLIM HP BAR (Moved to Top HUD so 3D tray is unobstructed) -->
+      <div id="vs-hp-bar-wrap" class="hidden mt-1">
+        <div id="vs-hp-bar-card" class="bg-slate-950/90 backdrop-blur-md border border-emerald-400/80 rounded-xl px-2 py-0.5 shadow flex items-center gap-2">
+          <div class="flex items-center gap-1 shrink-0 leading-none">
+            <span class="text-[11px]">❤️</span>
+            <span class="text-[9px] sm:text-[10px] font-black text-white tracking-wider">HP</span>
+            <span id="vs-hp-zone-atk-badge" class="hidden text-[8px] sm:text-[9px] font-black px-1 py-0.5 rounded-full bg-gradient-to-r from-fuchsia-500 to-amber-400 text-slate-950 animate-pulse">⚡×1.5</span>
+          </div>
+          <div class="flex-1 h-2 bg-slate-800/95 rounded-full overflow-hidden border border-slate-700">
+            <div id="vs-hp-fill" class="h-full bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 rounded-full transition-all duration-200" style="width: 100%;"></div>
+          </div>
+          <div class="flex items-center gap-1 shrink-0 leading-none">
+            <span id="vs-hp-dmg-popup" class="font-digital text-[10px] font-black text-rose-400"></span>
+            <span id="vs-hp-text" class="font-digital text-[10px] sm:text-xs font-black text-emerald-300">1500/1500</span>
+          </div>
+        </div>
       </div>
 
       <!-- ULTRA-COMPACT POS REGISTER BAR -->
@@ -2039,29 +2059,9 @@
 
     <!-- BOTTOM WALLET & ACTION CONTROLS -->
     <footer class="w-full max-w-3xl mx-auto pointer-events-auto">
-      <!-- VERSUS JAMMER MODE HP BAR + 3 ITEM BUTTONS (HEAL / STUN / CRASH) -->
-      <div id="vs-hp-bar-wrap" class="hidden px-2 sm:px-4 mb-1.5 pointer-events-none">
-        <div class="max-w-2xl mx-auto space-y-1">
-          <!-- Row 1: HP Bar -->
-          <div id="vs-hp-bar-card" class="max-w-md mx-auto bg-slate-950/90 backdrop-blur-md border-2 border-emerald-400/80 rounded-2xl px-2.5 sm:px-3 py-1 shadow-[0_4px_18px_rgba(0,0,0,0.75)] relative flex flex-col justify-center">
-            <div class="flex items-center justify-between gap-1.5 mb-1 leading-none">
-              <div class="flex items-center gap-1 min-w-0">
-                <span class="text-xs sm:text-sm shrink-0">❤️</span>
-                <span class="text-[10px] sm:text-xs font-black text-white tracking-wider shrink-0">YOUR HP</span>
-                <span id="vs-hp-zone-atk-badge" class="hidden text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded-full bg-gradient-to-r from-fuchsia-500 to-amber-400 text-slate-950 animate-pulse shrink-0">⚡×1.5</span>
-              </div>
-              <div class="flex items-center gap-1.5 shrink-0">
-                <span id="vs-hp-dmg-popup" class="font-digital text-[11px] sm:text-xs font-black text-rose-400"></span>
-                <span id="vs-hp-text" class="font-digital text-xs sm:text-sm font-black text-emerald-300">1500 / 1500</span>
-              </div>
-            </div>
-            <div class="w-full h-2.5 sm:h-3 bg-slate-800/95 rounded-full overflow-hidden border border-slate-700">
-              <div id="vs-hp-fill" class="h-full bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 rounded-full transition-all duration-200" style="width: 100%;"></div>
-            </div>
-          </div>
-
-          <!-- Row 2: 3 Item Buttons (Auto 3s / Stun / Tray Jammer Coins) -->
-          <div id="vs-items-row" class="hidden max-w-md mx-auto grid grid-cols-3 gap-1.5">
+      <!-- VERSUS JAMMER MODE 3 ITEM BUTTONS (Compact 1-row above wallet) -->
+      <div class="px-2 sm:px-4 mb-1 pointer-events-none">
+        <div id="vs-items-row" class="hidden max-w-md mx-auto grid grid-cols-3 gap-1.5">
             <!-- Auto (3s automatic PERFECT play) -->
             <button id="btn-vs-item-auto" type="button" disabled class="hidden pointer-events-auto btn-3d bg-gradient-to-b from-cyan-500 to-blue-700 hover:from-cyan-400 hover:to-blue-600 text-white rounded-xl border-2 border-cyan-300 px-1.5 py-1 shadow-lg flex flex-col items-center justify-center leading-tight disabled:opacity-45 disabled:grayscale disabled:cursor-not-allowed relative">
               <span id="key-hint-item-auto" class="hidden sm:inline-block absolute -top-2 -left-1 font-digital text-[9px] font-black px-1.5 py-0.5 rounded bg-slate-950 text-cyan-300 border border-cyan-400 leading-none">G</span>
@@ -2082,7 +2082,6 @@
               <div class="text-[10px] sm:text-xs font-black flex items-center gap-0.5"><span>💣</span><span>お邪魔送り</span><span id="vs-item-trayjam-uses" class="text-[9px] px-1 rounded bg-slate-950/75 text-rose-200">残3</span></div>
               <div id="vs-item-trayjam-sub" class="text-[9px] sm:text-[10px] font-extrabold text-rose-100 mt-0.5">あと3回神</div>
             </button>
-          </div>
         </div>
       </div>
 
@@ -6258,6 +6257,11 @@
           const vsRect = vsBar.getBoundingClientRect();
           if (vsRect.bottom > topBarBottom) topBarBottom = vsRect.bottom;
         }
+        const vsHpWrap = document.getElementById('vs-hp-bar-wrap');
+        if (vsHpWrap && !vsHpWrap.classList.contains('hidden')) {
+          const hpRect = vsHpWrap.getBoundingClientRect();
+          if (hpRect.bottom > topBarBottom) topBarBottom = hpRect.bottom;
+        }
         if (tutBanner && !tutBanner.classList.contains('hidden')) {
           const tutRect = tutBanner.getBoundingClientRect();
           if (tutRect.bottom > topBarBottom) topBarBottom = tutRect.bottom;
@@ -7710,6 +7714,8 @@
         document.getElementById('vs-opponent-bar').classList.add('hidden');
         const hpWrap = document.getElementById('vs-hp-bar-wrap');
         if (hpWrap) hpWrap.classList.add('hidden');
+        const itemsRowLobby = document.getElementById('vs-items-row');
+        if (itemsRowLobby) itemsRowLobby.classList.add('hidden');
 
         const nameInput = document.getElementById('input-vs-name');
         if (nameInput) nameInput.value = RankingManager.getSavedPlayerName() || this.game.playerName || '';
@@ -9538,6 +9544,7 @@
         document.getElementById('ui-judgment-overlay').classList.add('hidden');
         document.getElementById('vs-opponent-bar').classList.add('hidden');
         document.getElementById('vs-hp-bar-wrap').classList.add('hidden');
+        const itR = document.getElementById('vs-items-row'); if (itR) itR.classList.add('hidden');
         const tjB = document.getElementById('vs-tray-jammer-banner'); if (tjB) tjB.classList.add('hidden');
         const auB = document.getElementById('vs-auto-banner'); if (auB) auB.classList.add('hidden');
         if (this.game) { this.game.vsAutoTimeLeft = 0; }
@@ -10277,7 +10284,7 @@
         if (btnHudOpacity) {
           btnHudOpacity.addEventListener('click', () => {
             sound.playClick();
-            const steps = [50, 30, 15, 0, 80, 100];
+            const steps = [50, 70, 85, 100, 20, 0];
             const idx = steps.indexOf(this.popupOpacityPct);
             const nextVal = steps[(idx + 1) % steps.length];
             this.applyPopupOpacity(nextVal, true);
@@ -12056,7 +12063,9 @@
       applyPopupOpacity(pct, save = true) {
         const clamped = Math.max(0, Math.min(100, Math.round(Number(pct))));
         this.popupOpacityPct = isNaN(clamped) ? 50 : clamped;
-        document.documentElement.style.setProperty('--popup-opacity', String(this.popupOpacityPct / 100));
+        // 透明度: 0% = クッキリ表示(opacity:1), 50% = 半透明(0.5), 100% = 完全透明(opacity:0)
+        const cssOpacity = (100 - this.popupOpacityPct) / 100;
+        document.documentElement.style.setProperty('--popup-opacity', String(cssOpacity));
         if (save) {
           try {
             localStorage.setItem(POPUP_OPACITY_STORAGE_KEY, String(this.popupOpacityPct));
@@ -12330,6 +12339,8 @@
         if (!wrap) return;
         if (!this.isVersusJammerMode()) {
           wrap.classList.add('hidden');
+          const itemsRow = document.getElementById('vs-items-row');
+          if (itemsRow) itemsRow.classList.add('hidden');
           return;
         }
         wrap.classList.remove('hidden');
@@ -12345,10 +12356,10 @@
         const dmgPopup = document.getElementById('vs-hp-dmg-popup');
 
         if (hpText) {
-          hpText.textContent = `${curHp} / ${maxHp}`;
+          hpText.textContent = `${curHp}/${maxHp}`;
           hpText.className = pct <= 30
-            ? 'font-digital text-xs sm:text-sm font-black text-rose-400 animate-pulse'
-            : (pct <= 60 ? 'font-digital text-xs sm:text-sm font-black text-amber-300' : 'font-digital text-xs sm:text-sm font-black text-emerald-300');
+            ? 'font-digital text-[10px] sm:text-xs font-black text-rose-400 animate-pulse'
+            : (pct <= 60 ? 'font-digital text-[10px] sm:text-xs font-black text-amber-300' : 'font-digital text-[10px] sm:text-xs font-black text-emerald-300');
         }
         if (hpFill) {
           hpFill.style.width = `${pct}%`;
@@ -12360,10 +12371,10 @@
         }
         if (hpCard) {
           hpCard.className = pct <= 30
-            ? 'max-w-md mx-auto bg-rose-950/90 backdrop-blur-md border-2 border-rose-500 rounded-2xl px-3 py-1.5 shadow-[0_0_20px_rgba(244,63,94,0.65)] relative'
+            ? 'bg-rose-950/90 backdrop-blur-md border border-rose-500 rounded-xl px-2 py-0.5 shadow-[0_0_12px_rgba(244,63,94,0.65)] flex items-center gap-2'
             : (this.scene3D && this.scene3D.isZoneActive
-              ? 'max-w-md mx-auto bg-slate-950/90 backdrop-blur-md border-2 border-fuchsia-400 rounded-2xl px-3 py-1.5 shadow-[0_0_18px_rgba(232,121,249,0.55)] relative'
-              : 'max-w-md mx-auto bg-slate-950/90 backdrop-blur-md border-2 border-emerald-400/80 rounded-2xl px-3 py-1.5 shadow-[0_4px_18px_rgba(0,0,0,0.75)] relative');
+              ? 'bg-slate-950/90 backdrop-blur-md border border-fuchsia-400 rounded-xl px-2 py-0.5 shadow-[0_0_12px_rgba(232,121,249,0.55)] flex items-center gap-2'
+              : 'bg-slate-950/90 backdrop-blur-md border border-emerald-400/80 rounded-xl px-2 py-0.5 shadow flex items-center gap-2');
         }
         if (zoneAtkBadge) {
           zoneAtkBadge.classList.toggle('hidden', !(this.scene3D && this.scene3D.isZoneActive));

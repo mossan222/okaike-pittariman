@@ -708,25 +708,45 @@
       0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(-3deg); }
       50% { transform: translate(-50%, -50%) scale(1.06) rotate(3deg); }
     }
+    #vs-screen-jammer-layer.is-blocking {
+      pointer-events: auto !important;
+      background: rgba(69, 10, 10, 0.22);
+      touch-action: none;
+    }
     .vs-screen-jammer-coin {
       position: fixed;
       pointer-events: auto;
-      z-index: 68;
-      width: 68px;
-      height: 68px;
+      z-index: 69;
+      width: clamp(120px, 34vmin, 186px);
+      height: clamp(120px, 34vmin, 186px);
       border-radius: 9999px;
+      padding: 0;
+      margin: 0;
+      border: none;
+      background: transparent;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at 30% 30%, #fda4af 0%, #e11d48 55%, #881337 100%);
-      border: 3px solid #fef08a;
-      box-shadow: 0 0 22px rgba(244, 63, 94, 0.95), 0 6px 16px rgba(0, 0, 0, 0.75);
       cursor: pointer;
       touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
       animation: screenJammerPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards, screenJammerWobble 1.1s 0.25s ease-in-out infinite;
     }
+    .vs-screen-jammer-coin-inner {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      filter: sepia(0.72) hue-rotate(-50deg) saturate(3.2) brightness(0.94) contrast(1.06) drop-shadow(0 10px 22px rgba(136, 19, 55, 0.8));
+    }
+    .vs-screen-jammer-coin-inner svg {
+      width: 100% !important;
+      height: 100% !important;
+    }
     .vs-screen-jammer-coin:active {
-      transform: translate(-50%, -50%) scale(0.85) !important;
+      transform: translate(-50%, -50%) scale(0.88) !important;
     }
     /* === VERSUS MATCH START INTRO MOTION (VIDEO-INSPIRED SPLIT + SHATTER) === */
     @keyframes vsIntroBoltSlash {
@@ -6621,6 +6641,7 @@
 
       onPointerDown(e) {
         if (this.isTitleMode || !window.game || window.game.state !== 'PLAYING') return;
+        if (typeof window.game.getScreenJammerCount === 'function' && window.game.getScreenJammerCount() > 0) return;
 
         const rect = this.renderer.domElement.getBoundingClientRect();
         this.pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -10718,6 +10739,10 @@
 
           // 2. ゲームプレイ中のPCキー操作
           if (this.state !== 'PLAYING') return;
+          if (this.getScreenJammerCount() > 0) {
+            e.preventDefault();
+            return;
+          }
           if (e.repeat || e.isComposing || e.ctrlKey || e.metaKey || e.altKey) return;
 
           const activeEl = document.activeElement;
@@ -12199,6 +12224,22 @@
 
       updateScreenJammerLockUI() {
         const locked = this.getScreenJammerCount() > 0;
+        const layer = document.getElementById('vs-screen-jammer-layer');
+        if (layer) {
+          layer.classList.toggle('is-blocking', locked);
+          if (!layer.dataset.blockBound) {
+            layer.dataset.blockBound = '1';
+            const swallow = (e) => {
+              if (this.getScreenJammerCount() > 0 && e.target === layer) {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            };
+            layer.addEventListener('pointerdown', swallow);
+            layer.addEventListener('click', swallow);
+            layer.addEventListener('touchstart', swallow, { passive: false });
+          }
+        }
         const checkoutBtn = document.getElementById('btn-checkout');
         if (checkoutBtn) {
           checkoutBtn.disabled = locked;
@@ -12216,7 +12257,7 @@
         const cnt = this.getScreenJammerCount();
         if (cnt > 0 && (this.state === 'PLAYING' || this.state === 'JUDGING')) {
           banner.classList.remove('hidden');
-          if (txt) txt.textContent = `画面にお邪魔コインが 残り ${cnt}枚！すべてタップして消すまでお会計・アイテム不可！`;
+          if (txt) txt.textContent = `画面にお邪魔コインが 残り ${cnt}枚！すべてタップして消すまで操作不可！`;
         } else {
           banner.classList.add('hidden');
         }
@@ -12283,13 +12324,13 @@
           const d = COIN_DENOMS.includes(Number(rawD)) ? Number(rawD) : 1;
           countByDenom[d] = (countByDenom[d] || 0) + 1;
 
-          // 画面全体にバランスよく散らす（なるべく重ならないように配置）
+          // 画面全体を埋め尽くすように大きくバランスよく配置
           let bestX = 50;
-          let bestY = 48;
+          let bestY = 50;
           let bestDist = -1;
-          for (let attempt = 0; attempt < 24; attempt++) {
-            const cx = 12 + Math.random() * 76; // 12%〜88%
-            const cy = 16 + Math.random() * 68; // 16%〜84%
+          for (let attempt = 0; attempt < 32; attempt++) {
+            const cx = 16 + Math.random() * 68; // 16%〜84%
+            const cy = 15 + Math.random() * 70; // 15%〜85%
             let minDist = 999;
             for (const p of placed) {
               const dist = Math.hypot(cx - p.x, cy - p.y);
@@ -12299,7 +12340,7 @@
               bestDist = minDist;
               bestX = cx;
               bestY = cy;
-              if (minDist >= 16) break;
+              if (minDist >= 26) break;
             }
           }
           placed.push({ x: bestX, y: bestY });
@@ -12312,9 +12353,8 @@
           btn.style.top = `${bestY.toFixed(1)}%`;
           btn.setAttribute('aria-label', `お邪魔コイン ${d}円 タップして取り除く`);
           btn.innerHTML = `
-            <div class="relative w-14 h-14 flex items-center justify-center pointer-events-none">
+            <div class="vs-screen-jammer-coin-inner">
               ${this.getCoinIllustrationSVG(d, false)}
-              <span class="absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full bg-rose-600 text-white border-2 border-white text-xs font-black flex items-center justify-center shadow">✕</span>
             </div>
           `;
           btn.addEventListener('pointerdown', (e) => {
@@ -12347,7 +12387,7 @@
         this.updateTrayJammerBanner();
         this.updateScreenJammerLockUI();
         if (this.vsScreenJammerCoins.length === 0) {
-          this.showVersusJammerToast('✨ お邪魔コインをすべて除去！お会計＆アイテム復帰！', false);
+          this.showVersusJammerToast('✨ お邪魔コインをすべて除去！操作復帰！', false);
         }
       }
 
@@ -13374,7 +13414,7 @@
       }
 
       putMoneyOnTray(denom) {
-        if (this.state !== 'PLAYING' || this.vsStunTimeLeft > 0) return;
+        if (this.state !== 'PLAYING' || this.vsStunTimeLeft > 0 || this.getScreenJammerCount() > 0) return;
         if ((this.wallet[denom] || 0) <= 0) return;
 
         this.wallet[denom]--;
@@ -13424,7 +13464,7 @@
       }
 
       removeSpecificItemFromTray(id) {
-        if (this.state !== 'PLAYING' || this.vsStunTimeLeft > 0) return;
+        if (this.state !== 'PLAYING' || this.vsStunTimeLeft > 0 || this.getScreenJammerCount() > 0) return;
         const idx = this.trayList.findIndex(it => it.id === id);
         if (idx === -1) return;
 
@@ -13442,7 +13482,7 @@
       }
 
       removeDenomFromTray(denom) {
-        if (this.state !== 'PLAYING' || this.vsStunTimeLeft > 0) return;
+        if (this.state !== 'PLAYING' || this.vsStunTimeLeft > 0 || this.getScreenJammerCount() > 0) return;
         for (let i = this.trayList.length - 1; i >= 0; i--) {
           if (this.trayList[i].denom === denom) {
             this.removeSpecificItemFromTray(this.trayList[i].id);
@@ -13452,7 +13492,7 @@
       }
 
       returnAllTrayToWallet() {
-        if (this.vsStunTimeLeft > 0) return;
+        if (this.vsStunTimeLeft > 0 || this.getScreenJammerCount() > 0) return;
         if (this.trayList.length === 0) return;
         for (const item of this.trayList) {
           if (!item.isJammerTrayCoin) {

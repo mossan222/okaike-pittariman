@@ -36,6 +36,13 @@
   <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
   <style>
+    :root {
+      --popup-opacity: 0.5;
+    }
+    .popup-opacity-target {
+      opacity: var(--popup-opacity, 0.5) !important;
+      transition: opacity 0.12s ease;
+    }
     * {
       box-sizing: border-box;
       user-select: none;
@@ -780,7 +787,7 @@
   <div id="canvas-container"></div>
 
   <!-- 2. 3D Clerk Head-Tracked Floating Speech Bubble (Active during Gameplay) -->
-  <div id="clerk-bubble" class="fixed z-20 hidden pointer-events-none" style="left: 12px; top: 110px;">
+  <div id="clerk-bubble" class="popup-opacity-target fixed z-20 hidden pointer-events-none" style="left: 12px; top: 110px;">
     <div id="clerk-bubble-box" class="relative bg-white/95 text-slate-900 border-2 border-amber-400 rounded-2xl px-2.5 py-1.5 sm:px-3.5 sm:py-2 shadow-2xl max-w-[225px] sm:max-w-[300px] flex items-center gap-1.5">
       <span id="clerk-bubble-icon" class="text-base sm:text-xl shrink-0 leading-none">💁‍♀️</span>
       <p id="clerk-bubble-text" class="text-[10px] sm:text-xs font-extrabold leading-snug text-slate-800">
@@ -807,15 +814,15 @@
   </div>
 
   <!-- ZONE SHOCKWAVE & CUT-IN OVERLAY (#zone-shockwave-layer) -->
-  <div id="zone-shockwave-layer" class="fixed inset-0 z-50 hidden pointer-events-none items-center justify-center overflow-hidden"></div>
+  <div id="zone-shockwave-layer" class="popup-opacity-target fixed inset-0 z-50 hidden pointer-events-none items-center justify-center overflow-hidden"></div>
 
   <!-- BILL REDUCTION LIGHTNING BONUS FX OVERLAY (#lightning-fx-layer) -->
-  <div id="lightning-fx-layer" class="fixed inset-0 z-[65] pointer-events-none overflow-hidden" style="z-index: 65;" aria-hidden="true"></div>
+  <div id="lightning-fx-layer" class="popup-opacity-target fixed inset-0 z-[65] pointer-events-none overflow-hidden" style="z-index: 65;" aria-hidden="true"></div>
 
   <!-- DOPAGAKI RAINBOW LED FRAME & FX OVERLAY (pointer-events-none: zero gameplay impact) -->
   <div id="dopa-rainbow-frame" aria-hidden="true"></div>
-  <div id="dopa-fx-layer" class="fixed inset-0 z-30 pointer-events-none overflow-hidden" aria-hidden="true"></div>
-  <div id="vs-fx-layer" class="fixed inset-0 z-[70] pointer-events-none overflow-hidden" style="z-index: 70;" aria-hidden="true"></div>
+  <div id="dopa-fx-layer" class="popup-opacity-target fixed inset-0 z-30 pointer-events-none overflow-hidden" aria-hidden="true"></div>
+  <div id="vs-fx-layer" class="popup-opacity-target fixed inset-0 z-[70] pointer-events-none overflow-hidden" style="z-index: 70;" aria-hidden="true"></div>
 
   <!-- VERSUS RULE ROULETTE OVERLAY (#vs-roulette-overlay) -->
   <div id="vs-roulette-overlay" class="fixed inset-0 z-[76] hidden items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md select-none" style="z-index: 76;"></div>
@@ -885,6 +892,16 @@
         <button id="btn-title-toggle-rule" class="btn-3d shrink-0 whitespace-nowrap px-2.5 sm:px-3 py-1.5 rounded-xl font-black text-xs border-2 bg-cyan-500/20 border-cyan-400 text-cyan-200 hover:bg-cyan-500/30 shadow">
           🔄 ルール切替
         </button>
+      </div>
+
+      <!-- Popup Opacity Slider on Title Screen -->
+      <div class="bg-slate-950/85 border border-slate-700/80 rounded-2xl px-3 py-2 mb-3 flex items-center justify-between gap-2.5 text-left">
+        <div class="flex items-center gap-1.5 shrink-0">
+          <span class="text-sm">👻</span>
+          <span class="text-[11px] sm:text-xs font-black text-slate-200">ポップ透明度</span>
+          <span id="title-popup-opacity-val" class="font-digital text-xs font-black text-amber-300 w-9 text-right">50%</span>
+        </div>
+        <input id="slider-title-popup-opacity" type="range" min="0" max="100" step="5" value="50" class="flex-1 accent-amber-400 cursor-pointer h-2 bg-slate-800 rounded-lg" />
       </div>
 
       <!-- Rule Summary Cards -->
@@ -1046,6 +1063,16 @@
             <span id="mode-dopa-text">ドパガキ: OFF</span>
           </button>
         </div>
+      </div>
+
+      <!-- Popup Opacity Slider on Mode Screen -->
+      <div class="bg-slate-950/85 border border-slate-700/80 rounded-2xl px-3 py-2 mb-3 flex items-center justify-between gap-2.5 text-left">
+        <div class="flex items-center gap-1.5 shrink-0">
+          <span class="text-sm">👻</span>
+          <span class="text-[11px] sm:text-xs font-black text-slate-200">ポップ透明度</span>
+          <span id="mode-popup-opacity-val" class="font-digital text-xs font-black text-amber-300 w-9 text-right">50%</span>
+        </div>
+        <input id="slider-mode-popup-opacity" type="range" min="0" max="100" step="5" value="50" class="flex-1 accent-amber-400 cursor-pointer h-2 bg-slate-800 rounded-lg" />
       </div>
 
       <!-- Mode Cards -->
@@ -1834,6 +1861,12 @@
               <span id="hud-dopa-label" class="hidden sm:inline">ドパOFF</span>
             </button>
 
+            <!-- Popup Opacity Quick Toggle Button -->
+            <button id="btn-hud-popup-opacity" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-amber-400/70 text-amber-200 font-black text-[9px] sm:text-[10px] px-1.5 h-6 sm:h-7 rounded-lg flex items-center justify-center gap-0.5 shadow shrink-0" title="ポップ透明度を切り替え（50% / 30% / 15% / 0% / 80% / 100%）">
+              <span>👻</span>
+              <span id="hud-popup-opacity-label" class="font-digital">50%</span>
+            </button>
+
             <!-- BGM Toggle Button -->
             <button id="btn-bgm-toggle" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-slate-600 px-1.5 h-6 sm:h-7 rounded-lg flex items-center justify-center text-[10px] font-bold text-amber-300 shadow shrink-0" title="BGM ON/OFF">
               🎵
@@ -1961,6 +1994,18 @@
         </span>
       </div>
 
+      <!-- Versus Tray Jammer Warning Banner (Shown when jammer coins are on tray) -->
+      <div id="vs-tray-jammer-banner" class="hidden mt-1 bg-rose-950/95 border-2 border-rose-400 rounded-xl px-2.5 py-1 flex items-center justify-between gap-2 shadow-lg animate-pulse">
+        <span class="bg-rose-500 text-white font-black text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full shrink-0">💣 お邪魔混入!</span>
+        <span id="vs-tray-jammer-text" class="text-[10px] sm:text-xs font-black text-rose-100 flex-1 text-left">トレイにお邪魔コインが残っています！すべて戻さないとPERFECT不可！</span>
+      </div>
+
+      <!-- Versus Auto Item Active Banner -->
+      <div id="vs-auto-banner" class="hidden mt-1 bg-cyan-950/95 border-2 border-cyan-300 rounded-xl px-2.5 py-1 flex items-center justify-between gap-2 shadow-lg">
+        <span class="bg-cyan-400 text-slate-950 font-black text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full shrink-0 animate-pulse">🤖 AUTO発動中</span>
+        <span id="vs-auto-timer-text" class="font-digital text-xs sm:text-sm font-black text-cyan-200 flex-1 text-left">3秒間オート神会計！ 残り 3.0s</span>
+      </div>
+
       <!-- Tutorial Step Progress Banner (Shown only in Tutorial Mode) -->
       <div id="tutorial-banner" class="hidden mt-1 bg-sky-950/95 border border-sky-400 rounded-xl px-2.5 py-1 text-center flex items-center justify-between gap-2 shadow">
         <span id="tutorial-step-badge" class="bg-sky-400 text-slate-950 font-black text-[10px] px-2 py-0.5 rounded-full shrink-0">
@@ -1974,7 +2019,7 @@
 
     <!-- LOWER-CENTER OVERLAY FOR JUDGMENT POPUP -->
     <main class="relative flex-1 flex flex-col items-center justify-end pointer-events-none px-3 pb-2 sm:pb-3">
-      <div id="ui-judgment-overlay" class="hidden pointer-events-none z-30 flex flex-col items-center text-center max-w-md w-full">
+      <div id="ui-judgment-overlay" class="popup-opacity-target hidden pointer-events-none z-30 flex flex-col items-center text-center max-w-md w-full">
         <div id="ui-judgment-card" class="w-full bg-slate-900/95 backdrop-blur-md border-2 border-amber-400 rounded-2xl px-3.5 py-2 sm:px-5 sm:py-3 shadow-2xl">
           <div id="ui-judgment-badge" class="text-xl sm:text-3xl font-black tracking-wider mb-0.5 text-amber-300 drop-shadow">
             ✨ PERFECT!! ✨
@@ -2007,7 +2052,7 @@
               </div>
               <div class="flex items-center gap-1.5 shrink-0">
                 <span id="vs-hp-dmg-popup" class="font-digital text-[11px] sm:text-xs font-black text-rose-400"></span>
-                <span id="vs-hp-text" class="font-digital text-xs sm:text-sm font-black text-emerald-300">1000 / 1000</span>
+                <span id="vs-hp-text" class="font-digital text-xs sm:text-sm font-black text-emerald-300">1500 / 1500</span>
               </div>
             </div>
             <div class="w-full h-2.5 sm:h-3 bg-slate-800/95 rounded-full overflow-hidden border border-slate-700">
@@ -2015,13 +2060,13 @@
             </div>
           </div>
 
-          <!-- Row 2: 3 Item Buttons (Heal / Stun / Exchange Crash) -->
+          <!-- Row 2: 3 Item Buttons (Auto 3s / Stun / Tray Jammer Coins) -->
           <div id="vs-items-row" class="hidden max-w-md mx-auto grid grid-cols-3 gap-1.5">
-            <!-- Heal (+100 HP) -->
-            <button id="btn-vs-item-heal" type="button" disabled class="hidden pointer-events-auto btn-3d bg-gradient-to-b from-emerald-500 to-teal-700 hover:from-emerald-400 hover:to-teal-600 text-white rounded-xl border-2 border-emerald-300 px-1.5 py-1 shadow-lg flex flex-col items-center justify-center leading-tight disabled:opacity-45 disabled:grayscale disabled:cursor-not-allowed relative">
-              <span id="key-hint-item-heal" class="hidden sm:inline-block absolute -top-2 -left-1 font-digital text-[9px] font-black px-1.5 py-0.5 rounded bg-slate-950 text-emerald-300 border border-emerald-400 leading-none">G</span>
-              <div class="text-[10px] sm:text-xs font-black flex items-center gap-0.5"><span>💚</span><span>回復</span><span id="vs-item-heal-uses" class="text-[9px] px-1 rounded bg-slate-950/70 text-emerald-200">残3</span></div>
-              <div id="vs-item-heal-sub" class="text-[9px] sm:text-[10px] font-extrabold text-emerald-100 mt-0.5">あと3回神</div>
+            <!-- Auto (3s automatic PERFECT play) -->
+            <button id="btn-vs-item-auto" type="button" disabled class="hidden pointer-events-auto btn-3d bg-gradient-to-b from-cyan-500 to-blue-700 hover:from-cyan-400 hover:to-blue-600 text-white rounded-xl border-2 border-cyan-300 px-1.5 py-1 shadow-lg flex flex-col items-center justify-center leading-tight disabled:opacity-45 disabled:grayscale disabled:cursor-not-allowed relative">
+              <span id="key-hint-item-auto" class="hidden sm:inline-block absolute -top-2 -left-1 font-digital text-[9px] font-black px-1.5 py-0.5 rounded bg-slate-950 text-cyan-300 border border-cyan-400 leading-none">G</span>
+              <div class="text-[10px] sm:text-xs font-black flex items-center gap-0.5"><span>🤖</span><span>オート</span><span id="vs-item-auto-uses" class="text-[9px] px-1 rounded bg-slate-950/70 text-cyan-200">残3</span></div>
+              <div id="vs-item-auto-sub" class="text-[9px] sm:text-[10px] font-extrabold text-cyan-100 mt-0.5">あと3回神</div>
             </button>
 
             <!-- Stun (100 DMG + 2s Stun) -->
@@ -2031,11 +2076,11 @@
               <div id="vs-item-stun-sub" class="text-[9px] sm:text-[10px] font-extrabold text-slate-900 mt-0.5">あと3回神</div>
             </button>
 
-            <!-- Exchange Crash (Break 500/100 into 10/1 coins) -->
-            <button id="btn-vs-item-crash" type="button" disabled class="hidden pointer-events-auto btn-3d bg-gradient-to-b from-fuchsia-500 to-purple-800 hover:from-fuchsia-400 hover:to-purple-700 text-white rounded-xl border-2 border-fuchsia-300 px-1.5 py-1 shadow-lg flex flex-col items-center justify-center leading-tight disabled:opacity-45 disabled:grayscale disabled:cursor-not-allowed relative">
-              <span id="key-hint-item-crash" class="hidden sm:inline-block absolute -top-2 -right-1 font-digital text-[9px] font-black px-1.5 py-0.5 rounded bg-slate-950 text-fuchsia-300 border border-fuchsia-400 leading-none">Y</span>
-              <div class="text-[10px] sm:text-xs font-black flex items-center gap-0.5"><span>🔨</span><span>両替崩し</span><span id="vs-item-crash-uses" class="text-[9px] px-1 rounded bg-slate-950/75 text-fuchsia-200">残3</span></div>
-              <div id="vs-item-crash-sub" class="text-[9px] sm:text-[10px] font-extrabold text-fuchsia-100 mt-0.5">あと3回神</div>
+            <!-- Tray Jammer Coins (Send 3-5 jammer coins directly to opponent's tray) -->
+            <button id="btn-vs-item-trayjam" type="button" disabled class="hidden pointer-events-auto btn-3d bg-gradient-to-b from-rose-500 to-red-800 hover:from-rose-400 hover:to-red-700 text-white rounded-xl border-2 border-rose-300 px-1.5 py-1 shadow-lg flex flex-col items-center justify-center leading-tight disabled:opacity-45 disabled:grayscale disabled:cursor-not-allowed relative">
+              <span id="key-hint-item-trayjam" class="hidden sm:inline-block absolute -top-2 -right-1 font-digital text-[9px] font-black px-1.5 py-0.5 rounded bg-slate-950 text-rose-300 border border-rose-400 leading-none">Y</span>
+              <div class="text-[10px] sm:text-xs font-black flex items-center gap-0.5"><span>💣</span><span>お邪魔送り</span><span id="vs-item-trayjam-uses" class="text-[9px] px-1 rounded bg-slate-950/75 text-rose-200">残3</span></div>
+              <div id="vs-item-trayjam-sub" class="text-[9px] sm:text-[10px] font-extrabold text-rose-100 mt-0.5">あと3回神</div>
             </button>
           </div>
         </div>
@@ -2056,10 +2101,10 @@
         </div>
 
         <!-- Coins Row (500, 100, 50, 10, 5, 1) -->
-        <div id="wallet-coins-grid" class="grid grid-cols-6 gap-1.5 sm:gap-2.5 pt-1 mb-2"></div>
+        <div id="wallet-coins-grid" class="grid grid-cols-6 gap-1.5 sm:gap-2.5 pt-1 mb-3.5 sm:mb-4"></div>
 
-        <!-- Action Buttons Row -->
-        <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Action Buttons Row (Separated with clear gap & divider from coin return buttons) -->
+        <div class="flex items-center gap-2 sm:gap-3 pt-3 border-t border-slate-700/80">
           <button id="btn-reset-tray" class="btn-3d bg-slate-700 hover:bg-slate-600 active:bg-slate-800 text-slate-100 font-extrabold text-xs sm:text-base py-2.5 sm:py-3 px-3.5 sm:px-5 rounded-2xl border-b-4 border-slate-900 shadow-lg flex items-center justify-center gap-1.5 shrink-0">
             <span>↩️</span>
             <span>全戻し</span>
@@ -2315,7 +2360,7 @@
             🎲 完全ランダム生成
           </button>
         </div>
-        <div class="text-[10px] font-bold text-slate-400 mb-1">🎁 アイテム（HPお邪魔モード用：回復・スタン・両替崩し）</div>
+        <div class="text-[10px] font-bold text-slate-400 mb-1">🎁 アイテム（HPお邪魔モード用：オート3s・スタン・トレイお邪魔送り）</div>
         <div class="grid grid-cols-2 gap-1.5 mb-2.5">
           <button id="btn-vs-rand-items-on" type="button" class="btn-3d py-1.5 px-1.5 rounded-xl font-black text-[10px] sm:text-xs border-2 bg-amber-400 text-slate-950 border-white shadow">
             🎁 アイテムあり
@@ -2483,7 +2528,7 @@
 
         <!-- 1c. Jammer Items ON/OFF (Only when jammer selected) -->
         <div id="vs-jammer-items-row" class="hidden">
-          <div class="text-[10px] font-bold text-slate-400 mb-1">🎁 アイテム（回復+100 / スタン100+2s / 両替クラッシュ）</div>
+          <div class="text-[10px] font-bold text-slate-400 mb-1">🎁 アイテム（オート3秒 / スタン100+2s / お邪魔コイン3〜5枚送り）</div>
           <div class="grid grid-cols-2 gap-1.5">
             <button data-vs-set="itemsEnabled" data-vs-val="true" class="vs-opt-btn btn-3d py-1 px-2 rounded-xl text-[11px] font-black border-2">🎁 アイテムあり</button>
             <button data-vs-set="itemsEnabled" data-vs-val="false" class="vs-opt-btn btn-3d py-1 px-2 rounded-xl text-[11px] font-black border-2">🚫 アイテムなし</button>
@@ -2866,7 +2911,8 @@
     const RANKING_KEY_LUNATIC_10_10          = 'pittariman_ranking_lunatic_10p_10s';
     const RANKING_KEY_LUNATIC_10_15          = 'pittariman_ranking_lunatic_10p_15s';
     const PLAYER_NAME_STORAGE_KEY            = 'pittariman_player_name_v3';
-    const KEY_CONFIG_STORAGE_KEY             = 'pittariman_key_config_v4';
+    const KEY_CONFIG_STORAGE_KEY             = 'pittariman_key_config_v5';
+    const POPUP_OPACITY_STORAGE_KEY          = 'pittariman_popup_opacity_v1';
 
     const DEFAULT_KEY_BINDINGS = {
       '10000': 'KeyW',
@@ -2889,9 +2935,9 @@
       'ret_1': 'Comma',
       'checkout': 'Space',
       'reset': 'KeyB',
-      'item_heal': 'KeyG',
+      'item_auto': 'KeyG',
       'item_stun': 'KeyH',
-      'item_crash': 'KeyY'
+      'item_trayjam': 'KeyY'
     };
 
     const KEY_CONFIG_ITEMS = [
@@ -2915,9 +2961,9 @@
       { action: 'ret_1',     label: '↩️ 1円玉を戻す',      group: 'お金戻し' },
       { action: 'checkout',  label: '🔔 お会計！（決定）', group: '操作' },
       { action: 'reset',     label: '↩️ 全戻し',           group: '操作' },
-      { action: 'item_heal', label: '💚 回復アイテム (+100HP)', group: '対戦アイテム' },
+      { action: 'item_auto', label: '🤖 オートアイテム (3秒間オート神会計)', group: '対戦アイテム' },
       { action: 'item_stun', label: '⚡ スタンアイテム (100DMG+2秒痺れ)', group: '対戦アイテム' },
-      { action: 'item_crash', label: '🔨 両替クラッシュ (500/100円を10/1円に崩す)', group: '対戦アイテム' }
+      { action: 'item_trayjam', label: '💣 お邪魔送り (相手トレイに3〜5枚投入)', group: '対戦アイテム' }
     ];
 
     function normalizeKeyEventCode(e) {
@@ -6400,8 +6446,18 @@
         }
       }
 
-      spawnMoneyToTray(id, denom) {
+      spawnMoneyToTray(id, denom, isJammer = false) {
         const mesh = this.createMoneyMesh(denom);
+        if (isJammer && Array.isArray(mesh.material)) {
+          mesh.material = mesh.material.map((m) => {
+            const c = m.clone();
+            if (c.emissive) {
+              c.emissive.setHex(0xe11d48);
+              c.emissiveIntensity = 0.55;
+            }
+            return c;
+          });
+        }
         const startPos = new THREE.Vector3((Math.random() - 0.5) * 2.5, 1.8, 5.8);
         const target = this.computeTrayTargetPosition(denom);
         const targetPos = new THREE.Vector3(target.x, target.y, target.z);
@@ -7267,7 +7323,7 @@
         this.lastRoomData = null;
         this.matchLaunched = false;
         this.resultShown = false;
-        this.VS_JAMMER_MAX_HP = 1000;
+        this.VS_JAMMER_MAX_HP = 1500;
         this.lastJammerSeq = 0;
         this.lastReceivedDamage = 0;
         this.lastStampSeq = 0;
@@ -8520,8 +8576,8 @@
                 this.lastReceivedDamage = totalDmg;
               }
               const stunSec = Number(jam.stunSec || 0);
-              const isCrash = Boolean(jam.crashCoins);
-              if ((jam.c1 || 0) > 0 || (jam.c10 || 0) > 0 || deltaDmg > 0 || stunSec > 0 || isCrash) {
+              const trayJamCoins = Array.isArray(jam.trayJamCoins) ? jam.trayJamCoins : [];
+              if ((jam.c1 || 0) > 0 || (jam.c10 || 0) > 0 || deltaDmg > 0 || stunSec > 0 || trayJamCoins.length > 0) {
                 this.game.receiveVersusJammer(
                   jam.c1 || 0,
                   jam.c10 || 0,
@@ -8530,7 +8586,7 @@
                   deltaDmg,
                   Boolean(jam.isZone),
                   stunSec,
-                  isCrash
+                  trayJamCoins
                 );
               }
             }
@@ -8706,14 +8762,14 @@
           const existing = data.players ? data.players[slot] : null;
           if (existing && !existing.isBot && existing.connected !== false) {
             nextPlayers[slot] = this.makeEmptyPlayer(existing.name, false, existing.uid);
-            nextJammers[slot] = { seq: 0, c1: 0, c10: 0, damage: 0, totalDamage: 0, isZone: false, stunSec: 0, crashCoins: false, fromCombo: 0, fromName: '' };
+            nextJammers[slot] = { seq: 0, c1: 0, c10: 0, damage: 0, totalDamage: 0, isZone: false, stunSec: 0, trayJamCoins: null, fromCombo: 0, fromName: '' };
           } else if (fillWithBots) {
             const bName = this.BOT_NAMES[botIdx % this.BOT_NAMES.length];
             botIdx++;
             const uniqueName = usedBotNames.has(bName) ? `${bName}#${botIdx}` : bName;
             usedBotNames.add(uniqueName);
             nextPlayers[slot] = this.makeEmptyPlayer(uniqueName, true, `bot_${slot}_${Date.now()}`);
-            nextJammers[slot] = { seq: 0, c1: 0, c10: 0, damage: 0, totalDamage: 0, isZone: false, stunSec: 0, crashCoins: false, fromCombo: 0, fromName: '' };
+            nextJammers[slot] = { seq: 0, c1: 0, c10: 0, damage: 0, totalDamage: 0, isZone: false, stunSec: 0, trayJamCoins: null, fromCombo: 0, fromName: '' };
           }
         }
 
@@ -8893,9 +8949,9 @@
                 if ((jam.stunSec || 0) > 0) {
                   st.nextActionAt = Math.max(st.nextActionAt, now) + Math.round(jam.stunSec * 1000);
                 }
-                if (jam.crashCoins) {
-                  st.jammerHitCount += 10;
-                  st.nextActionAt = Math.max(st.nextActionAt, now) + 2200;
+                if (Array.isArray(jam.trayJamCoins) && jam.trayJamCoins.length > 0) {
+                  st.jammerHitCount += jam.trayJamCoins.length;
+                  st.nextActionAt = Math.max(st.nextActionAt, now) + 2600;
                   updates[`players/${st.slot}/jammerHitCount`] = st.jammerHitCount;
                 }
                 if (deltaDmg > 0) {
@@ -9257,7 +9313,7 @@
             totalDamage: prevTotalDmg + damage,
             isZone: Boolean(isZoneActive),
             stunSec: 0,
-            crashCoins: false,
+            trayJamCoins: null,
             fromCombo: comboCount,
             fromName: fromName || 'ライバル'
           };
@@ -9320,7 +9376,7 @@
             totalDamage: prevTotalDmg + stunDmg,
             isZone: false,
             stunSec: stunSec,
-            crashCoins: false,
+            trayJamCoins: null,
             fromCombo: this.game.combo || 1,
             fromName: this.game.playerName || 'ライバル'
           };
@@ -9334,7 +9390,7 @@
         return true;
       }
 
-      sendCrashItemAttack() {
+      sendTrayJammerItemAttack() {
         if (!this.roomRef || !this.lastRoomData || !this.mySlot) return false;
         const s = this.lastRoomData.settings || {};
         if (s.vsRule !== 'jammer') return false;
@@ -9347,6 +9403,12 @@
         if (candidates.length === 0) return false;
 
         const target = candidates[Math.floor(Math.random() * candidates.length)];
+        const count = 3 + Math.floor(Math.random() * 3); // 3〜5枚
+        const pool = [1, 5, 10, 50];
+        const trayJamCoins = [];
+        for (let i = 0; i < count; i++) {
+          trayJamCoins.push(pool[Math.floor(Math.random() * pool.length)]);
+        }
 
         this.roomRef.child('jammers/' + target.slot).transaction((cur) => {
           const nextSeq = (cur && typeof cur.seq === 'number' ? cur.seq : 0) + 1;
@@ -9359,7 +9421,7 @@
             totalDamage: prevTotalDmg,
             isZone: false,
             stunSec: 0,
-            crashCoins: true,
+            trayJamCoins: trayJamCoins,
             fromCombo: this.game.combo || 1,
             fromName: this.game.playerName || 'ライバル'
           };
@@ -9368,7 +9430,7 @@
         const costTxt = (this.game && typeof this.game.getVersusItemCost === 'function')
           ? this.game.getVersusItemCost().toLocaleString()
           : '20,000';
-        this.game.showVersusJammerToast(`🔨 両替クラッシュ発動!! ${target.player.name || '相手'} の大玉を小銭に粉砕!!（-${costTxt}pt）`, false);
+        this.game.showVersusJammerToast(`💣 お邪魔送り発動!! ${target.player.name || '相手'} のトレイに${count}枚投入!!（-${costTxt}pt）`, false);
         return true;
       }
 
@@ -9476,6 +9538,9 @@
         document.getElementById('ui-judgment-overlay').classList.add('hidden');
         document.getElementById('vs-opponent-bar').classList.add('hidden');
         document.getElementById('vs-hp-bar-wrap').classList.add('hidden');
+        const tjB = document.getElementById('vs-tray-jammer-banner'); if (tjB) tjB.classList.add('hidden');
+        const auB = document.getElementById('vs-auto-banner'); if (auB) auB.classList.add('hidden');
+        if (this.game) { this.game.vsAutoTimeLeft = 0; }
         document.getElementById('lunatic-banner').classList.add('hidden');
 
         const standings = this.getSortedStandings(data);
@@ -9655,15 +9720,18 @@
         this.isRankingRun = false;
         this.isVersusRun = false;
         this.vsSettings = null;
-        this.vsHp = 1000;
-        this.vsMaxHp = 1000;
+        this.vsHp = 1500;
+        this.vsMaxHp = 1500;
         this.vsKoDefeated = false;
         this.vsItemCharges = 0;
         this.vsItemPerfectProgress = 0;
-        this.vsHealUsesLeft = 3;
+        this.vsAutoUsesLeft = 3;
         this.vsStunUsesLeft = 3;
-        this.vsCrashUsesLeft = 3;
+        this.vsTrayJamUsesLeft = 3;
         this.vsStunTimeLeft = 0;
+        this.vsAutoTimeLeft = 0;
+        this.vsAutoStepCooldown = 0;
+        this.popupOpacityPct = this.loadPopupOpacity();
         this.vsRouletteTimers = [];
         this.runAnswerTimeSum = 0;
         this.runAnswerCount = 0;
@@ -9736,6 +9804,7 @@
         this.bindUIEvents();
         this.bindKeyboardEvents();
         this.syncKeyHintsUI();
+        this.applyPopupOpacity(this.popupOpacityPct, false);
         this.syncChangeToggleUI();
         this.syncHelperToggleUI();
         this.syncDopagakiUI();
@@ -10173,11 +10242,11 @@
           this.handleCheckout();
         });
 
-        const btnHeal = document.getElementById('btn-vs-item-heal');
-        if (btnHeal) {
-          btnHeal.addEventListener('click', () => {
+        const btnAuto = document.getElementById('btn-vs-item-auto');
+        if (btnAuto) {
+          btnAuto.addEventListener('click', () => {
             if (this.state !== 'PLAYING') return;
-            this.useVersusItem('heal');
+            this.useVersusItem('auto');
           });
         }
         const btnStun = document.getElementById('btn-vs-item-stun');
@@ -10187,11 +10256,31 @@
             this.useVersusItem('stun');
           });
         }
-        const btnCrash = document.getElementById('btn-vs-item-crash');
-        if (btnCrash) {
-          btnCrash.addEventListener('click', () => {
+        const btnTrayJam = document.getElementById('btn-vs-item-trayjam');
+        if (btnTrayJam) {
+          btnTrayJam.addEventListener('click', () => {
             if (this.state !== 'PLAYING') return;
-            this.useVersusItem('crash');
+            this.useVersusItem('trayjam');
+          });
+        }
+
+        // ポップ透明度スライダー（タイトル＆モード選択）＆HUDクイック切替
+        ['slider-title-popup-opacity', 'slider-mode-popup-opacity'].forEach((id) => {
+          const sl = document.getElementById(id);
+          if (sl) {
+            sl.addEventListener('input', () => {
+              this.applyPopupOpacity(Number(sl.value), true);
+            });
+          }
+        });
+        const btnHudOpacity = document.getElementById('btn-hud-popup-opacity');
+        if (btnHudOpacity) {
+          btnHudOpacity.addEventListener('click', () => {
+            sound.playClick();
+            const steps = [50, 30, 15, 0, 80, 100];
+            const idx = steps.indexOf(this.popupOpacityPct);
+            const nextVal = steps[(idx + 1) % steps.length];
+            this.applyPopupOpacity(nextVal, true);
           });
         }
 
@@ -10359,7 +10448,7 @@
         this.renderKeyConfigModal();
         const msgEl = document.getElementById('keyconfig-status-msg');
         if (msgEl) {
-          msgEl.innerHTML = '✅ <span class="text-emerald-300 font-black">初期設定に戻しました！</span>（出し: W-L / 戻し: U-, / 会計: Space / 全戻し: B / 回復: G / スタン: H / 両替崩し: Y）';
+          msgEl.innerHTML = '✅ <span class="text-emerald-300 font-black">初期設定に戻しました！</span>（出し: W-L / 戻し: U-, / 会計: Space / 全戻し: B / オート: G / スタン: H / お邪魔送り: Y）';
         }
       }
 
@@ -10449,17 +10538,17 @@
         if (resetHint) {
           resetHint.textContent = formatKeyCodeLabel(this.keyBindings.reset);
         }
-        const healHint = document.getElementById('key-hint-item-heal');
-        if (healHint) {
-          healHint.textContent = formatKeyCodeLabel(this.keyBindings.item_heal);
+        const autoHint = document.getElementById('key-hint-item-auto');
+        if (autoHint) {
+          autoHint.textContent = formatKeyCodeLabel(this.keyBindings.item_auto);
         }
         const stunHint = document.getElementById('key-hint-item-stun');
         if (stunHint) {
           stunHint.textContent = formatKeyCodeLabel(this.keyBindings.item_stun);
         }
-        const crashHint = document.getElementById('key-hint-item-crash');
-        if (crashHint) {
-          crashHint.textContent = formatKeyCodeLabel(this.keyBindings.item_crash);
+        const trayJamHint = document.getElementById('key-hint-item-trayjam');
+        if (trayJamHint) {
+          trayJamHint.textContent = formatKeyCodeLabel(this.keyBindings.item_trayjam);
         }
         if (this.state === 'PLAYING' || this.state === 'COUNTDOWN' || this.state === 'JUDGING') {
           this.renderWalletUI();
@@ -10556,12 +10645,12 @@
             this.handleCheckout();
           } else if (matchedAction === 'reset') {
             this.returnAllTrayToWallet();
-          } else if (matchedAction === 'item_heal') {
-            this.useVersusItem('heal');
+          } else if (matchedAction === 'item_auto') {
+            this.useVersusItem('auto');
           } else if (matchedAction === 'item_stun') {
             this.useVersusItem('stun');
-          } else if (matchedAction === 'item_crash') {
-            this.useVersusItem('crash');
+          } else if (matchedAction === 'item_trayjam') {
+            this.useVersusItem('trayjam');
           } else if (matchedAction.startsWith('ret_')) {
             const denom = Number(matchedAction.slice(4));
             if (ALL_DENOMS.includes(denom)) {
@@ -11568,15 +11657,17 @@
         this.isRankingRun = false; // ランキングには一切影響させない
         this.isVersusRun = true;
         this.vsSettings = s;
-        this.vsMaxHp = this.versus ? this.versus.VS_JAMMER_MAX_HP : 1000;
+        this.vsMaxHp = this.versus ? this.versus.VS_JAMMER_MAX_HP : 1500;
         this.vsHp = this.vsMaxHp;
         this.vsKoDefeated = false;
         this.vsItemCharges = 0;
         this.vsItemPerfectProgress = 0;
-        this.vsHealUsesLeft = 3;
+        this.vsAutoUsesLeft = 3;
         this.vsStunUsesLeft = 3;
-        this.vsCrashUsesLeft = 3;
+        this.vsTrayJamUsesLeft = 3;
         this.vsStunTimeLeft = 0;
+        this.vsAutoTimeLeft = 0;
+        this.vsAutoStepCooldown = 0;
         this.updateStunOverlay();
         this.mistakeLogs = [];
         this.ruleType = s.ruleType === 'change' ? 'change' : 'wallet';
@@ -11950,82 +12041,156 @@
         ReceiptImageExporter.exportCanvas(canvas, action, fname, btnEl);
       }
 
-      applyExchangeCrashToWallet() {
-        let crashedText = '';
-        const c10Now = this.wallet[10] || 0;
-        const c1Now = this.wallet[1] || 0;
-
-        if ((this.wallet[500] || 0) >= 1) {
-          this.wallet[500] -= 1;
-          if (c10Now <= 14 && c1Now <= 14) {
-            this.wallet[100] = (this.wallet[100] || 0) + 4;
-            this.wallet[10] = c10Now + 9;
-            this.wallet[1] = c1Now + 10;
-            crashedText = '500円玉→100円×4・10円×9・1円×10';
-          } else {
-            this.wallet[100] = (this.wallet[100] || 0) + 4;
-            this.wallet[50] = (this.wallet[50] || 0) + 1;
-            this.wallet[10] = c10Now + 4;
-            this.wallet[1] = c1Now + 10;
-            crashedText = '500円玉→小銭に粉砕！';
-          }
-        } else if ((this.wallet[100] || 0) >= 1) {
-          const breakCnt = ((this.wallet[100] || 0) >= 2 && c10Now <= 10 && c1Now <= 10) ? 2 : 1;
-          this.wallet[100] -= breakCnt;
-          if (breakCnt === 2) {
-            this.wallet[50] = (this.wallet[50] || 0) + 1;
-            this.wallet[10] = c10Now + 14;
-            this.wallet[1] = c1Now + 10;
-            crashedText = '100円玉×2→10円×14・1円×10・50円×1';
-          } else {
-            this.wallet[10] = c10Now + 9;
-            this.wallet[1] = c1Now + 10;
-            crashedText = '100円玉→10円×9・1円×10';
-          }
-        } else if ((this.wallet[50] || 0) >= 1) {
-          this.wallet[50] -= 1;
-          this.wallet[10] = c10Now + 4;
-          this.wallet[1] = c1Now + 10;
-          crashedText = '50円玉→10円×4・1円×10';
-        } else {
-          this.wallet[1] = c1Now + 5;
-          crashedText = '1円玉×5 襲来！';
+      loadPopupOpacity() {
+        try {
+          const raw = localStorage.getItem(POPUP_OPACITY_STORAGE_KEY);
+          if (raw === null || raw === '') return 50;
+          const n = Number(raw);
+          if (isNaN(n)) return 50;
+          return Math.max(0, Math.min(100, Math.round(n)));
+        } catch (e) {
+          return 50;
         }
-        return crashedText;
+      }
+
+      applyPopupOpacity(pct, save = true) {
+        const clamped = Math.max(0, Math.min(100, Math.round(Number(pct))));
+        this.popupOpacityPct = isNaN(clamped) ? 50 : clamped;
+        document.documentElement.style.setProperty('--popup-opacity', String(this.popupOpacityPct / 100));
+        if (save) {
+          try {
+            localStorage.setItem(POPUP_OPACITY_STORAGE_KEY, String(this.popupOpacityPct));
+          } catch (e) {}
+        }
+        ['slider-title-popup-opacity', 'slider-mode-popup-opacity'].forEach((id) => {
+          const sl = document.getElementById(id);
+          if (sl) sl.value = String(this.popupOpacityPct);
+        });
+        ['title-popup-opacity-val', 'mode-popup-opacity-val'].forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = `${this.popupOpacityPct}%`;
+        });
+        const hudLbl = document.getElementById('hud-popup-opacity-label');
+        if (hudLbl) hudLbl.textContent = `${this.popupOpacityPct}%`;
+      }
+
+      getJammerTrayCoinsCount() {
+        return this.trayList.filter((it) => Boolean(it.isJammerTrayCoin)).length;
+      }
+
+      updateTrayJammerBanner() {
+        const banner = document.getElementById('vs-tray-jammer-banner');
+        const txt = document.getElementById('vs-tray-jammer-text');
+        if (!banner) return;
+        const cnt = this.getJammerTrayCoinsCount();
+        if (cnt > 0 && this.state === 'PLAYING') {
+          banner.classList.remove('hidden');
+          if (txt) txt.textContent = `トレイにお邪魔コインが ${cnt}枚 混入中！すべて戻さないとPERFECT不可！`;
+        } else {
+          banner.classList.add('hidden');
+        }
+      }
+
+      updateAutoBanner() {
+        const banner = document.getElementById('vs-auto-banner');
+        const txt = document.getElementById('vs-auto-timer-text');
+        if (!banner) return;
+        if (this.vsAutoTimeLeft > 0 && (this.state === 'PLAYING' || this.state === 'JUDGING')) {
+          banner.classList.remove('hidden');
+          if (txt) txt.textContent = `3秒間オート神会計 発動中!! 残り ${this.vsAutoTimeLeft.toFixed(1)}s`;
+        } else {
+          banner.classList.add('hidden');
+        }
+      }
+
+      addJammerCoinsToTray(coinsArr) {
+        if (!Array.isArray(coinsArr) || coinsArr.length === 0) return '';
+        const countByDenom = {};
+        coinsArr.forEach((rawD) => {
+          const d = COIN_DENOMS.includes(Number(rawD)) ? Number(rawD) : 1;
+          countByDenom[d] = (countByDenom[d] || 0) + 1;
+          const id = this.nextItemId++;
+          this.trayList.push({ id, denom: d, isJammerTrayCoin: true });
+          if (this.scene3D) {
+            this.scene3D.spawnMoneyToTray(id, d, true);
+          }
+        });
+        this.updatePOSDisplay();
+        this.renderWalletUI();
+        this.updateTrayJammerBanner();
+        return Object.entries(countByDenom)
+          .sort((a, b) => Number(b[0]) - Number(a[0]))
+          .map(([d, c]) => `${d}円×${c}`)
+          .join('・');
+      }
+
+      runAutoItemStep() {
+        if (this.state !== 'PLAYING' || this.vsStunTimeLeft > 0) return;
+        if (!this.bestSolution || !this.bestSolution.breakdown) return;
+
+        // 1. トレイ上にお邪魔コインがあれば即座に全戻しで除去
+        if (this.getJammerTrayCoinsCount() > 0) {
+          this.returnAllTrayToWallet();
+          return;
+        }
+
+        // 2. 最適解に不要な硬貨・紙幣が出ていたら全戻し
+        const trayCounts = this.getTrayCountsByDenom();
+        const target = this.bestSolution.breakdown;
+        for (const d of ALL_DENOMS) {
+          if ((trayCounts[d] || 0) > (target[d] || 0)) {
+            this.returnAllTrayToWallet();
+            return;
+          }
+        }
+
+        // 3. 最適解に足りない紙幣・硬貨を1枚ずつ投入
+        for (const d of ALL_DENOMS) {
+          const need = (target[d] || 0) - (trayCounts[d] || 0);
+          if (need > 0 && (this.wallet[d] || 0) > 0) {
+            this.putMoneyOnTray(d);
+            return;
+          }
+        }
+
+        // 4. 最適解が揃ったら自動で「お会計！（決定）」を実行！
+        if (this.getTrayTotal() >= this.currentPrice) {
+          this.handleCheckout();
+        }
       }
 
       updateVersusItemButtons() {
         const itemsRow = document.getElementById('vs-items-row');
-        const btnHeal = document.getElementById('btn-vs-item-heal');
+        const btnAuto = document.getElementById('btn-vs-item-auto');
         const btnStun = document.getElementById('btn-vs-item-stun');
-        const btnCrash = document.getElementById('btn-vs-item-crash');
-        const healSub = document.getElementById('vs-item-heal-sub');
+        const btnTrayJam = document.getElementById('btn-vs-item-trayjam');
+        const autoSub = document.getElementById('vs-item-auto-sub');
         const stunSub = document.getElementById('vs-item-stun-sub');
-        const crashSub = document.getElementById('vs-item-crash-sub');
-        const healUsesEl = document.getElementById('vs-item-heal-uses');
+        const trayJamSub = document.getElementById('vs-item-trayjam-sub');
+        const autoUsesEl = document.getElementById('vs-item-auto-uses');
         const stunUsesEl = document.getElementById('vs-item-stun-uses');
-        const crashUsesEl = document.getElementById('vs-item-crash-uses');
-        if (!btnHeal || !btnStun || !btnCrash) return;
+        const trayJamUsesEl = document.getElementById('vs-item-trayjam-uses');
+        if (!btnAuto || !btnStun || !btnTrayJam) return;
 
         if (!this.isVersusJammerItemsEnabled()) {
           if (itemsRow) itemsRow.classList.add('hidden');
-          btnHeal.classList.add('hidden');
+          btnAuto.classList.add('hidden');
           btnStun.classList.add('hidden');
-          btnCrash.classList.add('hidden');
+          btnTrayJam.classList.add('hidden');
           return;
         }
 
         if (itemsRow) itemsRow.classList.remove('hidden');
-        btnHeal.classList.remove('hidden');
+        btnAuto.classList.remove('hidden');
         btnStun.classList.remove('hidden');
-        btnCrash.classList.remove('hidden');
+        btnTrayJam.classList.remove('hidden');
 
-        const healLeft = Math.max(0, this.vsHealUsesLeft || 0);
+        const autoLeft = Math.max(0, this.vsAutoUsesLeft || 0);
         const stunLeft = Math.max(0, this.vsStunUsesLeft || 0);
-        const crashLeft = Math.max(0, this.vsCrashUsesLeft || 0);
-        if (healUsesEl) healUsesEl.textContent = `残${healLeft}`;
+        const trayJamLeft = Math.max(0, this.vsTrayJamUsesLeft || 0);
+        if (autoUsesEl) autoUsesEl.textContent = `残${autoLeft}`;
         if (stunUsesEl) stunUsesEl.textContent = `残${stunLeft}`;
-        if (crashUsesEl) crashUsesEl.textContent = `残${crashLeft}`;
+        if (trayJamUsesEl) trayJamUsesEl.textContent = `残${trayJamLeft}`;
 
         const cost = this.getVersusItemCost();
         const costLabel = '20,000pt';
@@ -12035,21 +12200,22 @@
         const canUseBase = this.state === 'PLAYING' && hasCharge && canAfford && notStunned;
 
         const hasTarget = this.versus ? this.versus.hasAttackableOpponent() : false;
-        const canHeal = canUseBase && healLeft > 0 && (this.vsHp || 0) < (this.vsMaxHp || 1000);
+        const isAutoRunning = (this.vsAutoTimeLeft || 0) > 0;
+        const canAuto = canUseBase && autoLeft > 0 && !isAutoRunning;
         const canStun = canUseBase && stunLeft > 0 && hasTarget;
-        const canCrash = canUseBase && crashLeft > 0 && hasTarget;
+        const canTrayJam = canUseBase && trayJamLeft > 0 && hasTarget;
 
-        btnHeal.disabled = !canHeal;
+        btnAuto.disabled = !canAuto;
         btnStun.disabled = !canStun;
-        btnCrash.disabled = !canCrash;
+        btnTrayJam.disabled = !canTrayJam;
 
         const remPerfect = Math.max(1, 3 - (this.vsItemPerfectProgress || 0));
-        if (healSub) {
-          if (healLeft <= 0) healSub.textContent = '使用上限';
-          else if (!hasCharge) healSub.textContent = `あと${remPerfect}回神`;
-          else if (!canAfford) healSub.textContent = `要${costLabel}`;
-          else if ((this.vsHp || 0) >= (this.vsMaxHp || 1000)) healSub.textContent = 'HP満タン';
-          else healSub.textContent = `+100 (${costLabel})`;
+        if (autoSub) {
+          if (isAutoRunning) autoSub.textContent = `発動中 ${this.vsAutoTimeLeft.toFixed(1)}s`;
+          else if (autoLeft <= 0) autoSub.textContent = '使用上限';
+          else if (!hasCharge) autoSub.textContent = `あと${remPerfect}回神`;
+          else if (!canAfford) autoSub.textContent = `要${costLabel}`;
+          else autoSub.textContent = `3秒自動 (${costLabel})`;
         }
         if (stunSub) {
           if (stunLeft <= 0) stunSub.textContent = '使用上限';
@@ -12058,12 +12224,12 @@
           else if (!canAfford) stunSub.textContent = `要${costLabel}`;
           else stunSub.textContent = `100+2s (${costLabel})`;
         }
-        if (crashSub) {
-          if (crashLeft <= 0) crashSub.textContent = '使用上限';
-          else if (!hasTarget) crashSub.textContent = '相手終了';
-          else if (!hasCharge) crashSub.textContent = `あと${remPerfect}回神`;
-          else if (!canAfford) crashSub.textContent = `要${costLabel}`;
-          else crashSub.textContent = `小銭化 (${costLabel})`;
+        if (trayJamSub) {
+          if (trayJamLeft <= 0) trayJamSub.textContent = '使用上限';
+          else if (!hasTarget) trayJamSub.textContent = '相手終了';
+          else if (!hasCharge) trayJamSub.textContent = `あと${remPerfect}回神`;
+          else if (!canAfford) trayJamSub.textContent = `要${costLabel}`;
+          else trayJamSub.textContent = `3-5枚 (${costLabel})`;
         }
       }
 
@@ -12095,28 +12261,24 @@
           return;
         }
 
-        if (type === 'heal') {
-          if ((this.vsHealUsesLeft || 0) <= 0) {
+        if (type === 'auto') {
+          if ((this.vsAutoUsesLeft || 0) <= 0 || (this.vsAutoTimeLeft || 0) > 0) {
             sound.playBadBuzzer();
             return;
           }
-          if ((this.vsHp || 0) >= (this.vsMaxHp || 1000)) {
-            sound.playReturn();
-            return;
-          }
-          this.vsHealUsesLeft -= 1;
+          this.vsAutoUsesLeft -= 1;
           this.vsItemCharges = 0;
           this.vsItemPerfectProgress = 0;
           this.score = Math.max(0, (this.score || 0) - cost);
-          const beforeHp = this.vsHp || 0;
-          this.vsHp = Math.min(this.vsMaxHp || 1000, beforeHp + 100);
-          const healed = this.vsHp - beforeHp;
+          this.vsAutoTimeLeft = 3.0;
+          this.vsAutoStepCooldown = 0.05;
           sound.playPerfectFanfare();
-          this.vibrate(45);
+          this.vibrate([35, 25, 50]);
           this.updateTopHUD();
           this.showScoreSpendPopup(cost);
-          this.updateVersusHpBar(0, healed);
-          this.showVersusJammerToast(`💚 回復アイテム発動！ HP +${healed}（-${cost.toLocaleString()}pt / 残${this.vsHealUsesLeft}回）`, false);
+          this.updateAutoBanner();
+          this.updateVersusHpBar();
+          this.showVersusJammerToast(`🤖 オート発動!! 3秒間自動で神会計!!（-${cost.toLocaleString()}pt / 残${this.vsAutoUsesLeft}回）`, false);
           if (this.versus) this.versus.syncMyProgress(false, false);
         } else if (type === 'stun') {
           if ((this.vsStunUsesLeft || 0) <= 0) {
@@ -12139,18 +12301,18 @@
           this.showScoreSpendPopup(cost);
           this.updateVersusHpBar();
           if (this.versus) this.versus.syncMyProgress(false, false);
-        } else if (type === 'crash') {
-          if ((this.vsCrashUsesLeft || 0) <= 0) {
+        } else if (type === 'trayjam') {
+          if ((this.vsTrayJamUsesLeft || 0) <= 0) {
             sound.playBadBuzzer();
             return;
           }
           if (!this.versus) return;
-          const ok = this.versus.sendCrashItemAttack();
+          const ok = this.versus.sendTrayJammerItemAttack();
           if (!ok) {
             sound.playBadBuzzer();
             return;
           }
-          this.vsCrashUsesLeft -= 1;
+          this.vsTrayJamUsesLeft -= 1;
           this.vsItemCharges = 0;
           this.vsItemPerfectProgress = 0;
           this.score = Math.max(0, (this.score || 0) - cost);
@@ -12172,7 +12334,7 @@
         }
         wrap.classList.remove('hidden');
 
-        const maxHp = Math.max(1, this.vsMaxHp || 1000);
+        const maxHp = Math.max(1, this.vsMaxHp || 1500);
         const curHp = Math.max(0, Math.min(maxHp, Math.round(this.vsHp || 0)));
         const pct = (curHp / maxHp) * 100;
 
@@ -12229,19 +12391,16 @@
         this.updateVersusItemButtons();
       }
 
-      receiveVersusJammer(c1, c10, fromCombo, fromName = 'ライバル', damage = 0, isZoneAttack = false, stunSec = 0, isCrashAttack = false) {
+      receiveVersusJammer(c1, c10, fromCombo, fromName = 'ライバル', damage = 0, isZoneAttack = false, stunSec = 0, trayJamCoins = []) {
         if (!this.isVersusRun || this.state === 'RESULT') return;
         const hasCoins = (c1 || 0) > 0 || (c10 || 0) > 0;
         const dmg = Math.max(0, Math.round(Number(damage) || 0));
         const stunDur = Math.max(0, Number(stunSec) || 0);
-        let crashDetail = '';
-        if (isCrashAttack) {
-          crashDetail = this.applyExchangeCrashToWallet();
-          if (this.state === 'PLAYING') {
-            this.bestSolution = findBestPayment(this.currentPrice, this.wallet, this.ruleType);
-            this.updatePOSDisplay();
-            this.renderWalletUI();
-          }
+        const jamList = Array.isArray(trayJamCoins) ? trayJamCoins : [];
+        const hasTrayJam = jamList.length > 0;
+        let trayJamDetail = '';
+        if (hasTrayJam) {
+          trayJamDetail = this.addJammerCoinsToTray(jamList);
         }
 
         if (hasCoins) {
@@ -12289,12 +12448,12 @@
             posPanel.classList.add('animate-shake');
           }
           this.triggerVersusDamageFX(fromName, parts.join('・'), c1 || 0, c10 || 0, dmg, isZoneAttack);
-        } else if (isCrashAttack) {
+        } else if (hasTrayJam) {
           sound.playExchangeCrashSE();
           this.vibrate([90, 40, 110]);
           if (this.scene3D) {
             this.scene3D.triggerDamageShake(0.42, 0.45);
-            this.scene3D.spawnJammerCoinRain(6, 4);
+            this.scene3D.spawnJammerCoinRain(jamList.length, 2);
           }
           const screenEl = document.getElementById('screen-game');
           if (screenEl) {
@@ -12303,8 +12462,20 @@
             screenEl.classList.add('vs-screen-damage-shake');
             setTimeout(() => screenEl.classList.remove('vs-screen-damage-shake'), 520);
           }
-          this.setClerkComment('bad', `ガシャン🔨 ${fromName}さんの両替クラッシュ！財布がジャラジャラに💦`);
-          this.showVersusJammerToast(`🔨 ${fromName} の両替クラッシュ!! ${crashDetail}`, true);
+          const layer = document.getElementById('vs-fx-layer');
+          if (layer) {
+            const cutin = document.createElement('div');
+            cutin.className = 'vs-damage-cutin';
+            cutin.innerHTML = `
+              <div class="text-[11px] sm:text-xs font-black tracking-widest text-rose-200 uppercase">⚠️ TRAY JAMMER ATTACK!! ⚠️</div>
+              <div class="text-base sm:text-2xl font-black text-white drop-shadow">💣 ${escapeHtml(fromName)} からお邪魔コイン ${jamList.length}枚 投入!!</div>
+              <div class="text-[11px] sm:text-sm font-black text-amber-200 mt-0.5">${escapeHtml(trayJamDetail)} ／ すべて戻さないとPERFECT不可！</div>
+            `;
+            layer.appendChild(cutin);
+            setTimeout(() => cutin.remove(), 1450);
+          }
+          this.setClerkComment('bad', `うわっ💣 ${fromName}さんからお邪魔コイン${jamList.length}枚がトレイに！戻さないとPERFECTになりませんよ💦`);
+          this.showVersusJammerToast(`💣 トレイにお邪魔コイン${jamList.length}枚追加!! (${trayJamDetail}) 戻さないとPERFECT不可!`, true);
         } else if (stunDur > 0) {
           this.vsStunTimeLeft = Math.max(this.vsStunTimeLeft || 0, stunDur);
           this.updateStunOverlay();
@@ -13015,11 +13186,14 @@
         if (idx === -1) return;
 
         const item = this.trayList.splice(idx, 1)[0];
-        this.wallet[item.denom]++;
+        if (!item.isJammerTrayCoin) {
+          this.wallet[item.denom]++;
+        }
         sound.playReturn();
 
         this.scene3D.returnItemToWallet(id);
         this.updatePOSDisplay();
+        this.updateTrayJammerBanner();
         if (this.isTutorial) this.updateTutorialGuidance();
         this.renderWalletUI();
       }
@@ -13038,12 +13212,15 @@
         if (this.vsStunTimeLeft > 0) return;
         if (this.trayList.length === 0) return;
         for (const item of this.trayList) {
-          this.wallet[item.denom]++;
+          if (!item.isJammerTrayCoin) {
+            this.wallet[item.denom]++;
+          }
         }
         this.trayList = [];
         sound.playReturn();
         this.scene3D.clearAllTrayItems(false);
         this.updatePOSDisplay();
+        this.updateTrayJammerBanner();
         if (this.isTutorial) this.updateTutorialGuidance();
         this.renderWalletUI();
       }
@@ -13170,9 +13347,13 @@
         }
         sound.playRegisterCheckout();
 
+        const unreturnedJammerCount = this.getJammerTrayCoinsCount();
+        const hasUnreturnedTrayJammer = unreturnedJammerCount > 0;
         const walletBefore = { ...this.wallet };
         for (const it of this.trayList) {
-          walletBefore[it.denom]++;
+          if (!it.isJammerTrayCoin) {
+            walletBefore[it.denom]++;
+          }
         }
         const coinsBefore = countWalletCoins(walletBefore);
 
@@ -13219,7 +13400,10 @@
         const hasCoinOverlap = changeAmount > 0 && COIN_DENOMS.some(d => (trayCounts[d] || 0) > 0 && (changeInfo.breakdown[d] || 0) > 0);
 
         let grade = 'GOOD';
-        if (this.ruleType === 'change') {
+        if (hasUnreturnedTrayJammer) {
+          // お邪魔コインを戻さずに会計した場合はPERFECT不可（強制BAD）
+          grade = 'BAD';
+        } else if (this.ruleType === 'change') {
           // ルール②：お釣りの枚数最小ルール
           if (changeInfo.coinCount <= minPossibleChangeCoins && !wastedBill && !overpaidWhenExact && !hasCoinOverlap) {
             grade = 'PERFECT';
@@ -13329,7 +13513,7 @@
             if (
               this.isVersusJammerItemsEnabled() &&
               (this.vsItemCharges || 0) < 1 &&
-              ((this.vsHealUsesLeft || 0) > 0 || (this.vsStunUsesLeft || 0) > 0 || (this.vsCrashUsesLeft || 0) > 0)
+              ((this.vsAutoUsesLeft || 0) > 0 || (this.vsStunUsesLeft || 0) > 0 || (this.vsTrayJamUsesLeft || 0) > 0)
             ) {
               this.vsItemPerfectProgress = (this.vsItemPerfectProgress || 0) + 1;
               if (this.vsItemPerfectProgress >= 3) {
@@ -13464,6 +13648,7 @@
         }
 
         this.trayList = [];
+        this.updateTrayJammerBanner();
         this.scene3D.clearAllTrayItems(true);
         this.updateTopHUD();
         this.renderWalletUI();
@@ -13472,9 +13657,14 @@
         }
 
         this.showJudgmentFeedback(grade, changeAmount, changeInfo, coinsBefore, coinsAfter, earnedScore, billBonusInfo);
+        if (hasUnreturnedTrayJammer) {
+          const subEl = document.getElementById('ui-judgment-subtitle');
+          if (subEl) subEl.textContent = `💣 お邪魔コイン ${unreturnedJammerCount}枚 を戻さなかったためPERFECT不可！`;
+          this.setClerkComment('bad', `💣 お邪魔コインが${unreturnedJammerCount}枚残ったままでした！戻さないとPERFECTになりませんよ💦`);
+        }
 
-        // 通常ミス（BAD）時は解説表示時間を1秒延長（1450ms -> 2450ms）
-        const feedbackWaitMs = grade === 'BAD' ? 2450 : 1450;
+        // オート発動中は高速で次のお客さんへ（480ms）、通常ミス（BAD）時は2450ms
+        const feedbackWaitMs = (this.vsAutoTimeLeft > 0) ? 480 : (grade === 'BAD' ? 2450 : 1450);
         this.clearActiveTimers();
         this.nextTurnTimeout = setTimeout(() => {
           this.nextTurnTimeout = null;
@@ -14133,6 +14323,20 @@
       }
 
       update(dt) {
+        if (this.vsAutoTimeLeft > 0 && (this.state === 'PLAYING' || this.state === 'JUDGING')) {
+          this.vsAutoTimeLeft = Math.max(0, this.vsAutoTimeLeft - dt);
+          this.updateAutoBanner();
+          if (this.vsAutoTimeLeft <= 0) {
+            this.updateVersusItemButtons();
+          } else if (this.state === 'PLAYING' && this.vsStunTimeLeft <= 0) {
+            this.vsAutoStepCooldown -= dt;
+            if (this.vsAutoStepCooldown <= 0) {
+              this.vsAutoStepCooldown = 0.14;
+              this.runAutoItemStep();
+            }
+          }
+        }
+
         if (this.state !== 'PLAYING' || this.isTutorial) return;
 
         if (this.vsStunTimeLeft > 0) {

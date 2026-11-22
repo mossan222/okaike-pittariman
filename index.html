@@ -749,11 +749,107 @@
       transform: translate(-50%, -50%) scale(0.88) !important;
     }
     /* === DOPAGAKI ZONE 5-SECOND PACHINKO BLACKOUT FREEZE FX === */
-    @keyframes dopaPuchunCollapse {
-      0% { transform: scaleY(1) scaleX(1); opacity: 1; background: #ffffff; }
-      35% { transform: scaleY(0.03) scaleX(1.05); opacity: 1; background: #ffffff; }
-      70% { transform: scaleY(0.01) scaleX(0.08); opacity: 1; background: #e0f2fe; }
-      100% { transform: scaleY(0) scaleX(0); opacity: 0; background: #000000; }
+    @keyframes dopaPuchunFlash {
+      0% { opacity: 0.92; }
+      20% { opacity: 0.25; }
+      100% { opacity: 0; }
+    }
+    @keyframes dopaPuchunLine {
+      0% { transform: translate(-50%, -50%) scaleX(1.15) scaleY(3.2); opacity: 0.95; }
+      22% { transform: translate(-50%, -50%) scaleX(1.02) scaleY(1.1); opacity: 1; }
+      68% { transform: translate(-50%, -50%) scaleX(0.32) scaleY(0.28); opacity: 0.95; }
+      100% { transform: translate(-50%, -50%) scaleX(0) scaleY(0); opacity: 0; }
+    }
+    @keyframes dopaPuchunCore {
+      0% { transform: translate(-50%, -50%) scale(0.35); opacity: 0.85; }
+      24% { transform: translate(-50%, -50%) scale(1.22); opacity: 1; }
+      68% { transform: translate(-50%, -50%) scale(0.45); opacity: 0.95; }
+      100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    }
+    @keyframes dopaPuchunDiag {
+      0% { transform: translate(-50%, -50%) rotate(-54deg) scaleX(0.5); opacity: 0; }
+      25% { transform: translate(-50%, -50%) rotate(-54deg) scaleX(1.05); opacity: 0.85; }
+      75% { transform: translate(-50%, -50%) rotate(-54deg) scaleX(0.35); opacity: 0.5; }
+      100% { transform: translate(-50%, -50%) rotate(-54deg) scaleX(0); opacity: 0; }
+    }
+    @keyframes dopaSevenRainbowGlow {
+      0% { filter: hue-rotate(0deg) brightness(1.18) drop-shadow(0 0 22px #ff0080) drop-shadow(0 0 42px #fde047); }
+      50% { filter: hue-rotate(180deg) brightness(1.32) drop-shadow(0 0 28px #38bdf8) drop-shadow(0 0 54px #e879f9); }
+      100% { filter: hue-rotate(360deg) brightness(1.18) drop-shadow(0 0 22px #ff0080) drop-shadow(0 0 42px #fde047); }
+    }
+    @keyframes dopaSevenBoomIn {
+      0% { transform: scale(2.8) rotate(-8deg); opacity: 0; filter: brightness(3) blur(6px); }
+      28% { transform: scale(0.92) rotate(2deg); opacity: 1; filter: brightness(1.5) blur(0); }
+      58% { transform: scale(1.06) rotate(-1deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    .dopa-bo-puchun-flash {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, rgba(224,242,254,0.95) 0%, rgba(59,130,246,0.55) 45%, rgba(0,0,0,0.96) 100%);
+      pointer-events: none;
+      animation: dopaPuchunFlash 0.34s ease-out forwards;
+    }
+    .dopa-bo-puchun-line {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 108vw;
+      height: 22px;
+      border-radius: 9999px;
+      background: linear-gradient(90deg, rgba(29,78,216,0) 0%, rgba(59,130,246,0.85) 18%, #ffffff 50%, rgba(59,130,246,0.85) 82%, rgba(29,78,216,0) 100%);
+      box-shadow: 0 0 38px 14px rgba(59,130,246,0.95), 0 0 75px 24px rgba(37,99,235,0.75);
+      pointer-events: none;
+      animation: dopaPuchunLine 0.42s cubic-bezier(0.22, 0.9, 0.25, 1) forwards;
+    }
+    .dopa-bo-puchun-core {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: clamp(130px, 34vmin, 250px);
+      height: clamp(130px, 34vmin, 250px);
+      border-radius: 9999px;
+      background: radial-gradient(circle, #ffffff 0%, #e0f2fe 24%, rgba(96,165,250,0.92) 48%, rgba(37,99,235,0.45) 72%, rgba(0,0,0,0) 100%);
+      box-shadow: 0 0 55px 22px rgba(96,165,250,0.95), 0 0 110px 40px rgba(37,99,235,0.7);
+      pointer-events: none;
+      animation: dopaPuchunCore 0.44s cubic-bezier(0.22, 0.9, 0.25, 1) forwards;
+    }
+    .dopa-bo-puchun-diag {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: clamp(220px, 60vmin, 420px);
+      height: 28px;
+      border-radius: 9999px;
+      background: linear-gradient(90deg, rgba(59,130,246,0) 0%, rgba(147,197,253,0.85) 50%, rgba(59,130,246,0) 100%);
+      box-shadow: 0 0 32px 10px rgba(59,130,246,0.85);
+      pointer-events: none;
+      animation: dopaPuchunDiag 0.40s ease-out forwards;
+    }
+    .dopa-bo-777-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(10px, 3vw, 24px);
+      animation: dopaSevenBoomIn 0.46s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .dopa-bo-777-digit {
+      width: clamp(82px, 24vw, 152px);
+      height: clamp(104px, 30vw, 186px);
+      border-radius: 22px;
+      border: 4px solid #ffffff;
+      background: linear-gradient(135deg, #ff0080 0%, #ff8c00 18%, #fde047 36%, #22c55e 54%, #06b6d4 72%, #a855f7 88%, #ff0080 100%);
+      background-size: 300% 300%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(64px, 19vw, 124px);
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 0 0 20px #ffffff, 0 0 42px #fde047, 0 6px 0 rgba(15,23,42,0.75);
+      box-shadow: inset 0 0 24px rgba(255,255,255,0.75), 0 0 42px rgba(255,0,128,0.95), 0 0 70px rgba(56,189,248,0.9);
+      animation: dopaRainbowBorder 0.75s linear infinite, dopaSevenRainbowGlow 0.95s linear infinite;
     }
     @keyframes dopaHeartbeatPulse {
       0%, 100% { transform: scale(1); opacity: 0.25; }
@@ -5223,90 +5319,57 @@
         });
       }
 
-      // パチンコ・ブラックアウト確定フリーズ5秒フルサウンド（プチュン→心音→777停止→超確定キュイン連打＆ファンファーレ）
+      // パチンコ・ブラックアウト確定フリーズ5秒フルサウンド（ヴァルヴレイヴ風プチュン→長い無音暗転→七色777一発大爆発＆キュイン連打）
       playPachinkoBlackoutFreezeSE() {
         if (!this.seEnabled) return;
         this.init();
         if (!this.ctx) return;
         const now = this.ctx.currentTime;
 
-        // [0.00s] プチュン！電源遮断音（高音ピッ→急降下ザッ）
+        // [0.00s〜0.42s] 動画のような鋭い電源遮断「ピチュゥゥゥン…」音
         {
+          // 高音キーン→一気に急降下
           const osc = this.ctx.createOscillator();
           const g = this.ctx.createGain();
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(3400, now);
-          osc.frequency.exponentialRampToValueAtTime(95, now + 0.16);
-          g.gain.setValueAtTime(0.28, now);
-          g.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+          osc.frequency.setValueAtTime(4200, now);
+          osc.frequency.exponentialRampToValueAtTime(1400, now + 0.08);
+          osc.frequency.exponentialRampToValueAtTime(110, now + 0.36);
+          g.gain.setValueAtTime(0.30, now);
+          g.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
           osc.connect(g);
           g.connect(this.ctx.destination);
           osc.start(now);
-          osc.stop(now + 0.19);
+          osc.stop(now + 0.40);
+
+          // 電子的な「プッ」という瞬間スパークノイズ
+          const dur = 0.14;
+          const bufSize = Math.floor(this.ctx.sampleRate * dur);
+          const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
+          const data = buf.getChannelData(0);
+          for (let i = 0; i < bufSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufSize, 2.2);
+          }
+          const noise = this.ctx.createBufferSource();
+          noise.buffer = buf;
+          const bp = this.ctx.createBiquadFilter();
+          bp.type = 'bandpass';
+          bp.frequency.setValueAtTime(2600, now);
+          bp.Q.value = 1.4;
+          const ng = this.ctx.createGain();
+          ng.gain.setValueAtTime(0.24, now);
+          ng.gain.exponentialRampToValueAtTime(0.001, now + dur);
+          noise.connect(bp);
+          bp.connect(ng);
+          ng.connect(this.ctx.destination);
+          noise.start(now);
         }
 
-        // [0.35s, 0.78s] 暗闇の心音「ドクン…」「ドクンッ!!」
-        [0.35, 0.78].forEach((offset, idx) => {
-          const t = now + offset;
-          const osc = this.ctx.createOscillator();
-          const g = this.ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(idx === 0 ? 78 : 92, t);
-          osc.frequency.exponentialRampToValueAtTime(32, t + 0.24);
-          g.gain.setValueAtTime(idx === 0 ? 0.34 : 0.42, t);
-          g.gain.exponentialRampToValueAtTime(0.001, t + 0.26);
-          osc.connect(g);
-          g.connect(this.ctx.destination);
-          osc.start(t);
-          osc.stop(t + 0.28);
-        });
+        // [0.42s 〜 2.55s] 完全無音（暗転の長いタメ！）
 
-        // [0.95s 〜 2.40s] 高速デジタルリール回転音＆上昇チャージ
-        for (let step = 0; step < 18; step++) {
-          const t = now + 0.95 + step * 0.08;
-          const osc = this.ctx.createOscillator();
-          const g = this.ctx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(750 + (step % 4) * 260 + step * 35, t);
-          g.gain.setValueAtTime(0.08, t);
-          g.gain.exponentialRampToValueAtTime(0.001, t + 0.055);
-          osc.connect(g);
-          g.connect(this.ctx.destination);
-          osc.start(t);
-          osc.stop(t + 0.06);
-        }
-
-        // [1.30s] 左「7」停止ドォン！ / [1.75s] 右「7」停止ドォン！＋リーチキュイッ！
-        [1.30, 1.75].forEach((offset, idx) => {
-          const t = now + offset;
-          const sub = this.ctx.createOscillator();
-          const sg = this.ctx.createGain();
-          sub.type = 'sawtooth';
-          sub.frequency.setValueAtTime(160 + idx * 30, t);
-          sub.frequency.exponentialRampToValueAtTime(40, t + 0.22);
-          sg.gain.setValueAtTime(0.28, t);
-          sg.gain.exponentialRampToValueAtTime(0.001, t + 0.24);
-          sub.connect(sg);
-          sg.connect(this.ctx.destination);
-          sub.start(t);
-          sub.stop(t + 0.26);
-
-          const bell = this.ctx.createOscillator();
-          const bg = this.ctx.createGain();
-          bell.type = 'square';
-          bell.frequency.setValueAtTime(idx === 0 ? 1174.66 : 1567.98, t);
-          bell.frequency.exponentialRampToValueAtTime(idx === 0 ? 2349.32 : 3520.0, t + 0.14);
-          bg.gain.setValueAtTime(0.14, t);
-          bg.gain.exponentialRampToValueAtTime(0.001, t + 0.20);
-          bell.connect(bg);
-          bg.connect(this.ctx.destination);
-          bell.start(t);
-          bell.stop(t + 0.22);
-        });
-
-        // [2.50s] 『7・7・7』揃い完全確定!! 超重低音爆発＋キュイキュイキュイーン超連打＋大当たりファンファーレ!!
+        // [2.55s] 七色に輝く『7・7・7』一発出現!! 超重低音爆発＋キュイキュイキュイーン超連打＋大当たりファンファーレ!!
         {
-          const t0 = now + 2.50;
+          const t0 = now + 2.55;
           // 超重低音ドォォォォン!!
           const boom = this.ctx.createOscillator();
           const boomG = this.ctx.createGain();
@@ -14017,6 +14080,7 @@
         }
 
         this.state = 'JUDGING';
+        const isAutoCheckout = (this.vsAutoTimeLeft || 0) > 0 || Boolean(this.vsAutoFinishingTurn);
         if (this.vsAutoFinishingTurn) {
           this.vsAutoFinishingTurn = false;
           this.updateAutoBanner();
@@ -14154,6 +14218,7 @@
         const defaultZoneSec = isExOrLun ? 5.0 : 10.0;
         let earnedScore = 0;
         let billBonusInfo = null;
+        let justEnteredZone = false;
 
         if (grade === 'PERFECT') {
           this.combo++;
@@ -14161,7 +14226,6 @@
           this.perfectCount++;
 
           const wasInZone = this.scene3D.isZoneActive;
-          let justEnteredZone = false;
           if (!wasInZone) {
             this.zoneCharge++;
             // 7連続PERFECTで「神域（ゾーン）」突入！（倍率2.5倍・EX未満はデフォ10秒、EX以上はデフォ5秒）
@@ -14182,16 +14246,21 @@
           }
           const zoneMult = this.scene3D.isZoneActive ? 2.5 : 1.0;
 
-          const comboMult = Math.min(4.8, 1 + (this.combo - 1) * ((!isJammerNormScore && isExOrLun) ? 0.5 : 0.35));
-          const basePt = isJammerNormScore ? 1760 : (isLunatic ? 2750 : (isEx ? 2420 : 1760));
-          earnedScore = Math.round((basePt + Math.max(0, netDiff) * 275) * comboMult * modeMultiplier * noChangeMult * zoneMult);
+          if (!isAutoCheckout) {
+            const comboMult = Math.min(4.8, 1 + (this.combo - 1) * ((!isJammerNormScore && isExOrLun) ? 0.5 : 0.35));
+            const basePt = isJammerNormScore ? 1760 : (isLunatic ? 2750 : (isEx ? 2420 : 1760));
+            earnedScore = Math.round((basePt + Math.max(0, netDiff) * 275) * comboMult * modeMultiplier * noChangeMult * zoneMult);
 
-          if (isBillBonus) {
-            const billBonusPt = Math.round(billSavedCount * 440 * comboMult * modeMultiplier * noChangeMult * zoneMult);
-            earnedScore += billBonusPt;
-            billBonusInfo = { savedBills: billSavedCount, bonusPt: billBonusPt };
+            if (isBillBonus) {
+              const billBonusPt = Math.round(billSavedCount * 440 * comboMult * modeMultiplier * noChangeMult * zoneMult);
+              earnedScore += billBonusPt;
+              billBonusInfo = { savedBills: billSavedCount, bonusPt: billBonusPt };
+            }
+            this.score += earnedScore;
+          } else {
+            earnedScore = 0;
+            billBonusInfo = null;
           }
-          this.score += earnedScore;
           if (this.isVersusJammerMode() && this.versus) {
             if (
               this.isVersusJammerItemsEnabled() &&
@@ -14220,14 +14289,16 @@
             this.scene3D.spawnCoinShower(Math.max(6, this.combo));
           }
           this.scene3D.triggerClerkReaction('happy', 1.5);
-          sound.playPerfectFanfare();
-          if (isBillBonus) {
-            sound.playLightningBonusSE();
-            this.triggerBillBonusLightningEffect(billBonusInfo.savedBills, billBonusInfo.bonusPt);
-          }
-          if (this.dopagakiMode) {
-            sound.playPachinkoKyuin();
-            this.triggerDopaBurstEffect(null, true);
+          if (!(justEnteredZone && this.dopagakiMode)) {
+            sound.playPerfectFanfare();
+            if (isBillBonus && billBonusInfo) {
+              sound.playLightningBonusSE();
+              this.triggerBillBonusLightningEffect(billBonusInfo.savedBills, billBonusInfo.bonusPt);
+            }
+            if (this.dopagakiMode) {
+              sound.playPachinkoKyuin();
+              this.triggerDopaBurstEffect(null, true);
+            }
           }
           if (justEnteredZone) {
             this.setClerkComment('perfect', `⚡7連続PERFECT達成！！『神域（ゾーン）』突入（${defaultZoneSec}秒間）でスコア倍率が2.5倍に跳ね上がります！！`);
@@ -14255,8 +14326,12 @@
           } else {
             this.zoneCharge = 0;
           }
-          earnedScore = Math.round((660 + Math.max(0, netDiff) * 110) * modeMultiplier * noChangeMult * zoneMult);
-          this.score += earnedScore;
+          if (!isAutoCheckout) {
+            earnedScore = Math.round((660 + Math.max(0, netDiff) * 110) * modeMultiplier * noChangeMult * zoneMult);
+            this.score += earnedScore;
+          } else {
+            earnedScore = 0;
+          }
 
           // GOOD判定（PERFECT以外）も全モード共通で振り返りログへ保存
           this.mistakeLogs.push({
@@ -14346,8 +14421,8 @@
           this.setClerkComment('bad', `💣 お邪魔コインが${unreturnedJammerCount}枚残ったままでした！戻さないとPERFECTになりませんよ💦`);
         }
 
-        // ドパガキモード限定：ゾーン突入時はブラックアウト＆パチンコ確定演出（5秒間・時間停止）を発動！
-        if (grade === 'PERFECT' && this.dopagakiMode && this.scene3D.isZoneActive && this.zoneCharge >= 7 && this.zoneTimeLeft >= (this.zoneMaxTime - 0.05)) {
+        // ドパガキモード限定：ゾーンに入った瞬間の1回のみブラックアウト＆パチンコ確定演出（5秒間・時間停止）を発動！
+        if (justEnteredZone && this.dopagakiMode) {
           this.clearActiveTimers();
           this.blackoutPendingNextTurn = true;
           this.triggerDopaZoneBlackout();
@@ -15158,6 +15233,9 @@
           oppOv.classList.add('hidden');
           oppOv.classList.remove('flex');
         }
+        if (sound && sound.dopaAudio) {
+          sound.dopaAudio.volume = 0.55;
+        }
       }
 
       endBlackoutFreeze() {
@@ -15212,9 +15290,14 @@
         const ov = document.getElementById('dopa-blackout-overlay');
         if (!ov) return;
 
-        // 5秒フルパチンコ確定フリーズサウンド＆バイブレーション
+        // 暗転の間、BGMを一瞬ミュートして無音の静寂を際立たせる
+        if (sound && sound.dopaAudio) {
+          sound.dopaAudio.volume = 0;
+        }
+
+        // 5秒フルパチンコ確定フリーズサウンド（プチュン→長い無音暗転→七色777大爆発）
         sound.playPachinkoBlackoutFreezeSE();
-        this.vibrate([120, 230, 80, 350, 100]);
+        this.vibrate(140);
 
         const sched = (fn, ms) => {
           const id = setTimeout(() => {
@@ -15223,103 +15306,23 @@
           this.blackoutTimers.push(id);
         };
 
-        // [0.00s] プチュン！完全漆黒ブラックアウト
+        // [0.00s〜0.44s] 動画のような青白い光学フレアが一瞬閃いて中央へ収束→そのまま長い完全暗転（テキストなし！）
         ov.className = 'fixed inset-0 z-[88] flex items-center justify-center overflow-hidden bg-black pointer-events-auto select-none';
         ov.innerHTML = `
-          <div class="dopa-bo-puchun"></div>
-          <div id="dopa-bo-stage" class="relative w-full h-full flex flex-col items-center justify-center px-4 text-center">
-            <div id="dopa-bo-whisper" class="text-rose-500 font-black text-2xl sm:text-4xl tracking-[0.35em] opacity-0 transition-opacity duration-200" style="text-shadow: 0 0 24px rgba(244,63,94,0.95);">
-              ……プチュン。
-            </div>
-          </div>
+          <div class="dopa-bo-puchun-flash"></div>
+          <div class="dopa-bo-puchun-line"></div>
+          <div class="dopa-bo-puchun-diag"></div>
+          <div class="dopa-bo-puchun-core"></div>
+          <div id="dopa-bo-stage" class="relative w-full h-full flex flex-col items-center justify-center px-4 text-center"></div>
         `;
 
-        // [0.35s] 静寂の鼓動＋赤文字
+        // [0.45s〜2.55s] 完全な漆黒・無音の長い暗転の間（約2.1秒）
+
+        // [2.55s] 揃った状態の『7・7・7』が七色にギラギラ輝いて一発炸裂!!
         sched(() => {
-          const w = document.getElementById('dopa-bo-whisper');
-          if (w) {
-            w.style.opacity = '1';
-            w.style.animation = 'dopaHeartbeatPulse 0.45s ease-in-out infinite';
+          if (sound && sound.dopaAudio) {
+            sound.dopaAudio.volume = 0.55;
           }
-        }, 350);
-
-        // [0.75s] 「神 域 覚 醒」赤閃光
-        sched(() => {
-          const w = document.getElementById('dopa-bo-whisper');
-          if (w) {
-            w.textContent = '⚡ 神 域 覚 醒 ⚡';
-            w.className = 'text-amber-300 font-black text-3xl sm:text-5xl tracking-[0.28em]';
-            w.style.textShadow = '0 0 28px rgba(250,204,21,0.95), 0 0 54px rgba(236,72,153,0.9)';
-          }
-        }, 750);
-
-        // [0.95s] パチンコ777超高速リール出現＆虹レーザー斬撃！
-        sched(() => {
-          const stage = document.getElementById('dopa-bo-stage');
-          if (!stage) return;
-          stage.innerHTML = `
-            <div class="dopa-bo-laser" style="--ang: -18deg;"></div>
-            <div class="dopa-bo-laser" style="--ang: 18deg; animation-delay: 0.08s;"></div>
-            <div class="text-xs sm:text-base font-black tracking-[0.3em] text-fuchsia-300 uppercase mb-3 animate-pulse">
-              ★ PREMIUM FREEZE // 777 CHANCE ★
-            </div>
-            <div class="flex items-center justify-center gap-3 sm:gap-5 mb-4">
-              <div id="dopa-bo-r1" class="dopa-bo-reel-box">3</div>
-              <div id="dopa-bo-r2" class="dopa-bo-reel-box">8</div>
-              <div id="dopa-bo-r3" class="dopa-bo-reel-box">5</div>
-            </div>
-            <div id="dopa-bo-status" class="text-lg sm:text-2xl font-black text-amber-300 tracking-widest animate-pulse">
-              🎰 超高速回転中!! 🎰
-            </div>
-          `;
-
-          const symbols = ['1', '3', '5', '7', '9', '¥', '★'];
-          let tick = 0;
-          const spinInterval = setInterval(() => {
-            if (this.blackoutMode !== 'self') {
-              clearInterval(spinInterval);
-              return;
-            }
-            tick++;
-            const r1 = document.getElementById('dopa-bo-r1');
-            const r2 = document.getElementById('dopa-bo-r2');
-            const r3 = document.getElementById('dopa-bo-r3');
-            if (r1 && !r1.classList.contains('locked-7')) r1.textContent = symbols[tick % symbols.length];
-            if (r2 && !r2.classList.contains('locked-7')) r2.textContent = symbols[(tick + 3) % symbols.length];
-            if (r3 && !r3.classList.contains('locked-7')) r3.textContent = symbols[(tick + 5) % symbols.length];
-          }, 55);
-          this.blackoutTimers.push(spinInterval);
-        }, 950);
-
-        // [1.30s] 左リール「7」ロック！
-        sched(() => {
-          const r1 = document.getElementById('dopa-bo-r1');
-          const st = document.getElementById('dopa-bo-status');
-          if (r1) { r1.textContent = '7'; r1.classList.add('locked-7'); }
-          if (st) st.textContent = '🔥 ７ 停止!! 🔥';
-          this.vibrate(70);
-          ov.classList.remove('dopa-bo-fever-shake');
-          void ov.offsetWidth;
-          ov.classList.add('dopa-bo-fever-shake');
-        }, 1300);
-
-        // [1.75s] 右リール「7」ロック！（テンパイ確定リーチ！）
-        sched(() => {
-          const r3 = document.getElementById('dopa-bo-r3');
-          const st = document.getElementById('dopa-bo-status');
-          if (r3) { r3.textContent = '7'; r3.classList.add('locked-7'); }
-          if (st) {
-            st.textContent = '⚡ 激アツ ７・７ リーチ!! ⚡';
-            st.className = 'text-xl sm:text-3xl font-black text-fuchsia-300 tracking-widest animate-bounce';
-          }
-          this.vibrate([70, 30, 90]);
-          ov.classList.remove('dopa-bo-fever-shake');
-          void ov.offsetWidth;
-          ov.classList.add('dopa-bo-fever-shake');
-        }, 1750);
-
-        // [2.50s] 中リール「7」揃い完全確定!! 全画面レインボー脳汁MAX大爆発!!
-        sched(() => {
           ov.classList.add('dopa-bo-strobe');
           ov.classList.remove('dopa-bo-fever-shake');
           void ov.offsetWidth;
@@ -15340,26 +15343,26 @@
             <div class="dopa-bo-laser" style="--ang: 0deg; animation-delay:0.12s;"></div>
 
             <div class="relative z-10 flex flex-col items-center justify-center px-3">
-              <div class="px-4 py-1 rounded-full border-2 border-white bg-gradient-to-r from-pink-600 via-amber-400 to-cyan-500 text-slate-950 font-black text-xs sm:text-base tracking-widest shadow-2xl mb-3 animate-pulse">
+              <div class="px-4 py-1 rounded-full border-2 border-white bg-gradient-to-r from-pink-600 via-amber-400 to-cyan-500 text-slate-950 font-black text-xs sm:text-base tracking-widest shadow-2xl mb-4 animate-pulse">
                 ★ PREMIUM BLACKOUT FREEZE // 大当たり確定 ★
               </div>
 
-              <div class="flex items-center justify-center gap-3 sm:gap-5 mb-4">
-                <div class="dopa-bo-reel-box locked-7">7</div>
-                <div class="dopa-bo-reel-box locked-7">7</div>
-                <div class="dopa-bo-reel-box locked-7">7</div>
+              <div class="dopa-bo-777-wrap mb-4">
+                <div class="dopa-bo-777-digit">7</div>
+                <div class="dopa-bo-777-digit" style="animation-delay: -0.25s, -0.32s;">7</div>
+                <div class="dopa-bo-777-digit" style="animation-delay: -0.50s, -0.64s;">7</div>
               </div>
 
               <div class="dopa-bo-gold-title text-4xl sm:text-7xl font-black tracking-tight leading-none mb-2">
-                🌈 神域ZONE 確定!! 🌈
+                🌈 神域ZONE 突入!! 🌈
               </div>
               <div class="px-5 py-1.5 rounded-2xl bg-slate-950/90 border-2 border-amber-300 text-amber-200 font-black text-sm sm:text-2xl shadow-[0_0_30px_rgba(250,204,21,0.9)]">
-                ⚡ SCORE ×2.5 ＆ 脳汁MAX フィーバー突入!! ⚡
+                ⚡ SCORE ×2.5 ＆ 脳汁MAX フィーバー!! ⚡
               </div>
             </div>
           `;
 
-          // 爆発パーティクル＆文字を大量にぶちまける（遠慮一切なし！）
+          // 爆発パーティクル＆文字を大量にぶちまける
           const icons = ['7', '神', '確', '⚡', '🌈', '💰', '★', '💎', '🔥', '脳汁'];
           const colors = ['#ff0080', '#ff8c00', '#fde047', '#4ade80', '#38bdf8', '#e879f9', '#ffffff'];
           for (let i = 0; i < 48; i++) {
@@ -15384,9 +15387,9 @@
             this.scene3D.spawnPerfectParticles();
             this.scene3D.spawnCoinShower(15);
           }
-        }, 2500);
+        }, 2550);
 
-        // [3.65s] 追加の虹色衝撃波＆追いフラッシュ
+        // [3.70s] 追加の虹色衝撃波＆追いフラッシュ
         sched(() => {
           const stage = document.getElementById('dopa-bo-stage');
           if (!stage) return;
@@ -15399,7 +15402,7 @@
           r.style.boxShadow = '0 0 60px #fde047';
           stage.appendChild(r);
           this.vibrate([80, 30, 140]);
-        }, 3650);
+        }, 3700);
       }
 
       renderMistakeReviewList(target = 'normal') {

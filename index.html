@@ -13474,15 +13474,19 @@
         const g = this.game;
         const trayCounts = {};
         if (Array.isArray(g.trayList)) {
-          g.trayList.forEach((d) => {
-            trayCounts[d] = (trayCounts[d] || 0) + 1;
+          g.trayList.forEach((item) => {
+            const denom = (item && typeof item === 'object') ? Number(item.denom || 0) : Number(item || 0);
+            if (denom > 0 && Number.isFinite(denom)) {
+              const key = String(denom);
+              trayCounts[key] = (trayCounts[key] || 0) + 1;
+            }
           });
         }
         const walletCounts = {};
         if (g.wallet) {
           ALL_DENOMS.forEach((d) => {
             const c = Number(g.wallet[d] || 0);
-            if (c > 0) walletCounts[d] = c;
+            if (c > 0 && Number.isFinite(c)) walletCounts[String(d)] = c;
           });
         }
         return {
@@ -13506,11 +13510,26 @@
       syncMyLivePov(force = false) {
         if (!this.roomRef || !this.mySlot || !this.game || !this.game.isVersusRun) return;
         const now = Date.now();
-        if (!force && now - (this.lastPovSyncAt || 0) < 160) return;
+        const elapsed = now - (this.lastPovSyncAt || 0);
+        if (!force && elapsed < 120) {
+          if (!this._povTrailingTimer) {
+            this._povTrailingTimer = setTimeout(() => {
+              this._povTrailingTimer = null;
+              this.syncMyLivePov(true);
+            }, Math.max(40, 130 - elapsed));
+          }
+          return;
+        }
+        if (this._povTrailingTimer) {
+          clearTimeout(this._povTrailingTimer);
+          this._povTrailingTimer = null;
+        }
         this.lastPovSyncAt = now;
-        const pov = this.buildMyPovSnapshot();
-        if (!pov) return;
-        this.roomRef.child('players/' + this.mySlot + '/pov').set(pov).catch(() => {});
+        try {
+          const pov = this.buildMyPovSnapshot();
+          if (!pov) return;
+          this.roomRef.child('players/' + this.mySlot + '/pov').set(pov).catch(() => {});
+        } catch (e) {}
       }
 
       sendBlackoutEvent() {
@@ -18420,7 +18439,7 @@
         const paidTotal = this.getTrayTotal();
         document.getElementById('ui-tray-total').textContent = `¥ ${paidTotal.toLocaleString()}`;
         if (this.isVersusRun && this.versus && typeof this.versus.syncMyLivePov === 'function') {
-          this.versus.syncMyLivePov(false);
+          try { this.versus.syncMyLivePov(false); } catch (e) {}
         }
 
         const visibleContent = document.getElementById('ui-change-visible-content');

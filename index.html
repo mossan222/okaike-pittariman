@@ -8452,6 +8452,7 @@
         const recSaveBtn = document.getElementById('btn-vs-receipt-save');
         const recCopyBtn = document.getElementById('btn-vs-receipt-copy');
         const shareXBtn = document.getElementById('btn-share-vs-x');
+        const shareNativeBtn = document.getElementById('btn-share-vs-native');
 
         this.vsResultCooldownRemaining = 2.0;
         const applyCooldownState = () => {
@@ -8485,6 +8486,11 @@
             shareXBtn.disabled = true;
             shareXBtn.classList.add('opacity-50', 'grayscale', 'cursor-not-allowed');
             shareXBtn.textContent = `⏳ Xで共有 (${secStr}s)`;
+          }
+          if (shareNativeBtn) {
+            shareNativeBtn.disabled = true;
+            shareNativeBtn.classList.add('opacity-50', 'grayscale', 'cursor-not-allowed');
+            shareNativeBtn.textContent = `⏳ 共有 / 保存 (${secStr}s)`;
           }
         };
         applyCooldownState();
@@ -8528,6 +8534,11 @@
               shareXBtn.disabled = false;
               shareXBtn.classList.remove('opacity-50', 'grayscale', 'cursor-not-allowed');
               shareXBtn.innerHTML = '<span class="text-base leading-none">𝕏</span><span>Xで対戦結果を共有</span>';
+            }
+            if (shareNativeBtn) {
+              shareNativeBtn.disabled = false;
+              shareNativeBtn.classList.remove('opacity-50', 'grayscale', 'cursor-not-allowed');
+              shareNativeBtn.innerHTML = '<span>📤</span><span id="btn-share-vs-native-label">画像つきで共有 / 保存</span>';
             }
           } else {
             applyCooldownState();
@@ -11042,6 +11053,7 @@
         const btnResSave = document.getElementById('btn-res-receipt-save');
         if (btnResSave) {
           btnResSave.addEventListener('click', () => {
+            if (this.retryCooldownRemaining > 0) return;
             sound.playClick();
             this.exportSoloReceipt('download', btnResSave);
           });
@@ -11049,6 +11061,7 @@
         const btnResCopy = document.getElementById('btn-res-receipt-copy');
         if (btnResCopy) {
           btnResCopy.addEventListener('click', () => {
+            if (this.retryCooldownRemaining > 0) return;
             sound.playClick();
             this.exportSoloReceipt('copy', btnResCopy);
           });
@@ -11490,24 +11503,38 @@
         const retryBtn = document.getElementById('btn-retry-game');
         const retryIcon = document.getElementById('btn-retry-icon');
         const retryText = document.getElementById('btn-retry-text');
+        const recSaveBtn = document.getElementById('btn-res-receipt-save');
+        const recCopyBtn = document.getElementById('btn-res-receipt-copy');
+        const shareXBtn = document.getElementById('btn-share-solo-x');
+        const shareNativeBtn = document.getElementById('btn-share-solo-native');
         if (!retryBtn || !retryIcon || !retryText) return;
 
+        const lockedBtns = [titleBtn, modeBtn, retryBtn, recSaveBtn, recCopyBtn, shareXBtn, shareNativeBtn];
         this.retryCooldownRemaining = 2.0;
-        [titleBtn, modeBtn, retryBtn].forEach((b) => {
-          if (b) {
-            b.disabled = true;
-            b.classList.add('opacity-50', 'grayscale', 'cursor-not-allowed');
-          }
-        });
-        retryIcon.textContent = '⏳';
-        retryText.textContent = `もう一度遊ぶ (${this.retryCooldownRemaining.toFixed(1)}s)`;
+
+        const applySoloCooldownState = () => {
+          const secStr = this.retryCooldownRemaining.toFixed(1);
+          lockedBtns.forEach((b) => {
+            if (b) {
+              b.disabled = true;
+              b.classList.add('opacity-50', 'grayscale', 'cursor-not-allowed');
+            }
+          });
+          retryIcon.textContent = '⏳';
+          retryText.textContent = `もう一度遊ぶ (${secStr}s)`;
+          if (recSaveBtn) recSaveBtn.textContent = `⏳ 保存 (${secStr}s)`;
+          if (recCopyBtn) recCopyBtn.textContent = `⏳ コピー (${secStr}s)`;
+          if (shareXBtn) shareXBtn.textContent = `⏳ Xで共有 (${secStr}s)`;
+          if (shareNativeBtn) shareNativeBtn.textContent = `⏳ 共有 / 保存 (${secStr}s)`;
+        };
+        applySoloCooldownState();
 
         this.retryCooldownInterval = setInterval(() => {
           this.retryCooldownRemaining = Math.max(0, +(this.retryCooldownRemaining - 0.1).toFixed(1));
           if (this.retryCooldownRemaining <= 0) {
             clearInterval(this.retryCooldownInterval);
             this.retryCooldownInterval = null;
-            [titleBtn, modeBtn, retryBtn].forEach((b) => {
+            lockedBtns.forEach((b) => {
               if (b) {
                 b.disabled = false;
                 b.classList.remove('opacity-50', 'grayscale', 'cursor-not-allowed');
@@ -11515,8 +11542,12 @@
             });
             retryIcon.textContent = '🔄';
             retryText.textContent = 'もう一度遊ぶ！';
+            if (recSaveBtn) recSaveBtn.innerHTML = '<span>📷</span><span>画像保存</span>';
+            if (recCopyBtn) recCopyBtn.innerHTML = '<span>📋</span><span>画像コピー</span>';
+            if (shareXBtn) shareXBtn.innerHTML = '<span class="text-base leading-none">𝕏</span><span>Xで成果を共有</span>';
+            if (shareNativeBtn) shareNativeBtn.innerHTML = '<span>📤</span><span id="btn-share-solo-native-label">画像つきで共有 / 保存</span>';
           } else {
-            retryText.textContent = `もう一度遊ぶ (${this.retryCooldownRemaining.toFixed(1)}s)`;
+            applySoloCooldownState();
           }
         }, 100);
       }
@@ -16417,7 +16448,10 @@
           const btn = document.getElementById(id);
           if (!btn) return;
           btn.addEventListener('click', () => {
-            if (id === 'btn-share-vs-x' && window.game && window.game.versus && window.game.versus.vsResultCooldownRemaining > 0) {
+            if (mode === 'versus' && window.game && window.game.versus && window.game.versus.vsResultCooldownRemaining > 0) {
+              return;
+            }
+            if (mode === 'solo' && window.game && window.game.retryCooldownRemaining > 0) {
               return;
             }
             if (typeof sound !== 'undefined' && sound && typeof sound.playClick === 'function') {
@@ -16454,8 +16488,6 @@
   </script>
 </body>
 </html>
-
-
 
 
 

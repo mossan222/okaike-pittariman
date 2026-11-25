@@ -1086,6 +1086,78 @@
       animation: vsIntroShardFly 0.68s cubic-bezier(0.22, 0.8, 0.32, 1) forwards;
       will-change: transform, opacity;
     }
+
+    /* === TOURNAMENT MODE ANIMATIONS === */
+    @keyframes tourneyCardPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.7), 0 0 18px rgba(232, 121, 249, 0.55); }
+      50% { box-shadow: 0 0 0 5px rgba(250, 204, 21, 0), 0 0 28px rgba(56, 189, 248, 0.9); }
+    }
+    @keyframes tourneyWinnerPop {
+      0% { transform: scale(1); filter: brightness(1); }
+      35% { transform: scale(1.09); filter: brightness(1.65); }
+      70% { transform: scale(0.98); filter: brightness(1.2); }
+      100% { transform: scale(1); filter: brightness(1); }
+    }
+    @keyframes tourneyWinBadgeSlam {
+      0% { transform: scale(2.4) rotate(-14deg); opacity: 0; }
+      55% { transform: scale(0.92) rotate(4deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    @keyframes tourneyAdvanceGlow {
+      0% { background-color: rgba(250, 204, 21, 0.85); transform: scale(1.1); }
+      100% { background-color: rgba(30, 41, 59, 0.9); transform: scale(1); }
+    }
+    @keyframes tourneyBotClashShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-5px) rotate(-1.5deg); }
+      40% { transform: translateX(5px) rotate(1.5deg); }
+      60% { transform: translateX(-4px) rotate(-1deg); }
+      80% { transform: translateX(4px) rotate(1deg); }
+    }
+    @keyframes tourneyTrophyBounce {
+      0% { transform: scale(0.2) translateY(30px) rotate(-12deg); opacity: 0; }
+      45% { transform: scale(1.18) translateY(-10px) rotate(5deg); opacity: 1; }
+      70% { transform: scale(0.96) translateY(2px) rotate(-2deg); opacity: 1; }
+      100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; }
+    }
+    @keyframes tourneyLineFlow {
+      0% { stroke-dashoffset: 160; }
+      100% { stroke-dashoffset: 0; }
+    }
+    @keyframes tourneyDrawFlicker {
+      0%, 100% { border-color: #38bdf8; box-shadow: 0 0 14px rgba(56,189,248,0.65); }
+      50% { border-color: #fde047; box-shadow: 0 0 22px rgba(250,204,21,0.85); }
+    }
+    .tourney-match-active {
+      border-color: #fde047 !important;
+      animation: tourneyCardPulse 1.35s ease-in-out infinite;
+    }
+    .tourney-match-clash {
+      border-color: #f43f5e !important;
+      animation: tourneyBotClashShake 0.28s ease-in-out infinite;
+      box-shadow: 0 0 24px rgba(244, 63, 94, 0.85);
+    }
+    .tourney-match-draw {
+      animation: tourneyDrawFlicker 0.25s linear infinite;
+    }
+    .tourney-winner-pop {
+      animation: tourneyWinnerPop 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .tourney-win-badge {
+      display: inline-block;
+      animation: tourneyWinBadgeSlam 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .tourney-advance-glow {
+      animation: tourneyAdvanceGlow 1.1s ease-out forwards;
+    }
+    .tourney-trophy-anim {
+      animation: tourneyTrophyBounce 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .tourney-line-win {
+      stroke-dasharray: 160;
+      stroke-dashoffset: 0;
+      animation: tourneyLineFlow 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
   </style>
 </head>
 <body class="text-white select-none">
@@ -2799,6 +2871,27 @@
           <span id="vs-settings-role-hint" class="text-[10px] font-bold text-slate-400">ホストが変更できます</span>
         </div>
 
+        <!-- 00. Match Format (通常対戦 / トーナメント) -->
+        <div>
+          <div class="text-[10px] font-bold text-slate-400 mb-1">対戦形式（ルーム機能）</div>
+          <div class="grid grid-cols-2 gap-1.5">
+            <button data-vs-set="format" data-vs-val="normal" class="vs-opt-btn btn-3d py-1.5 px-2 rounded-xl text-[11px] sm:text-xs font-black border-2">⚔️ 通常対戦（一発勝負）</button>
+            <button data-vs-set="format" data-vs-val="tournament" class="vs-opt-btn btn-3d py-1.5 px-2 rounded-xl text-[11px] sm:text-xs font-black border-2">🏆 トーナメント（勝ち抜き）</button>
+          </div>
+          <p id="vs-format-explain" class="hidden text-[10px] text-amber-200 font-bold mt-1 leading-snug">
+            🏆 1対1の勝ち抜きトーナメント戦！抽選演出・対戦表アニメーション・ライブ観戦付き（3〜10人おすすめ・BOT補充OK）
+          </p>
+        </div>
+
+        <!-- 00b. Third Place Match Selector (Only when tournament selected) -->
+        <div id="vs-tourney-third-row" class="hidden">
+          <div class="text-[10px] font-bold text-slate-400 mb-1">🥉 3位決定戦（4人以上で有効）</div>
+          <div class="grid grid-cols-2 gap-1.5">
+            <button data-vs-set="thirdPlaceMatch" data-vs-val="true" class="vs-opt-btn btn-3d py-1 px-2 rounded-xl text-[11px] font-black border-2">🥉 3位決定戦 あり</button>
+            <button data-vs-set="thirdPlaceMatch" data-vs-val="false" class="vs-opt-btn btn-3d py-1 px-2 rounded-xl text-[11px] font-black border-2">⏩ 3位決定戦 なし</button>
+          </div>
+        </div>
+
         <!-- 0. Max Players (2〜10人 / ホストのみ変更可) -->
         <div>
           <div class="text-[10px] font-bold text-slate-400 mb-1">対戦人数（2〜10人）</div>
@@ -3008,6 +3101,145 @@
       </div>
     </div>
   </div>
+  <!-- =========================================================================
+       SCREEN 8: VERSUS TOURNAMENT BRACKET / SPECTATE / CHAMPION (#screen-versus-tournament)
+       ========================================================================= -->
+  <div id="screen-versus-tournament" class="fixed inset-0 z-50 hidden items-center justify-center p-2 sm:p-4 bg-black/82 backdrop-blur-md overflow-hidden">
+    <!-- Confetti / Celebration Layer -->
+    <div id="tourney-fx-layer" class="fixed inset-0 pointer-events-none overflow-hidden z-[52]" aria-hidden="true"></div>
+
+    <div class="relative z-[55] max-w-4xl w-full bg-slate-900/95 border-2 border-amber-400 rounded-3xl p-3 sm:p-5 shadow-2xl max-h-[95vh] overflow-y-auto custom-scroll flex flex-col">
+      <!-- Header -->
+      <div class="flex items-center justify-between gap-2 mb-2.5 flex-wrap">
+        <div class="text-left">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 tracking-wider uppercase">
+              🏆 TOURNAMENT MODE
+            </span>
+            <span id="tourney-rule-badge" class="text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-800 text-cyan-300 border border-cyan-400/50">
+              スコア対決
+            </span>
+          </div>
+          <h2 id="tourney-header-title" class="text-base sm:text-2xl font-black text-white leading-tight mt-0.5">
+            🏆 お会計ピッタリマン トーナメント表
+          </h2>
+        </div>
+        <button id="btn-tourney-leave" type="button" class="btn-3d bg-rose-700 hover:bg-rose-600 text-white text-xs font-black px-3 py-1.5 rounded-xl shrink-0">
+          退出する
+        </button>
+      </div>
+
+      <!-- Status / Next Match Spotlight / Live Spectate Banner -->
+      <div id="tourney-spotlight-box" class="mb-3 rounded-2xl border-2 border-fuchsia-400/80 bg-gradient-to-r from-violet-950/90 via-slate-900/95 to-fuchsia-950/90 p-3 shadow-lg">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div class="text-center sm:text-left min-w-0 flex-1">
+            <div id="tourney-spotlight-tag" class="text-[10px] font-black text-amber-300 tracking-wider uppercase">
+              NEXT MATCH
+            </div>
+            <div id="tourney-spotlight-title" class="text-sm sm:text-lg font-black text-white mt-0.5 break-words">
+              抽選中...
+            </div>
+            <div id="tourney-spotlight-sub" class="text-[11px] font-bold text-slate-300 mt-0.5">
+              まもなく試合が始まります！
+            </div>
+          </div>
+          <div id="tourney-spotlight-actions" class="flex items-center gap-2 shrink-0">
+            <span id="tourney-countdown-pill" class="hidden font-digital text-xs sm:text-sm font-black px-3 py-1.5 rounded-xl bg-slate-950 border border-amber-400 text-amber-300">
+              開始まで 5s
+            </span>
+            <button id="btn-tourney-start-match" type="button" class="hidden btn-3d bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 hover:from-emerald-300 hover:to-cyan-300 text-slate-950 font-black text-xs sm:text-sm px-4 py-2 rounded-xl border-b-4 border-emerald-800 shadow-lg">
+              ⚔️ 試合スタート！
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Spectate Scoreboard (Shown to non-fighting spectators during tournament_playing) -->
+        <div id="tourney-live-spectate" class="hidden mt-2.5 pt-2.5 border-t border-fuchsia-500/40">
+          <div class="flex items-center justify-center gap-1.5 mb-2">
+            <span class="inline-block w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+            <span class="text-[11px] font-black text-rose-300 tracking-widest uppercase">LIVE 観戦中 // REALTIME SCORE</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-11 gap-2 items-center">
+            <div id="tourney-spec-p1-card" class="sm:col-span-5 bg-slate-950/90 border-2 border-cyan-400/80 rounded-xl p-2.5 text-left">
+              <div class="flex items-center justify-between gap-1">
+                <span id="tourney-spec-p1-name" class="text-xs sm:text-sm font-black text-cyan-200 truncate">Player 1</span>
+                <span id="tourney-spec-p1-status" class="text-[10px] font-black text-emerald-300">対戦中</span>
+              </div>
+              <div id="tourney-spec-p1-main" class="font-digital text-xl sm:text-2xl font-black text-amber-300 mt-0.5">0 pt</div>
+              <div id="tourney-spec-p1-sub" class="text-[10px] font-bold text-slate-300">神:0回 / 処理:0人</div>
+            </div>
+            <div class="sm:col-span-1 text-center font-black text-lg sm:text-xl text-amber-300">VS</div>
+            <div id="tourney-spec-p2-card" class="sm:col-span-5 bg-slate-950/90 border-2 border-fuchsia-400/80 rounded-xl p-2.5 text-left">
+              <div class="flex items-center justify-between gap-1">
+                <span id="tourney-spec-p2-name" class="text-xs sm:text-sm font-black text-fuchsia-200 truncate">Player 2</span>
+                <span id="tourney-spec-p2-status" class="text-[10px] font-black text-emerald-300">対戦中</span>
+              </div>
+              <div id="tourney-spec-p2-main" class="font-digital text-xl sm:text-2xl font-black text-amber-300 mt-0.5">0 pt</div>
+              <div id="tourney-spec-p2-sub" class="text-[10px] font-bold text-slate-300">神:0回 / 処理:0人</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grand Champion Celebration Card (Shown only when status === 'tournament_champion') -->
+      <div id="tourney-champion-card" class="hidden mb-3 rounded-3xl border-4 border-amber-300 bg-gradient-to-b from-amber-950/90 via-slate-900/95 to-slate-950 p-4 sm:p-5 text-center relative overflow-hidden shadow-[0_0_45px_rgba(251,191,36,0.55)]">
+        <div class="relative z-10">
+          <div class="inline-block bg-gradient-to-r from-yellow-300 via-amber-400 to-orange-400 text-slate-950 text-[10px] sm:text-xs font-black px-3 py-0.5 rounded-full mb-2 tracking-widest uppercase shadow">
+            👑 GRAND CHAMPION!! 👑
+          </div>
+          <div class="tourney-trophy-anim text-5xl sm:text-6xl leading-none mb-1.5">🏆</div>
+          <div id="tourney-champ-name" class="text-2xl sm:text-4xl font-black text-amber-300 drop-shadow-[0_0_16px_rgba(251,191,36,0.85)] break-words">
+            優勝者名
+          </div>
+          <p id="tourney-champ-sub" class="text-xs sm:text-sm font-bold text-slate-200 mt-1 mb-3">
+            見事トーナメントを制覇しました！
+          </p>
+          <!-- Podium -->
+          <div id="tourney-podium-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-left max-w-2xl mx-auto"></div>
+        </div>
+      </div>
+
+      <!-- Animated Tournament Bracket Tree Container -->
+      <div class="bg-slate-950/90 border border-slate-700/90 rounded-2xl p-3 mb-3 overflow-x-auto custom-scroll">
+        <div id="tourney-bracket-stage" class="relative min-w-max mx-auto">
+          <svg id="tourney-bracket-svg" class="absolute inset-0 pointer-events-none" style="z-index: 1;"></svg>
+          <div id="tourney-bracket-columns" class="relative flex items-stretch gap-6 sm:gap-10" style="z-index: 2;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stamps during Tournament -->
+      <div class="bg-slate-950/85 border border-fuchsia-500/40 rounded-2xl p-2 mb-3 text-left">
+        <div class="flex items-center justify-between gap-2 mb-1">
+          <span class="text-[10px] font-black text-fuchsia-300">💬 応援・クイックスタンプ</span>
+          <span id="tourney-stamp-latest" class="text-[10px] font-bold text-cyan-200 truncate">スタンプで応援しよう！</span>
+        </div>
+        <div class="grid grid-cols-3 sm:grid-cols-6 gap-1">
+          <button type="button" data-vs-stamp="🔥 熱い戦い！" class="vs-stamp-btn btn-3d bg-slate-800 hover:bg-slate-700 border border-slate-600 text-orange-300 text-[10px] font-black py-1 px-1 rounded-lg">🔥 熱い戦い！</button>
+          <button type="button" data-vs-stamp="✨ ナイス神会計！" class="vs-stamp-btn btn-3d bg-slate-800 hover:bg-slate-700 border border-slate-600 text-amber-200 text-[10px] font-black py-1 px-1 rounded-lg">✨ ナイス神会計！</button>
+          <button type="button" data-vs-stamp="👏 おめでとう！" class="vs-stamp-btn btn-3d bg-slate-800 hover:bg-slate-700 border border-slate-600 text-emerald-300 text-[10px] font-black py-1 px-1 rounded-lg">👏 おめでとう！</button>
+          <button type="button" data-vs-stamp="😱 強すぎ…" class="vs-stamp-btn btn-3d bg-slate-800 hover:bg-slate-700 border border-slate-600 text-rose-300 text-[10px] font-black py-1 px-1 rounded-lg">😱 強すぎ…</button>
+          <button type="button" data-vs-stamp="😂 ヤバい！" class="vs-stamp-btn btn-3d bg-slate-800 hover:bg-slate-700 border border-slate-600 text-cyan-200 text-[10px] font-black py-1 px-1 rounded-lg">😂 ヤバい！</button>
+          <button type="button" data-vs-stamp="🏆 優勝狙う！" class="vs-stamp-btn btn-3d bg-slate-800 hover:bg-slate-700 border border-slate-600 text-yellow-300 text-[10px] font-black py-1 px-1 rounded-lg">🏆 優勝狙う！</button>
+        </div>
+      </div>
+
+      <!-- Footer Navigation (Champion Actions) -->
+      <div id="tourney-champion-footer" class="hidden grid-cols-2 sm:grid-cols-3 gap-2">
+        <button id="btn-tourney-to-title" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 text-slate-200 font-extrabold text-xs sm:text-sm py-2.5 rounded-2xl border-b-4 border-slate-950">
+          🏠 タイトルへ
+        </button>
+        <button id="btn-tourney-to-lobby" type="button" class="btn-3d bg-slate-700 hover:bg-slate-600 text-fuchsia-300 font-extrabold text-xs sm:text-sm py-2.5 rounded-2xl border-b-4 border-slate-900">
+          ⚔️ ロビーへ
+        </button>
+        <button id="btn-tourney-rematch" type="button" class="btn-3d col-span-2 sm:col-span-1 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 hover:from-amber-300 hover:to-orange-300 text-slate-950 font-black text-sm py-2.5 rounded-2xl border-b-4 border-amber-800 shadow-lg">
+          🔄 ルームに戻って再戦
+        </button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- =========================================================================
        MODAL: IN-GAME SETTINGS (#modal-game-settings)
@@ -3545,7 +3777,8 @@
       'screen-result',
       'screen-versus-lobby',
       'screen-versus-room',
-      'screen-versus-result'
+      'screen-versus-result',
+      'screen-versus-tournament'
     ];
 
     function switchScreen(activeId) {
@@ -8888,6 +9121,17 @@
           '🤖 釣銭ゼロ号'
         ];
 
+        // トーナメント進行・演出用状態
+        this.lastTourneyId = null;
+        this.lastTourneyPhaseSeq = 0;
+        this.tourneyMatchLaunchedId = null;
+        this.tourneyAdvancingMatchId = null;
+        this.tourneyAutoStartTimer = null;
+        this.tourneyCountdownTimer = null;
+        this.tourneyBotClashTimer = null;
+        this.tourneyDrawTimer = null;
+        this.tourneyChampFxPlayedId = null;
+
         this.bindLobbyAndRoomEvents();
       }
 
@@ -8905,6 +9149,8 @@
           ? ruleType
           : 'change';
         return {
+          format: 'normal',
+          thirdPlaceMatch: true,
           vsRule: vsRule,
           raceTarget: 7,
           ruleType: resolvedRuleType,
@@ -9156,7 +9402,7 @@
             const key = btn.getAttribute('data-vs-set');
             let val = btn.getAttribute('data-vs-val');
             if (key === 'raceTarget' || key === 'lunaticTaxRate' || key === 'maxPlayers') val = Number(val);
-            if (key === 'showChange' || key === 'itemsEnabled') val = (val === 'true');
+            if (key === 'showChange' || key === 'itemsEnabled' || key === 'thirdPlaceMatch') val = (val === 'true');
             if (key === 'maxPlayers') {
               const humans = this.getConnectedHumanEntries(this.lastRoomData).length;
               if (val < Math.max(2, humans)) {
@@ -9224,6 +9470,48 @@
             if (this.vsResultCooldownRemaining > 0) return;
             sound.playClick();
             this.exportVersusReceipt('copy', btnVsRecCopy);
+          });
+        }
+
+        // トーナメント画面ボタン
+        const btnTourneyLeave = document.getElementById('btn-tourney-leave');
+        if (btnTourneyLeave) {
+          btnTourneyLeave.addEventListener('click', () => {
+            sound.playReturn();
+            this.leaveRoom();
+            this.openLobby();
+          });
+        }
+        const btnTourneyStartMatch = document.getElementById('btn-tourney-start-match');
+        if (btnTourneyStartMatch) {
+          btnTourneyStartMatch.addEventListener('click', () => {
+            if (!this.isHost || !this.lastRoomData) return;
+            sound.playClick();
+            this.clearTournamentTimers();
+            this.hostStartTournamentMatch(this.lastRoomData);
+          });
+        }
+        const btnTourneyTitle = document.getElementById('btn-tourney-to-title');
+        if (btnTourneyTitle) {
+          btnTourneyTitle.addEventListener('click', () => {
+            sound.playReturn();
+            this.leaveRoom();
+            this.game.goToTitle();
+          });
+        }
+        const btnTourneyLobby = document.getElementById('btn-tourney-to-lobby');
+        if (btnTourneyLobby) {
+          btnTourneyLobby.addEventListener('click', () => {
+            sound.playClick();
+            this.leaveRoom();
+            this.openLobby();
+          });
+        }
+        const btnTourneyRematch = document.getElementById('btn-tourney-rematch');
+        if (btnTourneyRematch) {
+          btnTourneyRematch.addEventListener('click', () => {
+            sound.playClick();
+            this.requestRematch();
           });
         }
       }
@@ -9345,7 +9633,18 @@
       }
 
       getActiveParticipants(data) {
-        return this.getPlayerEntries(data).filter(({ player }) => player.isBot || player.connected !== false);
+        const all = this.getPlayerEntries(data).filter(({ player }) => player.isBot || player.connected !== false);
+        if (data && data.status === 'tournament_playing' && data.tournament && data.tournament.activeMatchId && data.tournament.matches) {
+          const m = data.tournament.matches[data.tournament.activeMatchId];
+          if (m) {
+            return all.filter(({ slot }) => slot === m.p1 || slot === m.p2);
+          }
+        }
+        return all;
+      }
+
+      isTournamentRoom(data) {
+        return Boolean(data && ((data.settings && data.settings.format === 'tournament') || data.tournament));
       }
 
       clearVersusResultCooldown() {
@@ -9459,6 +9758,13 @@
         }, 100);
       }
 
+      clearTournamentTimers() {
+        if (this.tourneyAutoStartTimer) { clearTimeout(this.tourneyAutoStartTimer); this.tourneyAutoStartTimer = null; }
+        if (this.tourneyCountdownTimer) { clearInterval(this.tourneyCountdownTimer); this.tourneyCountdownTimer = null; }
+        if (this.tourneyBotClashTimer) { clearInterval(this.tourneyBotClashTimer); this.tourneyBotClashTimer = null; }
+        if (this.tourneyDrawTimer) { clearInterval(this.tourneyDrawTimer); this.tourneyDrawTimer = null; }
+      }
+
       stopBotTimers() {
         this.clearVersusResultCooldown();
         if (this.botFillTimer) {
@@ -9473,6 +9779,7 @@
           clearInterval(this.botSimTimer);
           this.botSimTimer = null;
         }
+        this.clearTournamentTimers();
         this.botFillTriggered = false;
         this.isMergingRandom = false;
         this.botStates = {};
@@ -10089,7 +10396,8 @@
         // 相手のオートアイテム発動通知チェック
         if (data && data.autoEvent && typeof data.autoEvent.seq === 'number' && data.autoEvent.seq > this.lastAutoEventSeq) {
           this.lastAutoEventSeq = data.autoEvent.seq;
-          if (data.status === 'playing' && data.autoEvent.fromSlot && data.autoEvent.fromSlot !== this.mySlot) {
+          const isPlayStatus = (data.status === 'playing' || (data.status === 'tournament_playing' && this.getActiveParticipants(data).some((x) => x.slot === this.mySlot)));
+          if (isPlayStatus && data.autoEvent.fromSlot && data.autoEvent.fromSlot !== this.mySlot) {
             if (this.game && typeof this.game.showOpponentAutoNotice === 'function') {
               this.game.showOpponentAutoNotice(data.autoEvent.fromName || '相手');
             }
@@ -10099,7 +10407,8 @@
         // 相手のドパガキ・ブラックアウト発生通知チェック（自分はブラックアウトせず時間停止のみ連動！）
         if (data && data.blackoutEvent && typeof data.blackoutEvent.seq === 'number' && data.blackoutEvent.seq > this.lastBlackoutEventSeq) {
           this.lastBlackoutEventSeq = data.blackoutEvent.seq;
-          if (data.status === 'playing' && data.blackoutEvent.fromSlot && data.blackoutEvent.fromSlot !== this.mySlot) {
+          const isPlayStatusBo = (data.status === 'playing' || (data.status === 'tournament_playing' && this.getActiveParticipants(data).some((x) => x.slot === this.mySlot)));
+          if (isPlayStatusBo && data.blackoutEvent.fromSlot && data.blackoutEvent.fromSlot !== this.mySlot) {
             if (this.game && typeof this.game.triggerOpponentBlackoutFreeze === 'function') {
               this.game.triggerOpponentBlackoutFreeze(data.blackoutEvent.fromName || '相手');
             }
@@ -10228,9 +10537,869 @@
           return;
         }
 
+        if (data.status === 'tournament_bracket' || data.status === 'tournament_playing' || data.status === 'tournament_champion') {
+          this.handleTournamentRoomUpdate(data);
+          return;
+        }
+
         if (data.status === 'finished' && !this.resultShown) {
           this.showVersusResult(data);
         }
+      }
+
+      // =====================================================================
+      // トーナメントモード（ブラケット生成・3位決定戦対応・抽選演出・1v1進行・観戦・優勝演出）
+      // =====================================================================
+      getTournamentRoundLabel(roundIdx, totalRounds) {
+        const fromEnd = totalRounds - 1 - roundIdx;
+        if (fromEnd === 0) return '👑 決勝戦';
+        if (fromEnd === 1) return '🔥 準決勝';
+        if (fromEnd === 2) return '⚔️ 準々決勝';
+        return `🎯 ${roundIdx + 1}回戦`;
+      }
+
+      buildTournamentState(playersMap, thirdPlaceMatch = true) {
+        const slots = Object.keys(playersMap).filter((k) => playersMap[k] && playersMap[k].name);
+        for (let i = slots.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [slots[i], slots[j]] = [slots[j], slots[i]];
+        }
+
+        const n = slots.length;
+        let bracketSize = 2;
+        while (bracketSize < n) bracketSize *= 2;
+        const totalRounds = Math.round(Math.log2(bracketSize));
+        const enableThirdPlace = Boolean(thirdPlaceMatch && n >= 4 && totalRounds >= 2);
+
+        const matches = {};
+        const matchOrder = [];
+
+        for (let r = 0; r < totalRounds; r++) {
+          const count = bracketSize / Math.pow(2, r + 1);
+          const rLabel = this.getTournamentRoundLabel(r, totalRounds);
+          if (enableThirdPlace && r === totalRounds - 1) {
+            matches['third_place'] = {
+              id: 'third_place',
+              round: r,
+              index: 1,
+              roundLabel: '🥉 3位決定戦',
+              p1: null,
+              p2: null,
+              winner: null,
+              loser: null,
+              p1Score: 0,
+              p2Score: 0,
+              p1Hp: this.VS_JAMMER_MAX_HP,
+              p2Hp: this.VS_JAMMER_MAX_HP,
+              isBye: false,
+              isThirdPlace: true,
+              status: 'pending',
+              nextMatchId: null,
+              nextSlotKey: null
+            };
+            matchOrder.push('third_place');
+          }
+          for (let i = 0; i < count; i++) {
+            const id = `r${r}_m${i}`;
+            const nextMatchId = (r + 1 < totalRounds) ? `r${r + 1}_m${Math.floor(i / 2)}` : null;
+            const nextSlotKey = (i % 2 === 0) ? 'p1' : 'p2';
+            matches[id] = {
+              id,
+              round: r,
+              index: i,
+              roundLabel: rLabel,
+              p1: null,
+              p2: null,
+              winner: null,
+              loser: null,
+              p1Score: 0,
+              p2Score: 0,
+              p1Hp: this.VS_JAMMER_MAX_HP,
+              p2Hp: this.VS_JAMMER_MAX_HP,
+              isBye: false,
+              isThirdPlace: false,
+              status: 'pending',
+              nextMatchId,
+              nextSlotKey
+            };
+            matchOrder.push(id);
+          }
+        }
+
+        const r0Count = bracketSize / 2;
+        for (let i = 0; i < r0Count; i++) {
+          matches[`r0_m${i}`].p1 = slots[i] || null;
+        }
+        for (let i = r0Count; i < n; i++) {
+          matches[`r0_m${i - r0Count}`].p2 = slots[i] || null;
+        }
+
+        for (let i = 0; i < r0Count; i++) {
+          const m = matches[`r0_m${i}`];
+          if (m.p1 && !m.p2) {
+            m.isBye = true;
+            m.status = 'done';
+            m.winner = m.p1;
+            if (m.nextMatchId && matches[m.nextMatchId]) {
+              matches[m.nextMatchId][m.nextSlotKey] = m.p1;
+            }
+          }
+        }
+
+        let firstMatchId = null;
+        for (const id of matchOrder) {
+          const m = matches[id];
+          if (m.status === 'pending' && m.p1 && m.p2) {
+            m.status = 'ready';
+            firstMatchId = id;
+            break;
+          }
+        }
+
+        return {
+          id: 't_' + Date.now(),
+          bracketSize,
+          totalRounds,
+          thirdPlaceEnabled: enableThirdPlace,
+          phase: 'draw',
+          phaseSeq: 1,
+          activeMatchId: firstMatchId,
+          lastFinishedMatchId: null,
+          lastMatchSummary: null,
+          championSlot: null,
+          runnerUpSlot: null,
+          thirdPlaceSlot: null,
+          fourthPlaceSlot: null,
+          semiLoserSlots: [],
+          matches,
+          matchOrder
+        };
+      }
+
+      cleanupTournamentPlayUI() {
+        if (this.finishWaitTimeout) {
+          clearTimeout(this.finishWaitTimeout);
+          this.finishWaitTimeout = null;
+        }
+        if (this.game && (this.game.isVersusRun || this.game.state === 'PLAYING' || this.game.state === 'COUNTDOWN')) {
+          this.game.clearActiveTimers();
+          this.game.state = 'RESULT';
+          this.game.isVersusRun = false;
+          clearSeededRng();
+          this.game.trayList = [];
+          this.game.exitZoneMode();
+          this.game.scene3D.clearAllTrayItems(false);
+          this.game.scene3D.setTitleMode(true);
+          const hideIds = ['ui-judgment-overlay', 'vs-opponent-bar', 'vs-hp-bar-wrap', 'vs-items-row', 'vs-tray-jammer-banner', 'vs-auto-banner', 'lunatic-banner'];
+          hideIds.forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden');
+          });
+          this.game.vsAutoTimeLeft = 0;
+          this.game.vsAutoFinishingTurn = false;
+          if (typeof this.game.clearScreenJammerCoins === 'function') this.game.clearScreenJammerCoins();
+          if (typeof this.game.clearBlackoutFreeze === 'function') this.game.clearBlackoutFreeze();
+        }
+      }
+
+      handleTournamentRoomUpdate(data) {
+        const t = data.tournament;
+        if (!t || !t.matches) return;
+
+        if (data.status === 'tournament_playing') {
+          const activeMatch = t.activeMatchId ? t.matches[t.activeMatchId] : null;
+          if (!activeMatch) return;
+          const amIFighter = (this.mySlot === activeMatch.p1 || this.mySlot === activeMatch.p2);
+
+          if (this.tourneyMatchLaunchedId !== activeMatch.id) {
+            this.tourneyMatchLaunchedId = activeMatch.id;
+            this.tourneyAdvancingMatchId = null;
+            this.resultShown = false;
+            this.lastJammerSeq = 0;
+            this.lastReceivedDamage = 0;
+            this.jammerSentCount = 0;
+            this.damageDealtTotal = 0;
+            this.clearTournamentTimers();
+
+            if (amIFighter) {
+              this.game.startVersusPlay(data);
+            } else {
+              this.cleanupTournamentPlayUI();
+              switchScreen('screen-versus-tournament');
+            }
+            if (this.isHost) {
+              this.startBotSimulation(data);
+            }
+          }
+
+          if (amIFighter) {
+            this.updateOpponentHUD(data);
+            if (data.settings && data.settings.vsRule === 'jammer' && data.jammers && this.mySlot) {
+              const jam = data.jammers[this.mySlot];
+              if (jam && jam.seq > this.lastJammerSeq) {
+                this.lastJammerSeq = jam.seq;
+                const totalDmg = Number(jam.totalDamage || 0);
+                const deltaDmg = Math.max(0, totalDmg > 0 ? (totalDmg - this.lastReceivedDamage) : Number(jam.damage || 0));
+                if (totalDmg > this.lastReceivedDamage) this.lastReceivedDamage = totalDmg;
+                const stunSec = Number(jam.stunSec || 0);
+                const trayJamCoins = Array.isArray(jam.trayJamCoins) ? jam.trayJamCoins : [];
+                if ((jam.c1 || 0) > 0 || (jam.c10 || 0) > 0 || deltaDmg > 0 || stunSec > 0 || trayJamCoins.length > 0) {
+                  this.game.receiveVersusJammer(
+                    jam.c1 || 0,
+                    jam.c10 || 0,
+                    jam.fromCombo || 1,
+                    jam.fromName || 'ライバル',
+                    deltaDmg,
+                    Boolean(jam.isZone),
+                    stunSec,
+                    trayJamCoins
+                  );
+                }
+              }
+            }
+          } else {
+            this.renderTournamentScreen(data, false);
+          }
+
+          if (data.winner) {
+            if (this.botSimTimer) {
+              clearInterval(this.botSimTimer);
+              this.botSimTimer = null;
+            }
+            if (amIFighter && !this.resultShown) {
+              this.resultShown = true;
+              const isWin = data.winner.slot === this.mySlot;
+              const isJammer = data.settings && data.settings.vsRule === 'jammer';
+              const standings = this.getSortedStandings(data);
+              const isKoWin = Boolean(isWin && isJammer && standings.some((p) => !p.isMe && (p.hp <= 0 || p.koDefeated)));
+              StatsManager.recordVersusRun({
+                outcome: isWin ? 'win' : 'loss',
+                isKoWin,
+                mode: (data.settings && data.settings.difficulty) || 'NORMAL',
+                score: this.game.score || 0,
+                served: Math.max(0, this.game.customerIndex - 1),
+                perfectCount: this.game.perfectCount || 0,
+                answerSecSum: this.game.runAnswerTimeSum || 0,
+                answerCount: this.game.runAnswerCount || 0,
+                mistakeLogs: this.game.mistakeLogs || []
+              });
+              this.game.checkAndNotifyNewSkins();
+            }
+            if (this.isHost && this.tourneyAdvancingMatchId !== activeMatch.id) {
+              this.tourneyAdvancingMatchId = activeMatch.id;
+              this.hostAdvanceTournament(data, data.winner);
+            }
+            return;
+          }
+
+          const participants = this.getActiveParticipants(data);
+          if (participants.length <= 1 && !data.winner) {
+            const survivor = participants[0];
+            if (survivor) {
+              this.claimWinner(survivor.slot, `⚡ 相手が退出したため ${survivor.player.name} の不戦勝！`);
+            }
+            return;
+          }
+
+          if (data.settings && data.settings.vsRule === 'jammer' && participants.length === 2 && !data.winner) {
+            const alive = participants.filter(({ player }) => {
+              const hpVal = typeof player.hp === 'number' ? player.hp : this.VS_JAMMER_MAX_HP;
+              return !player.koDefeated && hpVal > 0 && !player.failedSuddenDeath;
+            });
+            const hasAnyKO = participants.some(({ player }) => {
+              const hpVal = typeof player.hp === 'number' ? player.hp : this.VS_JAMMER_MAX_HP;
+              return Boolean(player.koDefeated) || hpVal <= 0;
+            });
+            if (hasAnyKO && alive.length === 1) {
+              const survivor = alive[0];
+              this.claimWinner(survivor.slot, `💥 ${survivor.player.name} が相手をK.O.（HP 0）にして勝ち上がり！`);
+              return;
+            }
+          }
+
+          const allFinished = participants.length === 2 && participants.every(({ player }) => Boolean(player.finished));
+          if (allFinished && !data.winner) {
+            this.resolveScoreWinner(data);
+          }
+          return;
+        }
+
+        this.cleanupTournamentPlayUI();
+        if (this.botSimTimer) {
+          clearInterval(this.botSimTimer);
+          this.botSimTimer = null;
+        }
+        switchScreen('screen-versus-tournament');
+
+        const isNewPhase = (this.lastTourneyId !== t.id || this.lastTourneyPhaseSeq !== t.phaseSeq);
+        const isFirstDraw = (this.lastTourneyId !== t.id && t.phase === 'draw');
+        this.lastTourneyId = t.id;
+        this.lastTourneyPhaseSeq = t.phaseSeq;
+
+        if (isFirstDraw) {
+          this.playTournamentDrawAnimation(data);
+          return;
+        }
+
+        this.renderTournamentScreen(data, isNewPhase);
+
+        if (data.status === 'tournament_champion') {
+          if (this.tourneyChampFxPlayedId !== t.id) {
+            this.tourneyChampFxPlayedId = t.id;
+            this.playTournamentChampionFX();
+          }
+          return;
+        }
+
+        if (isNewPhase && t.phase === 'advance') {
+          sound.playRouletteDecide();
+        }
+
+        if (this.isHost && isNewPhase && data.status === 'tournament_bracket') {
+          this.scheduleHostTournamentNextStep(data);
+        }
+      }
+
+      playTournamentDrawAnimation(data) {
+        this.clearTournamentTimers();
+        const allNames = Object.values(data.players || {}).filter((p) => p && p.name).map((p) => p.name);
+        this.renderTournamentScreen(data, false, true);
+
+        const tagEl = document.getElementById('tourney-spotlight-tag');
+        const titleEl = document.getElementById('tourney-spotlight-title');
+        const subEl = document.getElementById('tourney-spotlight-sub');
+        if (tagEl) tagEl.textContent = '🎰 TOURNAMENT DRAW!!';
+        if (titleEl) titleEl.textContent = '組み合わせ抽選中...';
+        if (subEl) subEl.textContent = '対戦カードを決定しています！';
+
+        let ticks = 0;
+        const maxTicks = 13;
+        this.tourneyDrawTimer = setInterval(() => {
+          ticks++;
+          sound.playRouletteTick(ticks);
+          const nameNodes = document.querySelectorAll('#tourney-bracket-columns .tourney-draw-name');
+          nameNodes.forEach((el) => {
+            if (allNames.length > 0) {
+              el.textContent = allNames[Math.floor(Math.random() * allNames.length)];
+            }
+          });
+          if (ticks >= maxTicks) {
+            clearInterval(this.tourneyDrawTimer);
+            this.tourneyDrawTimer = null;
+            sound.playRouletteDecide();
+            this.renderTournamentScreen(data, true, false);
+            if (this.isHost) {
+              this.scheduleHostTournamentNextStep(data);
+            }
+          }
+        }, 105);
+      }
+
+      scheduleHostTournamentNextStep(data) {
+        this.clearTournamentTimers();
+        const t = data.tournament;
+        if (!t || !t.activeMatchId || !t.matches) return;
+        const m = t.matches[t.activeMatchId];
+        if (!m || !m.p1 || !m.p2) return;
+
+        const p1 = data.players ? data.players[m.p1] : null;
+        const p2 = data.players ? data.players[m.p2] : null;
+        const isBotVsBot = Boolean(p1 && p1.isBot && p2 && p2.isBot);
+
+        if (isBotVsBot) {
+          const delayMs = t.phase === 'advance' ? 1600 : 1200;
+          this.tourneyAutoStartTimer = setTimeout(() => {
+            this.runHostBotVsBotClash(data, m);
+          }, delayMs);
+        } else {
+          let secLeft = t.phase === 'advance' ? 6 : 5;
+          const cdPill = document.getElementById('tourney-countdown-pill');
+          if (cdPill) {
+            cdPill.classList.remove('hidden');
+            cdPill.textContent = `自動開始まで ${secLeft}s`;
+          }
+          this.tourneyCountdownTimer = setInterval(() => {
+            secLeft--;
+            if (cdPill) cdPill.textContent = `自動開始まで ${Math.max(0, secLeft)}s`;
+            if (secLeft <= 0) {
+              this.clearTournamentTimers();
+              if (this.lastRoomData && this.lastRoomData.status === 'tournament_bracket') {
+                this.hostStartTournamentMatch(this.lastRoomData);
+              }
+            }
+          }, 1000);
+        }
+      }
+
+      runHostBotVsBotClash(data, match) {
+        if (!this.isHost || !this.roomRef) return;
+        const p1 = data.players[match.p1];
+        const p2 = data.players[match.p2];
+        if (!p1 || !p2) return;
+
+        const cardEl = document.querySelector(`[data-tourney-match-id="${match.id}"]`);
+        if (cardEl) cardEl.classList.add('tourney-match-clash');
+
+        const tagEl = document.getElementById('tourney-spotlight-tag');
+        const titleEl = document.getElementById('tourney-spotlight-title');
+        const subEl = document.getElementById('tourney-spotlight-sub');
+        if (tagEl) tagEl.textContent = `🤖 BOT BATTLE // ${match.roundLabel}`;
+        if (titleEl) titleEl.textContent = `${p1.name} ⚔️ ${p2.name}`;
+        if (subEl) subEl.textContent = 'BOT同士が白熱の暗算バトルを展開中...！';
+
+        let step = 0;
+        let s1 = 0, s2 = 0;
+        this.tourneyBotClashTimer = setInterval(() => {
+          step++;
+          sound.playRouletteTick(step);
+          s1 += 1800 + Math.floor(Math.random() * 4500);
+          s2 += 1800 + Math.floor(Math.random() * 4500);
+          if (subEl) {
+            subEl.textContent = `⚡ ${p1.name}: ${s1.toLocaleString()}pt  VS  ${p2.name}: ${s2.toLocaleString()}pt`;
+          }
+          if (step >= 12) {
+            clearInterval(this.tourneyBotClashTimer);
+            this.tourneyBotClashTimer = null;
+            if (s1 === s2) s1 += 500;
+            const winSlot = s1 > s2 ? match.p1 : match.p2;
+            const winName = winSlot === match.p1 ? p1.name : p2.name;
+            const fakeData = {
+              ...data,
+              players: {
+                ...data.players,
+                [match.p1]: { ...p1, score: s1, hp: winSlot === match.p1 ? 850 : 0 },
+                [match.p2]: { ...p2, score: s2, hp: winSlot === match.p2 ? 850 : 0 }
+              }
+            };
+            this.hostAdvanceTournament(fakeData, {
+              slot: winSlot,
+              reason: `🤖 BOT対決を制して ${winName} が勝利！`
+            });
+          }
+        }, 160);
+      }
+
+      hostStartTournamentMatch(data) {
+        if (!this.isHost || !this.roomRef || !data || !data.tournament) return;
+        const t = data.tournament;
+        const m = t.activeMatchId ? t.matches[t.activeMatchId] : null;
+        if (!m || !m.p1 || !m.p2) return;
+
+        const p1Orig = data.players[m.p1];
+        const p2Orig = data.players[m.p2];
+        if (!p1Orig || !p2Orig) return;
+
+        const freshP1 = this.makeEmptyPlayer(p1Orig.name, Boolean(p1Orig.isBot), p1Orig.uid);
+        const freshP2 = this.makeEmptyPlayer(p2Orig.name, Boolean(p2Orig.isBot), p2Orig.uid);
+        const freshJam = { seq: 0, c1: 0, c10: 0, damage: 0, totalDamage: 0, isZone: false, stunSec: 0, trayJamCoins: null, fromCombo: 0, fromName: '' };
+
+        const seed = Math.floor(Math.random() * 2147483640) + 1;
+        const updates = {
+          status: 'tournament_playing',
+          seed,
+          startedAt: Date.now(),
+          winner: null,
+          [`players/${m.p1}`]: freshP1,
+          [`players/${m.p2}`]: freshP2,
+          [`jammers/${m.p1}`]: freshJam,
+          [`jammers/${m.p2}`]: freshJam,
+          'tournament/phase': 'playing',
+          'tournament/phaseSeq': (t.phaseSeq || 1) + 1,
+          [`tournament/matches/${m.id}/status`]: 'playing'
+        };
+        this.roomRef.update(updates).catch(() => {});
+      }
+
+      hostAdvanceTournament(data, winnerObj) {
+        if (!this.isHost || !this.roomRef || !data || !data.tournament) return;
+        const t = JSON.parse(JSON.stringify(data.tournament));
+        const m = t.activeMatchId ? t.matches[t.activeMatchId] : null;
+        if (!m) return;
+
+        const winSlot = (winnerObj && (winnerObj.slot === m.p1 || winnerObj.slot === m.p2)) ? winnerObj.slot : m.p1;
+        const loseSlot = (winSlot === m.p1) ? m.p2 : m.p1;
+        const p1Obj = (data.players && data.players[m.p1]) || {};
+        const p2Obj = (data.players && data.players[m.p2]) || {};
+
+        m.winner = winSlot;
+        m.loser = loseSlot;
+        m.status = 'done';
+        m.p1Score = Number(p1Obj.score || 0);
+        m.p2Score = Number(p2Obj.score || 0);
+        m.p1Hp = typeof p1Obj.hp === 'number' ? p1Obj.hp : this.VS_JAMMER_MAX_HP;
+        m.p2Hp = typeof p2Obj.hp === 'number' ? p2Obj.hp : this.VS_JAMMER_MAX_HP;
+
+        if (!m.isThirdPlace && t.totalRounds >= 2 && m.round === t.totalRounds - 2) {
+          if (!Array.isArray(t.semiLoserSlots)) t.semiLoserSlots = [];
+          if (!t.semiLoserSlots.includes(loseSlot)) t.semiLoserSlots.push(loseSlot);
+          if (t.matches['third_place']) {
+            if (m.index === 0) t.matches['third_place'].p1 = loseSlot;
+            else t.matches['third_place'].p2 = loseSlot;
+          }
+        }
+
+        const winName = (data.players && data.players[winSlot] && data.players[winSlot].name) || winSlot;
+        const loseName = (data.players && data.players[loseSlot] && data.players[loseSlot].name) || loseSlot;
+        t.lastFinishedMatchId = m.id;
+        t.lastMatchSummary = {
+          matchId: m.id,
+          roundLabel: m.roundLabel,
+          isThirdPlace: Boolean(m.isThirdPlace),
+          winnerSlot: winSlot,
+          winnerName: winName,
+          loserSlot: loseSlot,
+          loserName: loseName,
+          reason: (winnerObj && winnerObj.reason) || `🏆 ${winName} が勝利！`
+        };
+        t.phaseSeq = (t.phaseSeq || 1) + 1;
+
+        if (m.isThirdPlace) {
+          t.thirdPlaceSlot = winSlot;
+          t.fourthPlaceSlot = loseSlot;
+        } else if (!m.nextMatchId) {
+          t.championSlot = winSlot;
+          t.runnerUpSlot = loseSlot;
+          t.activeMatchId = null;
+          t.phase = 'champion';
+          this.roomRef.update({
+            status: 'tournament_champion',
+            winner: null,
+            tournament: t
+          }).catch(() => {});
+          return;
+        } else {
+          const nextM = t.matches[m.nextMatchId];
+          if (nextM) {
+            nextM[m.nextSlotKey] = winSlot;
+          }
+        }
+
+        let nextPlayableId = null;
+        for (const id of t.matchOrder) {
+          const cand = t.matches[id];
+          if (cand && cand.status === 'pending' && cand.p1 && cand.p2) {
+            cand.status = 'ready';
+            nextPlayableId = id;
+            break;
+          }
+        }
+        t.activeMatchId = nextPlayableId;
+        t.phase = 'advance';
+
+        this.roomRef.update({
+          status: 'tournament_bracket',
+          winner: null,
+          tournament: t
+        }).catch(() => {});
+      }
+
+      renderTournamentScreen(data, animateAdvance = false, isDrawFlicker = false) {
+        const t = data.tournament;
+        if (!t || !t.matches) return;
+        const s = { ...this.getDefaultSettings(), ...(data.settings || {}) };
+        const players = data.players || {};
+
+        const ruleBadge = document.getElementById('tourney-rule-badge');
+        if (ruleBadge) {
+          const rStr = s.vsRule === 'jammer' ? '❤️HPお邪魔' : (s.vsRule === 'race' ? `⚡${s.raceTarget || 7}人先取` : '🏆スコア対決');
+          const tpStr = t.thirdPlaceEnabled ? ' / 🥉3位決定戦あり' : '';
+          ruleBadge.textContent = `${rStr} / ${s.difficulty || 'NORMAL'}${tpStr}`;
+        }
+
+        const isChampion = data.status === 'tournament_champion';
+        const isPlaying = data.status === 'tournament_playing';
+        const activeMatch = t.activeMatchId ? t.matches[t.activeMatchId] : null;
+
+        const spotlightBox = document.getElementById('tourney-spotlight-box');
+        const champCard = document.getElementById('tourney-champion-card');
+        const champFooter = document.getElementById('tourney-champion-footer');
+        const liveSpec = document.getElementById('tourney-live-spectate');
+        const startMatchBtn = document.getElementById('btn-tourney-start-match');
+        const cdPill = document.getElementById('tourney-countdown-pill');
+
+        if (spotlightBox) spotlightBox.classList.toggle('hidden', isChampion);
+        if (champCard) champCard.classList.toggle('hidden', !isChampion);
+        if (champFooter) {
+          champFooter.classList.toggle('hidden', !isChampion);
+          if (isChampion) champFooter.classList.add('grid');
+          else champFooter.classList.remove('grid');
+        }
+        if (liveSpec) liveSpec.classList.toggle('hidden', !isPlaying);
+
+        if (isChampion) {
+          const champP = players[t.championSlot] || { name: '優勝者' };
+          const runnerP = players[t.runnerUpSlot] || null;
+          const thirdP = t.thirdPlaceSlot ? players[t.thirdPlaceSlot] : null;
+          const semiLosers = (Array.isArray(t.semiLoserSlots) ? t.semiLoserSlots : []).map((sl) => players[sl]).filter(Boolean);
+
+          const cNameEl = document.getElementById('tourney-champ-name');
+          const cSubEl = document.getElementById('tourney-champ-sub');
+          if (cNameEl) cNameEl.textContent = champP.name + (t.championSlot === this.mySlot ? ' (YOU!)' : '');
+          if (cSubEl) {
+            cSubEl.textContent = t.championSlot === this.mySlot
+              ? '🎉 おめでとうございます！あなたがトーナメント王者です！！'
+              : `👑 ${champP.name} が激戦のトーナメントを制覇しました！`;
+          }
+
+          const podiumEl = document.getElementById('tourney-podium-grid');
+          if (podiumEl) {
+            const thirdLabel = thirdP ? '🥉 3位 (3RD PLACE)' : '🥉 ベスト4';
+            const thirdText = thirdP ? thirdP.name : (semiLosers.length > 0 ? semiLosers.map((p) => p.name).join(' / ') : '---');
+            podiumEl.innerHTML = `
+              <div class="bg-amber-500/20 border-2 border-amber-400 rounded-2xl p-2.5">
+                <div class="text-[10px] font-black text-amber-300">🥇 優勝 (CHAMPION)</div>
+                <div class="text-sm font-black text-white truncate mt-0.5">${escapeHtml(champP.name)}</div>
+              </div>
+              <div class="bg-slate-800/90 border-2 border-slate-400/70 rounded-2xl p-2.5">
+                <div class="text-[10px] font-black text-slate-300">🥈 準優勝 (2ND)</div>
+                <div class="text-sm font-black text-white truncate mt-0.5">${escapeHtml(runnerP ? runnerP.name : '---')}</div>
+              </div>
+              <div class="bg-orange-950/60 border-2 border-orange-400/60 rounded-2xl p-2.5">
+                <div class="text-[10px] font-black text-orange-300">${thirdLabel}</div>
+                <div class="text-xs sm:text-sm font-black text-white truncate mt-0.5">${escapeHtml(thirdText)}</div>
+              </div>
+            `;
+          }
+        } else if (activeMatch) {
+          const p1 = players[activeMatch.p1] || { name: 'TBD' };
+          const p2 = players[activeMatch.p2] || { name: 'TBD' };
+          const tagEl = document.getElementById('tourney-spotlight-tag');
+          const titleEl = document.getElementById('tourney-spotlight-title');
+          const subEl = document.getElementById('tourney-spotlight-sub');
+          const isBotMatch = Boolean(p1.isBot && p2.isBot);
+
+          if (isPlaying) {
+            if (tagEl) tagEl.textContent = `📺 LIVE NOW // ${activeMatch.roundLabel}`;
+            if (titleEl) titleEl.textContent = `${p1.name}  VS  ${p2.name}`;
+            if (subEl) subEl.textContent = '試合がリアルタイム進行中！スタンプで応援しよう！';
+            if (startMatchBtn) startMatchBtn.classList.add('hidden');
+            if (cdPill) cdPill.classList.add('hidden');
+
+            const isJammer = s.vsRule === 'jammer';
+            const setSpec = (prefix, pObj) => {
+              const nEl = document.getElementById(`tourney-spec-${prefix}-name`);
+              const stEl = document.getElementById(`tourney-spec-${prefix}-status`);
+              const mEl = document.getElementById(`tourney-spec-${prefix}-main`);
+              const sbEl = document.getElementById(`tourney-spec-${prefix}-sub`);
+              if (nEl) nEl.textContent = pObj.name || '---';
+              if (stEl) {
+                stEl.textContent = pObj.koDefeated ? '💀 K.O.' : (pObj.finished ? '🏁 終了' : (pObj.combo >= 2 ? `🔥 ${pObj.combo}連鎖` : '⚔️ 対戦中'));
+              }
+              if (mEl) {
+                if (isJammer) {
+                  const hp = typeof pObj.hp === 'number' ? pObj.hp : this.VS_JAMMER_MAX_HP;
+                  mEl.textContent = hp <= 0 ? '💀 0 HP' : `❤️ ${hp} HP`;
+                } else if (s.vsRule === 'race') {
+                  mEl.textContent = `✨ ${pObj.perfectCount || 0} / ${s.raceTarget || 7} 神`;
+                } else {
+                  mEl.textContent = `${Number(pObj.score || 0).toLocaleString()} pt`;
+                }
+              }
+              if (sbEl) {
+                sbEl.textContent = `神:${pObj.perfectCount || 0}回 ／ 処理:${pObj.served || 0}人 ／ ${Number(pObj.score || 0).toLocaleString()}pt`;
+              }
+            };
+            setSpec('p1', p1);
+            setSpec('p2', p2);
+          } else {
+            const amINext = (this.mySlot === activeMatch.p1 || this.mySlot === activeMatch.p2);
+            if (tagEl) {
+              if (t.lastMatchSummary && t.phase === 'advance') {
+                const prevTag = t.lastMatchSummary.isThirdPlace
+                  ? `🥉 ${t.lastMatchSummary.winnerName} が3位決定！`
+                  : `🎉 ${t.lastMatchSummary.winnerName} が勝ち上がり！`;
+                tagEl.textContent = `${prevTag} ➔ NEXT: ${activeMatch.roundLabel}`;
+              } else {
+                tagEl.textContent = `🔥 NEXT MATCH // ${activeMatch.roundLabel}`;
+              }
+            }
+            if (titleEl) titleEl.textContent = `${p1.name}  ⚔️  ${p2.name}`;
+            if (subEl) {
+              subEl.textContent = isBotMatch
+                ? '🤖 BOT同士の対決！まもなくシミュレーション決着します...'
+                : (amINext ? '⚡ あなたの出番です！準備してください！' : '⏳ まもなく次の試合が始まります（観戦モード）');
+            }
+            if (startMatchBtn) {
+              startMatchBtn.classList.toggle('hidden', !(this.isHost && !isBotMatch && !isDrawFlicker));
+            }
+            if (cdPill && (!this.isHost || isBotMatch || isDrawFlicker)) {
+              cdPill.classList.add('hidden');
+            }
+          }
+        }
+
+        const colsEl = document.getElementById('tourney-bracket-columns');
+        if (!colsEl) return;
+        colsEl.innerHTML = '';
+
+        const buildMatchCard = (m) => {
+          const p1 = m.p1 ? players[m.p1] : null;
+          const p2 = m.p2 ? players[m.p2] : null;
+          const isActive = (m.id === t.activeMatchId && !isChampion);
+          const isJustFinished = (animateAdvance && m.id === t.lastFinishedMatchId);
+          const isNextTargetSlot = (animateAdvance && t.lastFinishedMatchId && t.matches[t.lastFinishedMatchId] && t.matches[t.lastFinishedMatchId].nextMatchId === m.id);
+          const nextSlotKey = isNextTargetSlot ? t.matches[t.lastFinishedMatchId].nextSlotKey : null;
+
+          const card = document.createElement('div');
+          card.setAttribute('data-tourney-match-id', m.id);
+          card.className = `rounded-2xl border-2 bg-slate-900/95 p-1.5 shadow-lg transition-all ${
+            isDrawFlicker
+              ? 'tourney-match-draw border-cyan-400'
+              : (isActive
+                ? 'tourney-match-active border-amber-400'
+                : (m.isThirdPlace ? 'border-orange-500/60' : (m.status === 'done' ? 'border-slate-700' : 'border-slate-800')))
+          }`;
+
+          const renderRow = (slotKey, slotId, pObj) => {
+            const isWin = Boolean(m.winner && m.winner === slotId);
+            const isLose = Boolean(m.loser && m.loser === slotId);
+            const isMe = Boolean(slotId && slotId === this.mySlot);
+            const isByeEmpty = Boolean(m.isBye && slotKey === 'p2');
+            const scoreVal = slotKey === 'p1' ? m.p1Score : m.p2Score;
+            const hpVal = slotKey === 'p1' ? m.p1Hp : m.p2Hp;
+            const nameCls = isDrawFlicker && pObj ? 'tourney-draw-name' : '';
+
+            let rowCls = 'flex items-center justify-between gap-1.5 px-2 py-1.5 rounded-xl text-[11px] sm:text-xs font-black ';
+            if (isWin) {
+              rowCls += m.isThirdPlace
+                ? 'bg-orange-500/25 border border-orange-400 text-orange-200 '
+                : 'bg-amber-500/25 border border-amber-400 text-amber-200 ';
+              if (isJustFinished) rowCls += 'tourney-winner-pop ';
+            } else if (isLose) {
+              rowCls += 'bg-slate-950/70 text-slate-500 line-through opacity-65 ';
+            } else if (isNextTargetSlot && nextSlotKey === slotKey) {
+              rowCls += 'bg-slate-800/90 border border-amber-300 text-white tourney-advance-glow ';
+            } else if (isMe) {
+              rowCls += 'bg-cyan-950/80 border border-cyan-400/80 text-cyan-200 ';
+            } else {
+              rowCls += 'bg-slate-800/80 text-slate-200 ';
+            }
+
+            const rightTag = isByeEmpty
+              ? '<span class="text-[9px] text-slate-500 font-bold">シード</span>'
+              : (isWin
+                ? `<span class="tourney-win-badge text-[9px] px-1.5 py-0.5 rounded ${m.isThirdPlace ? 'bg-orange-400' : 'bg-amber-400'} text-slate-950 font-black">${m.isThirdPlace ? '3RD!' : 'WIN!'}</span>`
+                : (isLose
+                  ? '<span class="text-[9px] text-rose-400/80 font-bold">LOSE</span>'
+                  : (m.status === 'done' && !m.isBye
+                    ? `<span class="font-digital text-[10px] text-slate-400">${s.vsRule === 'jammer' ? `❤️${hpVal}` : scoreVal.toLocaleString()}</span>`
+                    : '')));
+
+            const labelName = isByeEmpty ? '--- BYE ---' : (pObj ? pObj.name : 'TBD');
+            return `
+              <div class="${rowCls}">
+                <span class="truncate ${nameCls}">${isMe ? '▶ ' : ''}${escapeHtml(labelName)}</span>
+                <span class="shrink-0">${rightTag}</span>
+              </div>
+            `;
+          };
+
+          card.innerHTML = `
+            <div class="space-y-1">
+              ${renderRow('p1', m.p1, p1)}
+              ${renderRow('p2', m.p2, p2)}
+            </div>
+          `;
+          return card;
+        };
+
+        for (let r = 0; r < t.totalRounds; r++) {
+          const roundMatches = t.matchOrder
+            .map((id) => t.matches[id])
+            .filter((m) => m && m.round === r && !m.isThirdPlace);
+          const thirdMatch = (r === t.totalRounds - 1 && t.matches['third_place']) ? t.matches['third_place'] : null;
+
+          const col = document.createElement('div');
+          col.className = 'flex flex-col justify-around gap-3 min-w-[175px] sm:min-w-[205px]';
+
+          const header = document.createElement('div');
+          header.className = 'text-center text-[11px] font-black text-amber-300 bg-slate-900 border border-amber-500/40 rounded-xl py-1 px-2 mb-1';
+          header.textContent = this.getTournamentRoundLabel(r, t.totalRounds);
+          col.appendChild(header);
+
+          const wrap = document.createElement('div');
+          wrap.className = 'flex-1 flex flex-col justify-around gap-3';
+
+          roundMatches.forEach((m) => wrap.appendChild(buildMatchCard(m)));
+
+          if (thirdMatch) {
+            const tpWrap = document.createElement('div');
+            tpWrap.className = 'mt-3 pt-2 border-t border-dashed border-orange-500/40';
+            const tpLabel = document.createElement('div');
+            tpLabel.className = 'text-center text-[10px] font-black text-orange-300 mb-1';
+            tpLabel.textContent = '🥉 3位決定戦';
+            tpWrap.appendChild(tpLabel);
+            tpWrap.appendChild(buildMatchCard(thirdMatch));
+            wrap.appendChild(tpWrap);
+          }
+
+          col.appendChild(wrap);
+          colsEl.appendChild(col);
+        }
+
+        requestAnimationFrame(() => this.drawTournamentConnectors(t, animateAdvance));
+      }
+
+      drawTournamentConnectors(t, animateAdvance = false) {
+        const stage = document.getElementById('tourney-bracket-stage');
+        const svg = document.getElementById('tourney-bracket-svg');
+        if (!stage || !svg || !t || !t.matches) return;
+
+        const stageRect = stage.getBoundingClientRect();
+        svg.setAttribute('width', Math.ceil(stage.scrollWidth));
+        svg.setAttribute('height', Math.ceil(stage.scrollHeight));
+        svg.innerHTML = '';
+
+        for (const id of t.matchOrder) {
+          const m = t.matches[id];
+          if (!m || !m.nextMatchId || m.isThirdPlace) continue;
+          const fromEl = stage.querySelector(`[data-tourney-match-id="${m.id}"]`);
+          const toEl = stage.querySelector(`[data-tourney-match-id="${m.nextMatchId}"]`);
+          if (!fromEl || !toEl) continue;
+
+          const fRect = fromEl.getBoundingClientRect();
+          const tRect = toEl.getBoundingClientRect();
+
+          const x1 = fRect.right - stageRect.left;
+          const y1 = fRect.top - stageRect.top + fRect.height * 0.5;
+          const x2 = tRect.left - stageRect.left;
+          const y2 = tRect.top - stageRect.top + (m.nextSlotKey === 'p1' ? tRect.height * 0.28 : tRect.height * 0.72);
+          const midX = (x1 + x2) * 0.5;
+
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          path.setAttribute('d', `M ${x1} ${y1} H ${midX} V ${y2} H ${x2}`);
+          path.setAttribute('fill', 'none');
+          const isWon = Boolean(m.winner);
+          path.setAttribute('stroke', isWon ? '#fbbf24' : '#334155');
+          path.setAttribute('stroke-width', isWon ? '3.5' : '2');
+          path.setAttribute('stroke-linecap', 'round');
+          path.setAttribute('stroke-linejoin', 'round');
+          if (isWon && animateAdvance && m.id === t.lastFinishedMatchId) {
+            path.setAttribute('class', 'tourney-line-win');
+          }
+          svg.appendChild(path);
+        }
+      }
+
+      playTournamentChampionFX() {
+        sound.playPerfectFanfare();
+        const layer = document.getElementById('tourney-fx-layer');
+        if (!layer) return;
+        layer.innerHTML = '';
+
+        const colors = ['#fde047', '#f472b6', '#38bdf8', '#4ade80', '#fb923c', '#c084fc', '#ffffff'];
+        for (let i = 0; i < 48; i++) {
+          const cf = document.createElement('div');
+          cf.className = 'dopa-confetti';
+          cf.style.left = `${Math.random() * 100}%`;
+          cf.style.background = colors[i % colors.length];
+          cf.style.setProperty('--dur', `${2.2 + Math.random() * 2.0}s`);
+          cf.style.animationDelay = `${Math.random() * 0.8}s`;
+          layer.appendChild(cf);
+        }
+        setTimeout(() => {
+          if (layer) layer.innerHTML = '';
+        }, 4800);
       }
 
       renderRoomUI(data) {
@@ -10298,6 +11467,11 @@
           } ${disabled ? 'opacity-50 cursor-default' : ''}`;
         });
 
+        const fmtExp = document.getElementById('vs-format-explain');
+        if (fmtExp) fmtExp.classList.toggle('hidden', s.format !== 'tournament');
+        const thirdRow = document.getElementById('vs-tourney-third-row');
+        if (thirdRow) thirdRow.classList.toggle('hidden', s.format !== 'tournament');
+
         const raceRow = document.getElementById('vs-race-target-row');
         if (raceRow) raceRow.classList.toggle('hidden', s.vsRule !== 'race');
         const itemsRow = document.getElementById('vs-jammer-items-row');
@@ -10320,16 +11494,25 @@
         const botBtn = document.getElementById('btn-vs-start-with-bots');
         const emptySlots = Math.max(0, maxP - humans.length);
 
+        const isTourneyFmt = s.format === 'tournament';
         if (startBtn) {
           if (this.isHost) {
             const canStartHumans = humans.length >= 2;
             startBtn.disabled = !canStartHumans;
-            startBtn.textContent = humans.length >= maxP
-              ? `🚀 ${maxP}人で対戦スタート！`
-              : (canStartHumans ? `🚀 現在の ${humans.length}人で対戦スタート！` : '⏳ 他のプレイヤー入室待ち（または下でBOT対戦）');
+            if (isTourneyFmt) {
+              startBtn.textContent = humans.length >= maxP
+                ? `🏆 ${maxP}人トーナメント開始！`
+                : (canStartHumans ? `🏆 現在の ${humans.length}人でトーナメント開始！` : '⏳ 他のプレイヤー入室待ち（または下でBOTトーナメント）');
+            } else {
+              startBtn.textContent = humans.length >= maxP
+                ? `🚀 ${maxP}人で対戦スタート！`
+                : (canStartHumans ? `🚀 現在の ${humans.length}人で対戦スタート！` : '⏳ 他のプレイヤー入室待ち（または下でBOT対戦）');
+            }
           } else {
             startBtn.disabled = true;
-            startBtn.textContent = '⏳ ホストが対戦を開始するのを待っています...';
+            startBtn.textContent = isTourneyFmt
+              ? '⏳ ホストがトーナメントを開始するのを待っています...'
+              : '⏳ ホストが対戦を開始するのを待っています...';
           }
         }
 
@@ -10338,7 +11521,9 @@
           if (this.isHost && emptySlots > 0) {
             botBtn.classList.remove('hidden');
             botBtn.disabled = false;
-            botBtn.textContent = `🤖 残りをbotで埋めてスタート（BOT ${emptySlots}人追加 → 計${maxP}人）`;
+            botBtn.textContent = isTourneyFmt
+              ? `🤖 残りをbotで埋めてトーナメント開始（BOT ${emptySlots}人追加 → 計${maxP}人）`
+              : `🤖 残りをbotで埋めてスタート（BOT ${emptySlots}人追加 → 計${maxP}人）`;
           } else {
             botBtn.classList.add('hidden');
           }
@@ -10441,6 +11626,23 @@
         }
 
         const seed = Math.floor(Math.random() * 2147483640) + 1;
+        if (!data.isRandom && finalSettings.format === 'tournament') {
+          const tState = this.buildTournamentState(nextPlayers, finalSettings.thirdPlaceMatch !== false);
+          this.roomRef.update({
+            status: 'tournament_bracket',
+            anyRule: false,
+            settings: finalSettings,
+            rouletteConflicts: [],
+            seed,
+            startedAt: Date.now(),
+            winner: null,
+            tournament: tState,
+            players: nextPlayers,
+            jammers: nextJammers
+          }).catch(() => {});
+          return;
+        }
+
         this.roomRef.update({
           status: 'playing',
           anyRule: false,
@@ -10449,6 +11651,7 @@
           seed,
           startedAt: Date.now(),
           winner: null,
+          tournament: null,
           players: nextPlayers,
           jammers: nextJammers
         }).catch(() => {});
@@ -10462,7 +11665,7 @@
           clearInterval(this.botSimTimer);
           this.botSimTimer = null;
         }
-        const botEntries = this.getPlayerEntries(roomData).filter(({ player }) => player.isBot);
+        const botEntries = this.getActiveParticipants(roomData).filter(({ player }) => player.isBot);
         if (botEntries.length === 0) return;
 
         const s = { ...this.getDefaultSettings(), ...(roomData.settings || {}) };
@@ -10509,7 +11712,7 @@
         });
 
         this.botSimTimer = setInterval(() => {
-          if (!this.roomRef || !this.lastRoomData || this.lastRoomData.status !== 'playing' || this.lastRoomData.winner) {
+          if (!this.roomRef || !this.lastRoomData || (this.lastRoomData.status !== 'playing' && this.lastRoomData.status !== 'tournament_playing') || this.lastRoomData.winner) {
             clearInterval(this.botSimTimer);
             this.botSimTimer = null;
             return;
@@ -11094,8 +12297,10 @@
         const label = `${stamp.fromName || 'プレイヤー'}: ${stamp.text}`;
         const roomLatest = document.getElementById('vs-room-stamp-latest');
         const resLatest = document.getElementById('vs-res-stamp-latest');
+        const tourneyLatest = document.getElementById('tourney-stamp-latest');
         if (roomLatest) roomLatest.textContent = label;
         if (resLatest) resLatest.textContent = label;
+        if (tourneyLatest) tourneyLatest.textContent = label;
 
         const layer = document.getElementById('vs-fx-layer');
         if (layer) {
@@ -11118,11 +12323,12 @@
 
       claimWinner(winnerSlot, reason) {
         if (!this.roomRef) return;
+        const isTourneyPlay = Boolean(this.lastRoomData && this.lastRoomData.status === 'tournament_playing');
         this.roomRef.child('winner').transaction((cur) => {
           if (cur) return;
           return { slot: winnerSlot, reason };
         }).then((res) => {
-          if (res && res.committed && this.roomRef) {
+          if (res && res.committed && this.roomRef && !isTourneyPlay) {
             this.roomRef.child('status').set('finished').catch(() => {});
           }
         }).catch(() => {});
@@ -11136,21 +12342,32 @@
         const top = standings[0];
         const second = standings[1];
 
+        const isTourney = data.status === 'tournament_playing';
         if (s.vsRule === 'jammer') {
           if (second && top.hp === second.hp) {
-            this.claimWinner('draw', `同HP（❤️${top.hp}）で引き分け！白熱のバトルでした！`);
+            if (isTourney) {
+              const tieWinner = (top.score >= second.score) ? top : second;
+              this.claimWinner(tieWinner.slot, `⚖️ 同HP（❤️${top.hp}）のためスコア判定で ${tieWinner.name} が勝ち上がり！`);
+            } else {
+              this.claimWinner('draw', `同HP（❤️${top.hp}）で引き分け！白熱のバトルでした！`);
+            }
           } else {
-            const hpDiff = second ? `（2位とHP +${top.hp - second.hp} 差）` : '';
+            const hpDiff = second ? `（HP +${top.hp - second.hp} 差）` : '';
             this.claimWinner(top.slot, `🏆 ${top.name} が残りHP ❤️${top.hp} で勝利！${hpDiff}`);
           }
           return;
         }
 
         if (second && top.score === second.score && top.perfectCount === second.perfectCount) {
-          this.claimWinner('draw', '同点引き分け！白熱の名勝負でした！');
+          if (isTourney) {
+            const tieWinner = (top.served >= second.served) ? top : second;
+            this.claimWinner(tieWinner.slot, `⚖️ 同点のため規定判定で ${tieWinner.name} が勝ち上がり！`);
+          } else {
+            this.claimWinner('draw', '同点引き分け！白熱の名勝負でした！');
+          }
         } else {
-          const diffStr = second ? `（2位と +${(top.score - second.score).toLocaleString()}pt 差）` : '';
-          this.claimWinner(top.slot, `🏆 ${top.name} が優勝！${diffStr}`);
+          const diffStr = second ? `（+${(top.score - second.score).toLocaleString()}pt 差）` : '';
+          this.claimWinner(top.slot, `🏆 ${top.name} が勝利！${diffStr}`);
         }
       }
 
@@ -11308,9 +12525,10 @@
           const txRes = await this.roomRef.transaction((data) => {
             if (data === null) return null;
             if (!data.players) data.players = {};
-            if (data.status === 'finished') {
+            if (data.status === 'finished' || data.status === 'tournament_champion') {
               data.status = 'waiting';
               data.winner = null;
+              data.tournament = null;
               data.jammers = {};
               for (let i = 1; i <= 10; i++) {
                 const sl = 'p' + i;
@@ -13674,9 +14892,13 @@
         const rivals = participants.filter((x) => x.slot !== this.versus.mySlot);
         const myName = (myEntry && myEntry.player && myEntry.player.name) ? myEntry.player.name : this.playerName;
 
-        const ruleTitle = s.vsRule === 'jammer'
+        const baseRuleTitle = s.vsRule === 'jammer'
           ? '💣 お邪魔バトル'
           : (s.vsRule === 'race' ? `⚡ ${s.raceTarget || 7}人先取勝負` : '🏆 スコア対決');
+        const tActive = (roomData && roomData.tournament && roomData.tournament.activeMatchId && roomData.tournament.matches)
+          ? roomData.tournament.matches[roomData.tournament.activeMatchId]
+          : null;
+        const ruleTitle = tActive ? `${tActive.roundLabel} // ${baseRuleTitle}` : baseRuleTitle;
 
         const isMulti = rivals.length > 1;
         const primaryRival = rivals[0] ? rivals[0].player : { name: 'ライバル', isBot: false };

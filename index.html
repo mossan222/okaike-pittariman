@@ -1158,6 +1158,14 @@
       stroke-dashoffset: 0;
       animation: tourneyLineFlow 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
+    @keyframes tourneyRankRowIn {
+      0% { transform: translateY(10px) scale(0.96); opacity: 0; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .tourney-rank-row {
+      opacity: 0;
+      animation: tourneyRankRowIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
   </style>
 </head>
 <body class="text-white select-none">
@@ -3196,6 +3204,15 @@
           </p>
           <!-- Podium -->
           <div id="tourney-podium-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-left max-w-2xl mx-auto"></div>
+
+          <!-- Full Final Rankings (全員の最終順位一覧) -->
+          <div class="mt-3 pt-3 border-t border-amber-400/35 max-w-2xl mx-auto text-left">
+            <div class="flex items-center justify-between mb-1.5 px-1">
+              <span class="text-[11px] sm:text-xs font-black text-amber-300 tracking-wider">🏅 最終順位（全参加者）</span>
+              <span id="tourney-ranking-count" class="text-[10px] font-bold text-slate-300"></span>
+            </div>
+            <div id="tourney-final-rankings" class="space-y-1.5 max-h-56 overflow-y-auto custom-scroll pr-1"></div>
+          </div>
         </div>
       </div>
 
@@ -11093,6 +11110,75 @@
         }).catch(() => {});
       }
 
+      getTournamentFinalRankings(t, players) {
+        if (!t || !t.matches) return [];
+        const pMap = players || {};
+        const rankings = [];
+        const placed = new Set();
+
+        const pushSlot = (slot, rank, isTied, note) => {
+          if (!slot || placed.has(slot)) return;
+          const p = pMap[slot];
+          if (!p || !p.name) return;
+          placed.add(slot);
+          rankings.push({
+            slot,
+            rank,
+            isTied: Boolean(isTied),
+            name: p.name,
+            isBot: Boolean(p.isBot),
+            note: note || ''
+          });
+        };
+
+        // 1位・2位
+        pushSlot(t.championSlot, 1, false, '👑 優勝');
+        pushSlot(t.runnerUpSlot, 2, false, '決勝進出');
+
+        // 3位・4位（3位決定戦ありの場合）
+        if (t.thirdPlaceSlot) {
+          pushSlot(t.thirdPlaceSlot, 3, false, '3位決定戦 勝利');
+          pushSlot(t.fourthPlaceSlot, 4, false, '3位決定戦 敗退');
+        }
+
+        // 各ラウンドの敗退者を上位ラウンドから順にグルーピング
+        const losersByRound = new Map();
+        const order = Array.isArray(t.matchOrder) ? t.matchOrder : Object.keys(t.matches);
+        for (const id of order) {
+          const m = t.matches[id];
+          if (!m || m.isBye || m.isThirdPlace || !m.loser || placed.has(m.loser)) continue;
+          const r = typeof m.round === 'number' ? m.round : 0;
+          if (!losersByRound.has(r)) {
+            losersByRound.set(r, { roundLabel: m.roundLabel || `${r + 1}回戦`, slots: [] });
+          }
+          const grp = losersByRound.get(r);
+          if (!grp.slots.includes(m.loser)) {
+            grp.slots.push(m.loser);
+          }
+        }
+
+        const sortedRounds = Array.from(losersByRound.keys()).sort((a, b) => b - a);
+        for (const r of sortedRounds) {
+          const grp = losersByRound.get(r);
+          const unplaced = grp.slots.filter((sl) => !placed.has(sl) && pMap[sl] && pMap[sl].name);
+          if (unplaced.length === 0) continue;
+          const rankNum = rankings.length + 1;
+          const isTied = unplaced.length > 1;
+          const cleanLabel = String(grp.roundLabel || '').replace(/^[^\s]+\s+/, '');
+          const note = cleanLabel ? `${cleanLabel} 敗退` : '敗退';
+          unplaced.forEach((sl) => pushSlot(sl, rankNum, isTied, note));
+        }
+
+        // 万一未配置の参加者がいれば末尾に追加
+        const rest = Object.keys(pMap).filter((sl) => !placed.has(sl) && pMap[sl] && pMap[sl].name);
+        if (rest.length > 0) {
+          const rankNum = rankings.length + 1;
+          rest.forEach((sl) => pushSlot(sl, rankNum, rest.length > 1, '参加'));
+        }
+
+        return rankings;
+      }
+
       renderTournamentScreen(data, animateAdvance = false, isDrawFlicker = false) {
         const t = data.tournament;
         if (!t || !t.matches) return;
@@ -11143,15 +11229,15 @@
 
           const podiumEl = document.getElementById('tourney-podium-grid');
           if (podiumEl) {
-            const thirdLabel = thirdP ? '🥉 3位 (3RD PLACE)' : '🥉 ベスト4';
+            const thirdLabel = thirdP ? '🥉 3位 (3RD PLACE)' : '🥉 3位（ベスト4）';
             const thirdText = thirdP ? thirdP.name : (semiLosers.length > 0 ? semiLosers.map((p) => p.name).join(' / ') : '---');
             podiumEl.innerHTML = `
               <div class="bg-amber-500/20 border-2 border-amber-400 rounded-2xl p-2.5">
-                <div class="text-[10px] font-black text-amber-300">🥇 優勝 (CHAMPION)</div>
+                <div class="text-[10px] font-black text-amber-300">🥇 1位（優勝）</div>
                 <div class="text-sm font-black text-white truncate mt-0.5">${escapeHtml(champP.name)}</div>
               </div>
               <div class="bg-slate-800/90 border-2 border-slate-400/70 rounded-2xl p-2.5">
-                <div class="text-[10px] font-black text-slate-300">🥈 準優勝 (2ND)</div>
+                <div class="text-[10px] font-black text-slate-300">🥈 2位（準優勝）</div>
                 <div class="text-sm font-black text-white truncate mt-0.5">${escapeHtml(runnerP ? runnerP.name : '---')}</div>
               </div>
               <div class="bg-orange-950/60 border-2 border-orange-400/60 rounded-2xl p-2.5">
@@ -11159,6 +11245,43 @@
                 <div class="text-xs sm:text-sm font-black text-white truncate mt-0.5">${escapeHtml(thirdText)}</div>
               </div>
             `;
+          }
+
+          // 全参加者の最終順位（「1位：〇〇」「2位：〇〇」…）を描画
+          const finalRankings = this.getTournamentFinalRankings(t, players);
+          const rankCountEl = document.getElementById('tourney-ranking-count');
+          if (rankCountEl) rankCountEl.textContent = `全${finalRankings.length}名`;
+          const rankListEl = document.getElementById('tourney-final-rankings');
+          if (rankListEl) {
+            rankListEl.innerHTML = '';
+            finalRankings.forEach((entry, idx) => {
+              const row = document.createElement('div');
+              const rankNum = entry.rank;
+              const isMe = entry.slot === this.mySlot;
+              const medal = rankNum === 1 ? '🥇' : (rankNum === 2 ? '🥈' : (rankNum === 3 ? '🥉' : ''));
+              const rankText = `${medal ? medal + ' ' : ''}${rankNum}位${entry.isTied ? 'タイ' : ''}`;
+              const borderCls = isMe
+                ? 'bg-cyan-950/80 border-cyan-400 text-white shadow'
+                : (rankNum === 1
+                  ? 'bg-amber-500/20 border-amber-400 text-amber-100'
+                  : (rankNum === 2
+                    ? 'bg-slate-800/90 border-slate-400/70 text-white'
+                    : (rankNum === 3
+                      ? 'bg-orange-950/55 border-orange-400/60 text-orange-100'
+                      : 'bg-slate-900/85 border-slate-700/80 text-slate-200')));
+              row.className = `tourney-rank-row flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl border-2 text-xs sm:text-sm font-black ${borderCls}`;
+              row.style.animationDelay = `${Math.min(idx, 10) * 65}ms`;
+              row.innerHTML = `
+                <div class="flex items-center gap-2 min-w-0 flex-1">
+                  <span class="min-w-[64px] shrink-0 font-black ${rankNum === 1 ? 'text-amber-300' : (rankNum === 2 ? 'text-slate-200' : (rankNum === 3 ? 'text-orange-300' : 'text-slate-400'))}">${rankText}</span>
+                  <span class="truncate ${isMe ? 'text-cyan-200' : 'text-white'}">${escapeHtml(entry.name)}</span>
+                  ${isMe ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-cyan-400 text-slate-950 font-black shrink-0">YOU</span>' : ''}
+                  ${entry.isBot ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-200 border border-amber-400/60 font-black shrink-0">BOT</span>' : ''}
+                </div>
+                <span class="text-[10px] font-bold text-slate-300 shrink-0">${escapeHtml(entry.note)}</span>
+              `;
+              rankListEl.appendChild(row);
+            });
           }
         } else if (activeMatch) {
           const p1 = players[activeMatch.p1] || { name: 'TBD' };

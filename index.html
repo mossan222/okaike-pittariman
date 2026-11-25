@@ -3116,7 +3116,7 @@
     <!-- Confetti / Celebration Layer -->
     <div id="tourney-fx-layer" class="fixed inset-0 pointer-events-none overflow-hidden z-[52]" aria-hidden="true"></div>
 
-    <div class="relative z-[55] max-w-4xl w-full bg-slate-900/95 border-2 border-amber-400 rounded-3xl p-3 sm:p-5 shadow-2xl max-h-[95vh] overflow-y-auto custom-scroll flex flex-col">
+    <div class="relative z-[55] max-w-4xl w-full bg-slate-900/95 border-2 border-amber-400 rounded-3xl p-3 sm:p-5 shadow-2xl max-h-[92vh] overflow-y-auto overscroll-contain custom-scroll" style="-webkit-overflow-scrolling: touch;">
       <!-- Header -->
       <div class="flex items-center justify-between gap-2 mb-2.5 flex-wrap">
         <div class="text-left">
@@ -3190,7 +3190,7 @@
       </div>
 
       <!-- Grand Champion Celebration Card (Shown only when status === 'tournament_champion') -->
-      <div id="tourney-champion-card" class="hidden mb-3 rounded-3xl border-4 border-amber-300 bg-gradient-to-b from-amber-950/90 via-slate-900/95 to-slate-950 p-4 sm:p-5 text-center relative overflow-hidden shadow-[0_0_45px_rgba(251,191,36,0.55)]">
+      <div id="tourney-champion-card" class="hidden mb-3 rounded-3xl border-4 border-amber-300 bg-gradient-to-b from-amber-950/90 via-slate-900/95 to-slate-950 p-3.5 sm:p-5 text-center relative shadow-[0_0_45px_rgba(251,191,36,0.55)]">
         <div class="relative z-10">
           <div class="inline-block bg-gradient-to-r from-yellow-300 via-amber-400 to-orange-400 text-slate-950 text-[10px] sm:text-xs font-black px-3 py-0.5 rounded-full mb-2 tracking-widest uppercase shadow">
             👑 GRAND CHAMPION!! 👑
@@ -3211,7 +3211,7 @@
               <span class="text-[11px] sm:text-xs font-black text-amber-300 tracking-wider">🏅 最終順位（全参加者）</span>
               <span id="tourney-ranking-count" class="text-[10px] font-bold text-slate-300"></span>
             </div>
-            <div id="tourney-final-rankings" class="space-y-1.5 max-h-56 overflow-y-auto custom-scroll pr-1"></div>
+            <div id="tourney-final-rankings" class="space-y-1.5"></div>
           </div>
         </div>
       </div>

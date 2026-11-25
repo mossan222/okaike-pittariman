@@ -1166,6 +1166,23 @@
       opacity: 0;
       animation: tourneyRankRowIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
+    /* === LITE MODE (軽量化モード) === */
+    body.lite-mode *,
+    body.lite-mode *::before,
+    body.lite-mode *::after {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+    body.lite-mode .money-svg-shadow {
+      filter: none !important;
+    }
+    body.lite-mode .wallet-card {
+      background: rgba(20, 17, 15, 0.97) !important;
+    }
+    body.lite-mode .animate-pulse,
+    body.lite-mode .animate-ping {
+      animation: none !important;
+    }
   </style>
 </head>
 <body class="text-white select-none">
@@ -1280,6 +1297,9 @@
           </button>
           <button id="btn-title-dopa" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-fuchsia-500/60 text-[10px] sm:text-[11px] font-black px-2 py-1 rounded-xl text-fuchsia-300 flex items-center gap-1" title="虹色・パチンコ音・星目演出（プレイ影響なし）">
             <span>🌈</span><span class="dopa-label-text">ドパガキ OFF</span>
+          </button>
+          <button id="btn-title-lite" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-lime-400/70 text-[10px] sm:text-[11px] font-black px-2 py-1 rounded-xl text-lime-300 flex items-center gap-1" title="重い端末向け：影・ぼかし・パーティクル削減＆3Dを30fps化">
+            <span>🪶</span><span class="lite-label-text">軽量 OFF</span>
           </button>
           <button id="btn-title-keyconfig" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-sky-400/70 text-[10px] sm:text-[11px] font-black px-2 py-1 rounded-xl text-sky-300 flex items-center gap-1" title="PCキーボード操作のキー設定変更">
             <span>⌨️</span><span>キー設定</span>
@@ -3390,6 +3410,11 @@
           <span id="hud-dopa-label">ドパガキモード: OFF</span>
         </button>
 
+        <button id="btn-hud-lite-toggle" type="button" class="btn-3d w-full bg-slate-800 hover:bg-slate-700 border-2 border-lime-400/70 text-lime-300 font-black text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow" title="重い端末向け：影・ぼかし・パーティクル削減＆3Dを30fps化">
+          <span id="hud-lite-icon">🪶</span>
+          <span id="hud-lite-label">軽量モード: OFF（通常画質）</span>
+        </button>
+
         <!-- Popup Opacity Slider & Quick Step Button -->
         <div class="bg-slate-900/90 border border-slate-700 rounded-xl px-2.5 py-2 space-y-1.5">
           <div class="flex items-center justify-between gap-2">
@@ -3713,6 +3738,7 @@
     const PLAYER_NAME_STORAGE_KEY            = 'pittariman_player_name_v3';
     const KEY_CONFIG_STORAGE_KEY             = 'pittariman_key_config_v5';
     const POPUP_OPACITY_STORAGE_KEY          = 'pittariman_popup_opacity_v1';
+    const LITE_MODE_STORAGE_KEY              = 'pittariman_lite_mode_v1';
 
     const DEFAULT_KEY_BINDINGS = {
       '10000': 'KeyW',
@@ -7413,6 +7439,8 @@
         this.zoneStarsGroup = null;
         this.isZoneActive = false;
         this.isDopagakiMode = false;
+        this.isLiteMode = false;
+        this.dirLight = null;
         this.dopaRainbowLight = null;
         this.trayRimMat = null;
         this.clerkStarEyes = [];
@@ -7449,8 +7477,9 @@
         this.scene.add(ambient);
 
         const dirLight = new THREE.DirectionalLight(0xfffaed, 0.95);
+        this.dirLight = dirLight;
         dirLight.position.set(5, 13, 8);
-        dirLight.castShadow = true;
+        dirLight.castShadow = !this.isLiteMode;
         dirLight.shadow.mapSize.width = 1024;
         dirLight.shadow.mapSize.height = 1024;
         dirLight.shadow.camera.near = 2;
@@ -7574,7 +7603,7 @@
       }
 
       syncSceneMood() {
-        const showStars = this.isZoneActive || this.isDopagakiMode;
+        const showStars = !this.isLiteMode && (this.isZoneActive || this.isDopagakiMode);
         if (this.zoneStarsGroup) {
           this.zoneStarsGroup.visible = showStars;
         }
@@ -7616,6 +7645,25 @@
 
       setDopagakiMode(active) {
         this.isDopagakiMode = Boolean(active);
+        this.syncSceneMood();
+      }
+
+      setLiteMode(enabled) {
+        this.isLiteMode = Boolean(enabled);
+        if (this.renderer) {
+          this.renderer.setPixelRatio(this.isLiteMode ? 0.85 : Math.min(window.devicePixelRatio, 2));
+          this.renderer.shadowMap.enabled = !this.isLiteMode;
+          this.renderer.shadowMap.autoUpdate = !this.isLiteMode;
+          this.renderer.shadowMap.needsUpdate = true;
+          this.renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        if (this.dirLight) {
+          this.dirLight.castShadow = !this.isLiteMode;
+        }
+        if (this.isLiteMode && Array.isArray(this.coinShowerItems) && this.coinShowerItems.length > 0) {
+          this.coinShowerItems.forEach((it) => { if (it && it.mesh) this.scene.remove(it.mesh); });
+          this.coinShowerItems = [];
+        }
         this.syncSceneMood();
       }
 
@@ -7682,6 +7730,7 @@
       }
 
       spawnJammerCoinRain(c1 = 2, c10 = 1) {
+        if (this.isLiteMode) return;
         const list = [];
         for (let i = 0; i < Math.min(10, c1 + 2); i++) list.push(1);
         for (let i = 0; i < Math.min(6, c10 + 1); i++) list.push(10);
@@ -7708,6 +7757,7 @@
       }
 
       spawnCoinShower(comboCount = 5) {
+        if (this.isLiteMode) return;
         const denoms = [500, 500, 100, 1000, 5000, 10000];
         const count = Math.min(24, 8 + comboCount);
         for (let i = 0; i < count; i++) {
@@ -13881,6 +13931,9 @@
         this.freePlayShowChange = true;
         this.showChangeDisplay = true;
         this.aiHelperEnabled = false;
+        this.liteMode = (() => {
+          try { return localStorage.getItem(LITE_MODE_STORAGE_KEY) === '1'; } catch (e) { return false; }
+        })();
         this.dopagakiMode = (() => {
           try { return localStorage.getItem('pittariman_dopagaki_mode_v1') === '1'; } catch (e) { return false; }
         })();
@@ -13944,6 +13997,7 @@
         this.syncChangeToggleUI();
         this.syncHelperToggleUI();
         this.syncDopagakiUI();
+        this.syncLiteModeUI();
         this.syncVibrationUI();
         this.syncRuleToggleUI();
         SkinManager.initSeenUnlocksIfNeeded();
@@ -13964,6 +14018,13 @@
           btnTitleDopa.addEventListener('click', () => {
             sound.init();
             this.toggleDopagakiMode();
+          });
+        }
+        const btnTitleLite = document.getElementById('btn-title-lite');
+        if (btnTitleLite) {
+          btnTitleLite.addEventListener('click', () => {
+            sound.init();
+            this.toggleLiteMode();
           });
         }
         ['btn-title-vibe', 'btn-mode-toggle-vibe', 'btn-hud-vibe-toggle', 'btn-vs-lobby-vibe'].forEach((id) => {
@@ -14328,6 +14389,13 @@
           btnHudDopa.addEventListener('click', () => {
             sound.init();
             this.toggleDopagakiMode();
+          });
+        }
+        const btnHudLite = document.getElementById('btn-hud-lite-toggle');
+        if (btnHudLite) {
+          btnHudLite.addEventListener('click', () => {
+            sound.init();
+            this.toggleLiteMode();
           });
         }
 
@@ -15389,8 +15457,44 @@
         }
       }
 
+      toggleLiteMode() {
+        this.liteMode = !this.liteMode;
+        try {
+          localStorage.setItem(LITE_MODE_STORAGE_KEY, this.liteMode ? '1' : '0');
+        } catch (e) {}
+        this.syncLiteModeUI();
+        sound.playClick();
+      }
+
+      syncLiteModeUI() {
+        const on = Boolean(this.liteMode);
+        document.body.classList.toggle('lite-mode', on);
+        if (this.scene3D && typeof this.scene3D.setLiteMode === 'function') {
+          this.scene3D.setLiteMode(on);
+        }
+
+        const titleBtn = document.getElementById('btn-title-lite');
+        if (titleBtn) {
+          titleBtn.className = on
+            ? 'btn-3d bg-lime-400 hover:bg-lime-300 text-slate-950 border-2 border-white text-[10px] sm:text-[11px] font-black px-2 py-1 rounded-xl flex items-center gap-1 shadow'
+            : 'btn-3d bg-slate-800 hover:bg-slate-700 border border-lime-400/70 text-[10px] sm:text-[11px] font-black px-2 py-1 rounded-xl text-lime-300 flex items-center gap-1';
+        }
+        document.querySelectorAll('.lite-label-text').forEach((el) => {
+          el.textContent = on ? '軽量 ON' : '軽量 OFF';
+        });
+
+        const hudBtn = document.getElementById('btn-hud-lite-toggle');
+        const hudLabel = document.getElementById('hud-lite-label');
+        if (hudBtn && hudLabel) {
+          hudBtn.className = on
+            ? 'btn-3d w-full bg-lime-400 hover:bg-lime-300 border-2 border-white text-slate-950 font-black text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow'
+            : 'btn-3d w-full bg-slate-800 hover:bg-slate-700 border-2 border-lime-400/70 text-lime-300 font-black text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow';
+          hudLabel.textContent = on ? '軽量モード: ON（省電力・軽量描画）' : '軽量モード: OFF（通常画質）';
+        }
+      }
+
       spawnDopaTapSparks(denom) {
-        if (!this.dopagakiMode) return;
+        if (!this.dopagakiMode || this.liteMode) return;
         const layer = document.getElementById('dopa-fx-layer');
         if (!layer) return;
 
@@ -19545,6 +19649,7 @@
       sound.tryAutoStartBGM();
 
       let lastTime = performance.now();
+      let lite3DAccum = 0;
       function animate(now) {
         requestAnimationFrame(animate);
         const dt = Math.min(0.05, Math.max(0, (now - lastTime) / 1000));
@@ -19557,10 +19662,23 @@
         }
         // 全画面ブラックアウト演出中は裏の3D描画を一時停止してiPhone/モバイルのGPU負荷を大幅軽減
         if (!(game && game.blackoutMode === 'self' && game.isBlackoutFrozen())) {
-          try {
-            scene3D.update(dt);
-          } catch (err) {
-            console.warn('scene3D.update error:', err);
+          if (scene3D && scene3D.isLiteMode) {
+            lite3DAccum += dt;
+            if (lite3DAccum < 0.032) return; // 軽量モード時は3D描画のみ約30fpsに間引き
+            const stepDt = lite3DAccum;
+            lite3DAccum = 0;
+            try {
+              scene3D.update(stepDt);
+            } catch (err) {
+              console.warn('scene3D.update error:', err);
+            }
+          } else {
+            lite3DAccum = 0;
+            try {
+              scene3D.update(dt);
+            } catch (err) {
+              console.warn('scene3D.update error:', err);
+            }
           }
         }
       }

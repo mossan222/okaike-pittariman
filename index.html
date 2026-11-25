@@ -3161,30 +3161,118 @@
           </div>
         </div>
 
-        <!-- Live Spectate Scoreboard (Shown to non-fighting spectators during tournament_playing) -->
+        <!-- Live Spectate Scoreboard & POV Viewer (Shown to non-fighting spectators during tournament_playing) -->
         <div id="tourney-live-spectate" class="hidden mt-2.5 pt-2.5 border-t border-fuchsia-500/40">
-          <div class="flex items-center justify-center gap-1.5 mb-2">
-            <span class="inline-block w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-            <span class="text-[11px] font-black text-rose-300 tracking-widest uppercase">LIVE 観戦中 // REALTIME SCORE</span>
+          <div class="flex flex-wrap items-center justify-between gap-1.5 mb-2">
+            <div class="flex items-center gap-1.5">
+              <span class="inline-block w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+              <span class="text-[11px] font-black text-rose-300 tracking-widest uppercase">LIVE 観戦中 // REALTIME</span>
+            </div>
+            <!-- 視点切替ボタン（全体ボード / P1視点 / P2視点） -->
+            <div id="tourney-spec-view-controls" class="flex flex-wrap items-center gap-1">
+              <button id="btn-tourney-pov-board" type="button" class="btn-3d px-2 py-1 rounded-lg text-[10px] font-black border bg-amber-400 text-slate-950 border-amber-200">
+                📊 全体ボード
+              </button>
+              <button id="btn-tourney-pov-p1" type="button" class="btn-3d px-2 py-1 rounded-lg text-[10px] font-black border bg-slate-800 text-cyan-200 border-cyan-400/70 max-w-[125px] truncate">
+                👁️ P1視点
+              </button>
+              <button id="btn-tourney-pov-p2" type="button" class="btn-3d px-2 py-1 rounded-lg text-[10px] font-black border bg-slate-800 text-fuchsia-200 border-fuchsia-400/70 max-w-[125px] truncate">
+                👁️ P2視点
+              </button>
+            </div>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-11 gap-2 items-center">
-            <div id="tourney-spec-p1-card" class="sm:col-span-5 bg-slate-950/90 border-2 border-cyan-400/80 rounded-xl p-2.5 text-left">
+
+          <!-- アイテム使用リアルタイム通知バナー -->
+          <div id="tourney-spec-item-banner" class="hidden mb-2 rounded-xl border-2 border-amber-300 bg-gradient-to-r from-amber-500/25 via-fuchsia-600/35 to-cyan-500/25 px-3 py-1.5 text-center shadow-lg animate-pop">
+            <div id="tourney-spec-item-banner-text" class="text-xs sm:text-sm font-black text-white drop-shadow">⚡ アイテム発動！</div>
+          </div>
+
+          <!-- 全体ボード（P1 vs P2） -->
+          <div id="tourney-spec-board-grid" class="grid grid-cols-1 sm:grid-cols-11 gap-2 items-center">
+            <div id="tourney-spec-p1-card" class="sm:col-span-5 bg-slate-950/90 border-2 border-cyan-400/80 hover:border-cyan-300 rounded-xl p-2.5 text-left cursor-pointer transition-colors" title="タップでこの人の視点を見る">
               <div class="flex items-center justify-between gap-1">
                 <span id="tourney-spec-p1-name" class="text-xs sm:text-sm font-black text-cyan-200 truncate">Player 1</span>
-                <span id="tourney-spec-p1-status" class="text-[10px] font-black text-emerald-300">対戦中</span>
+                <span id="tourney-spec-p1-status" class="text-[10px] font-black text-emerald-300 shrink-0">対戦中</span>
               </div>
               <div id="tourney-spec-p1-main" class="font-digital text-xl sm:text-2xl font-black text-amber-300 mt-0.5">0 pt</div>
-              <div id="tourney-spec-p1-sub" class="text-[10px] font-bold text-slate-300">神:0回 / 処理:0人</div>
+              <div class="flex items-center justify-between gap-1 mt-0.5">
+                <span id="tourney-spec-p1-sub" class="text-[10px] font-bold text-slate-300 truncate">神:0回 / 処理:0人</span>
+                <span class="text-[9px] font-black text-cyan-300 shrink-0">👁️ 視点を見る ▶</span>
+              </div>
             </div>
             <div class="sm:col-span-1 text-center font-black text-lg sm:text-xl text-amber-300">VS</div>
-            <div id="tourney-spec-p2-card" class="sm:col-span-5 bg-slate-950/90 border-2 border-fuchsia-400/80 rounded-xl p-2.5 text-left">
+            <div id="tourney-spec-p2-card" class="sm:col-span-5 bg-slate-950/90 border-2 border-fuchsia-400/80 hover:border-fuchsia-300 rounded-xl p-2.5 text-left cursor-pointer transition-colors" title="タップでこの人の視点を見る">
               <div class="flex items-center justify-between gap-1">
                 <span id="tourney-spec-p2-name" class="text-xs sm:text-sm font-black text-fuchsia-200 truncate">Player 2</span>
-                <span id="tourney-spec-p2-status" class="text-[10px] font-black text-emerald-300">対戦中</span>
+                <span id="tourney-spec-p2-status" class="text-[10px] font-black text-emerald-300 shrink-0">対戦中</span>
               </div>
               <div id="tourney-spec-p2-main" class="font-digital text-xl sm:text-2xl font-black text-amber-300 mt-0.5">0 pt</div>
-              <div id="tourney-spec-p2-sub" class="text-[10px] font-bold text-slate-300">神:0回 / 処理:0人</div>
+              <div class="flex items-center justify-between gap-1 mt-0.5">
+                <span id="tourney-spec-p2-sub" class="text-[10px] font-bold text-slate-300 truncate">神:0回 / 処理:0人</span>
+                <span class="text-[9px] font-black text-fuchsia-300 shrink-0">👁️ 視点を見る ▶</span>
+              </div>
             </div>
+          </div>
+
+          <!-- プレイヤー視点モニター（P1/P2視点選択時に表示） -->
+          <div id="tourney-spec-pov-panel" class="hidden mt-2 rounded-2xl border-2 border-cyan-400/85 bg-slate-950/95 p-2.5 sm:p-3 text-left shadow-xl">
+            <div class="flex flex-wrap items-center justify-between gap-1.5 mb-2">
+              <div class="flex items-center gap-1.5 min-w-0">
+                <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-cyan-400 text-slate-950 shrink-0">👁️ POV LIVE</span>
+                <span id="tourney-pov-name" class="text-xs sm:text-sm font-black text-white truncate">Player</span>
+                <span id="tourney-pov-badges" class="flex items-center gap-1 flex-wrap"></span>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <span id="tourney-pov-score" class="font-digital text-sm sm:text-base font-black text-amber-300">0 pt</span>
+                <span id="tourney-pov-customer" class="text-[10px] font-bold text-slate-300">1人目</span>
+              </div>
+            </div>
+
+            <!-- HP Bar in POV (Shown in Jammer rule) -->
+            <div id="tourney-pov-hp-wrap" class="hidden mb-2 flex items-center gap-2">
+              <span class="text-[10px] font-black text-rose-300 shrink-0">❤️ HP</span>
+              <div class="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+                <div id="tourney-pov-hp-fill" class="h-full bg-gradient-to-r from-emerald-400 to-cyan-400 transition-all duration-200" style="width: 100%;"></div>
+              </div>
+              <span id="tourney-pov-hp-text" class="font-digital text-[10px] font-black text-emerald-300 shrink-0">1500/1500</span>
+            </div>
+
+            <!-- Simulated POS Register Display -->
+            <div class="lcd-panel rounded-xl px-2.5 py-2 mb-2 grid grid-cols-3 gap-2 items-center text-center">
+              <div class="text-left">
+                <div id="tourney-pov-price-label" class="text-[9px] font-bold text-emerald-400">お会計金額</div>
+                <div id="tourney-pov-price" class="font-digital text-base sm:text-xl font-black text-emerald-300 lcd-glow">¥ ---</div>
+              </div>
+              <div class="border-x border-slate-800 px-1">
+                <div class="text-[9px] font-bold text-amber-300">トレイ投入</div>
+                <div id="tourney-pov-tray-total" class="font-digital text-base sm:text-xl font-black text-amber-300">¥ 0</div>
+              </div>
+              <div class="text-right">
+                <div id="tourney-pov-change-label" class="text-[9px] font-bold text-slate-300">算出お釣り</div>
+                <div id="tourney-pov-change-val" class="font-digital text-sm sm:text-base font-black text-cyan-300">---</div>
+              </div>
+            </div>
+
+            <!-- Tray Contents & Last Judgment -->
+            <div class="bg-blue-950/55 border border-blue-500/50 rounded-xl px-2.5 py-1.5 mb-2">
+              <div class="flex items-center justify-between gap-1 mb-1">
+                <span class="text-[10px] font-black text-sky-300">🟦 カルトン（トレイ）に出しているお金</span>
+                <span id="tourney-pov-last-grade" class="text-[10px] font-black text-amber-300"></span>
+              </div>
+              <div id="tourney-pov-tray-items" class="flex flex-wrap gap-1 text-[10px] font-black text-slate-300">まだ出ていません</div>
+            </div>
+
+            <!-- Wallet Snapshot -->
+            <div class="bg-slate-900/90 border border-slate-700/80 rounded-xl px-2.5 py-1.5">
+              <div class="text-[9px] font-black text-amber-300/90 mb-1">👛 現在の財布の中身</div>
+              <div id="tourney-pov-wallet-items" class="flex flex-wrap gap-1 text-[9px] sm:text-[10px] font-bold text-slate-200"></div>
+            </div>
+          </div>
+
+          <!-- アイテム使用ログ（直近4件） -->
+          <div id="tourney-spec-item-log-wrap" class="hidden mt-2 bg-slate-950/80 border border-amber-500/35 rounded-xl px-2.5 py-1.5 text-left">
+            <div class="text-[9px] font-black text-amber-300 mb-1">🎁 アイテム使用ログ</div>
+            <div id="tourney-spec-item-log" class="space-y-0.5 text-[10px] font-bold text-slate-200"></div>
           </div>
         </div>
       </div>
@@ -3205,13 +3293,22 @@
           <!-- Podium -->
           <div id="tourney-podium-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-left max-w-2xl mx-auto"></div>
 
-          <!-- Full Final Rankings (全員の最終順位一覧) -->
+          <!-- Full Final Rankings (全員の最終順位＆スコア一覧) -->
           <div class="mt-3 pt-3 border-t border-amber-400/35 max-w-2xl mx-auto text-left">
             <div class="flex items-center justify-between mb-1.5 px-1">
-              <span class="text-[11px] sm:text-xs font-black text-amber-300 tracking-wider">🏅 最終順位（全参加者）</span>
+              <span class="text-[11px] sm:text-xs font-black text-amber-300 tracking-wider">🏅 最終順位・みんなの点数（全参加者）</span>
               <span id="tourney-ranking-count" class="text-[10px] font-bold text-slate-300"></span>
             </div>
             <div id="tourney-final-rankings" class="space-y-1.5"></div>
+          </div>
+
+          <!-- All Match Scores History (全試合の対戦スコア一覧) -->
+          <div class="mt-3 pt-3 border-t border-amber-400/35 max-w-2xl mx-auto text-left">
+            <div class="flex items-center justify-between mb-1.5 px-1">
+              <span class="text-[11px] sm:text-xs font-black text-cyan-300 tracking-wider">📋 全試合の対戦スコア</span>
+              <span id="tourney-match-results-count" class="text-[10px] font-bold text-slate-300"></span>
+            </div>
+            <div id="tourney-match-results" class="space-y-1.5"></div>
           </div>
         </div>
       </div>
@@ -9103,6 +9200,11 @@
         this.lastReceivedDamage = 0;
         this.lastStampSeq = 0;
         this.lastAutoEventSeq = 0;
+        this.lastItemEventSeq = 0;
+        this.spectateItemLog = [];
+        this.spectateItemBannerTimer = null;
+        this.spectatePovSlot = null;
+        this.lastPovSyncAt = 0;
         this.lastBlackoutEventSeq = 0;
         this.lastStampSentAt = 0;
         this.lastVersusResultInfo = null;
@@ -9511,6 +9613,40 @@
             this.openLobby();
           });
         }
+        const setSpectatePov = (slotOrNull) => {
+          sound.playClick();
+          this.spectatePovSlot = slotOrNull;
+          if (this.lastRoomData && this.lastRoomData.tournament) {
+            this.renderTournamentScreen(this.lastRoomData, false, false);
+          }
+        };
+        const povBoardBtn = document.getElementById('btn-tourney-pov-board');
+        const povP1Btn = document.getElementById('btn-tourney-pov-p1');
+        const povP2Btn = document.getElementById('btn-tourney-pov-p2');
+        const p1CardEl = document.getElementById('tourney-spec-p1-card');
+        const p2CardEl = document.getElementById('tourney-spec-p2-card');
+        if (povBoardBtn) povBoardBtn.addEventListener('click', () => setSpectatePov(null));
+        if (povP1Btn) povP1Btn.addEventListener('click', () => {
+          const m = this.lastRoomData && this.lastRoomData.tournament && this.lastRoomData.tournament.activeMatchId
+            ? this.lastRoomData.tournament.matches[this.lastRoomData.tournament.activeMatchId] : null;
+          if (m && m.p1) setSpectatePov(m.p1);
+        });
+        if (povP2Btn) povP2Btn.addEventListener('click', () => {
+          const m = this.lastRoomData && this.lastRoomData.tournament && this.lastRoomData.tournament.activeMatchId
+            ? this.lastRoomData.tournament.matches[this.lastRoomData.tournament.activeMatchId] : null;
+          if (m && m.p2) setSpectatePov(m.p2);
+        });
+        if (p1CardEl) p1CardEl.addEventListener('click', () => {
+          const m = this.lastRoomData && this.lastRoomData.tournament && this.lastRoomData.tournament.activeMatchId
+            ? this.lastRoomData.tournament.matches[this.lastRoomData.tournament.activeMatchId] : null;
+          if (m && m.p1) setSpectatePov(m.p1);
+        });
+        if (p2CardEl) p2CardEl.addEventListener('click', () => {
+          const m = this.lastRoomData && this.lastRoomData.tournament && this.lastRoomData.tournament.activeMatchId
+            ? this.lastRoomData.tournament.matches[this.lastRoomData.tournament.activeMatchId] : null;
+          if (m && m.p2) setSpectatePov(m.p2);
+        });
+
         const btnTourneyStartMatch = document.getElementById('btn-tourney-start-match');
         if (btnTourneyStartMatch) {
           btnTourneyStartMatch.addEventListener('click', () => {
@@ -9636,12 +9772,13 @@
         return obj;
       }
 
-      calcJammerAttackDamage(comboCount = 1, isZoneActive = false, isFromBot = false) {
+      calcJammerAttackDamage(comboCount = 1, isZoneActive = false, isFromBot = false, isAutoActive = false) {
         const c = Math.max(1, Number(comboCount) || 1);
         const base = isFromBot ? 28 : 65;
         const comboMult = 1 + (c - 1) * (isFromBot ? 0.12 : 0.22);
         const zoneMult = isZoneActive ? 1.5 : 1.0;
-        return Math.round(base * comboMult * zoneMult);
+        const autoMult = isAutoActive ? 0.45 : 1.0; // オート発動中は攻撃力を0.45倍に調整
+        return Math.max(10, Math.round(base * comboMult * zoneMult * autoMult));
       }
 
       getPlayerEntries(data) {
@@ -10319,6 +10456,9 @@
         this.lastReceivedDamage = 0;
         this.lastStampSeq = 0;
         this.lastAutoEventSeq = 0;
+        this.lastItemEventSeq = 0;
+        this.spectateItemLog = [];
+        this.spectatePovSlot = null;
         this.lastBlackoutEventSeq = 0;
         this.jammerSentCount = 0;
         this.damageDealtTotal = 0;
@@ -10431,6 +10571,18 @@
               this.game.showOpponentAutoNotice(data.autoEvent.fromName || '相手');
             }
           }
+        }
+
+        // 観戦者向け：アイテム使用通知チェック（「〜がアイテムを使った！」）
+        if (data && data.itemEvent && typeof data.itemEvent.seq === 'number' && data.itemEvent.seq > this.lastItemEventSeq) {
+          this.lastItemEventSeq = data.itemEvent.seq;
+          const isSpectating = (data.status === 'tournament_playing' && !this.getActiveParticipants(data).some((x) => x.slot === this.mySlot));
+          if (isSpectating) {
+            this.showSpectateItemNotice(data.itemEvent);
+          }
+        } else if (data && !data.itemEvent && this.spectateItemLog.length > 0 && data.status !== 'tournament_playing') {
+          this.spectateItemLog = [];
+          this.lastItemEventSeq = 0;
         }
 
         // 相手のドパガキ・ブラックアウト発生通知チェック（自分はブラックアウトせず時間停止のみ連動！）
@@ -11014,12 +11166,15 @@
             if (s1 === s2) s1 += 500;
             const winSlot = s1 > s2 ? match.p1 : match.p2;
             const winName = winSlot === match.p1 ? p1.name : p2.name;
+            const targetPerf = (data.settings && data.settings.raceTarget) ? Number(data.settings.raceTarget) : 7;
+            const winPerf = data.settings && data.settings.vsRule === 'race' ? targetPerf : Math.max(4, Math.min(18, Math.round(Math.max(s1, s2) / 3600)));
+            const losePerf = data.settings && data.settings.vsRule === 'race' ? Math.max(1, targetPerf - 1 - Math.floor(Math.random() * 2)) : Math.max(2, Math.min(winPerf, Math.round(Math.min(s1, s2) / 3800)));
             const fakeData = {
               ...data,
               players: {
                 ...data.players,
-                [match.p1]: { ...p1, score: s1, hp: winSlot === match.p1 ? 850 : 0 },
-                [match.p2]: { ...p2, score: s2, hp: winSlot === match.p2 ? 850 : 0 }
+                [match.p1]: { ...p1, score: s1, hp: winSlot === match.p1 ? 850 : 0, perfectCount: winSlot === match.p1 ? winPerf : losePerf, served: (winSlot === match.p1 ? winPerf : losePerf) + 1 },
+                [match.p2]: { ...p2, score: s2, hp: winSlot === match.p2 ? 850 : 0, perfectCount: winSlot === match.p2 ? winPerf : losePerf, served: (winSlot === match.p2 ? winPerf : losePerf) + 1 }
               }
             };
             this.hostAdvanceTournament(fakeData, {
@@ -11050,6 +11205,7 @@
           seed,
           startedAt: Date.now(),
           winner: null,
+          itemEvent: null,
           [`players/${m.p1}`]: freshP1,
           [`players/${m.p2}`]: freshP2,
           [`jammers/${m.p1}`]: freshJam,
@@ -11079,6 +11235,10 @@
         m.p2Score = Number(p2Obj.score || 0);
         m.p1Hp = typeof p1Obj.hp === 'number' ? p1Obj.hp : this.VS_JAMMER_MAX_HP;
         m.p2Hp = typeof p2Obj.hp === 'number' ? p2Obj.hp : this.VS_JAMMER_MAX_HP;
+        m.p1Perfect = Number(p1Obj.perfectCount || 0);
+        m.p2Perfect = Number(p2Obj.perfectCount || 0);
+        m.p1Served = Number(p1Obj.served || 0);
+        m.p2Served = Number(p2Obj.served || 0);
 
         if (!m.isThirdPlace && t.totalRounds >= 2 && m.round === t.totalRounds - 2) {
           if (!Array.isArray(t.semiLoserSlots)) t.semiLoserSlots = [];
@@ -11150,18 +11310,58 @@
         const rankings = [];
         const placed = new Set();
 
+        // 全試合から各参加者のスコア（合計・最高・最終・勝敗・神回数）を集計
+        const statsBySlot = {};
+        const ensureStat = (sl) => {
+          if (!statsBySlot[sl]) {
+            statsBySlot[sl] = { totalScore: 0, bestScore: 0, lastScore: 0, wins: 0, losses: 0, matchesPlayed: 0, totalPerfect: 0, matchScores: [] };
+          }
+          return statsBySlot[sl];
+        };
+        const statOrder = Array.isArray(t.matchOrder) ? t.matchOrder : Object.keys(t.matches);
+        for (const id of statOrder) {
+          const m = t.matches[id];
+          if (!m || m.isBye || m.status !== 'done') continue;
+          if (m.p1) {
+            const st1 = ensureStat(m.p1);
+            const sc1 = Number(m.p1Score || 0);
+            st1.totalScore += sc1;
+            if (sc1 > st1.bestScore) st1.bestScore = sc1;
+            st1.lastScore = sc1;
+            st1.matchesPlayed += 1;
+            st1.totalPerfect += Number(m.p1Perfect || 0);
+            st1.matchScores.push(sc1);
+            if (m.winner === m.p1) st1.wins += 1;
+            else if (m.loser === m.p1) st1.losses += 1;
+          }
+          if (m.p2) {
+            const st2 = ensureStat(m.p2);
+            const sc2 = Number(m.p2Score || 0);
+            st2.totalScore += sc2;
+            if (sc2 > st2.bestScore) st2.bestScore = sc2;
+            st2.lastScore = sc2;
+            st2.matchesPlayed += 1;
+            st2.totalPerfect += Number(m.p2Perfect || 0);
+            st2.matchScores.push(sc2);
+            if (m.winner === m.p2) st2.wins += 1;
+            else if (m.loser === m.p2) st2.losses += 1;
+          }
+        }
+
         const pushSlot = (slot, rank, isTied, note) => {
           if (!slot || placed.has(slot)) return;
           const p = pMap[slot];
           if (!p || !p.name) return;
           placed.add(slot);
+          const st = statsBySlot[slot] || { totalScore: 0, bestScore: 0, lastScore: 0, wins: 0, losses: 0, matchesPlayed: 0, totalPerfect: 0, matchScores: [] };
           rankings.push({
             slot,
             rank,
             isTied: Boolean(isTied),
             name: p.name,
             isBot: Boolean(p.isBot),
-            note: note || ''
+            note: note || '',
+            ...st
           });
         };
 
@@ -11303,18 +11503,88 @@
                     : (rankNum === 3
                       ? 'bg-orange-950/55 border-orange-400/60 text-orange-100'
                       : 'bg-slate-900/85 border-slate-700/80 text-slate-200')));
-              row.className = `tourney-rank-row flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl border-2 text-xs sm:text-sm font-black ${borderCls}`;
+              const scoreMainText = entry.matchesPlayed > 1
+                ? `計 ${entry.totalScore.toLocaleString()} pt`
+                : `${entry.totalScore.toLocaleString()} pt`;
+              const scoreSubText = entry.matchesPlayed > 1
+                ? `${entry.wins}勝${entry.losses}敗 / 最高 ${entry.bestScore.toLocaleString()}pt`
+                : `${entry.note} (${entry.wins}勝${entry.losses}敗)`;
+
+              row.className = `tourney-rank-row flex items-center justify-between gap-2 px-3 py-2 rounded-xl border-2 text-xs sm:text-sm font-black ${borderCls}`;
               row.style.animationDelay = `${Math.min(idx, 10) * 65}ms`;
               row.innerHTML = `
                 <div class="flex items-center gap-2 min-w-0 flex-1">
-                  <span class="min-w-[64px] shrink-0 font-black ${rankNum === 1 ? 'text-amber-300' : (rankNum === 2 ? 'text-slate-200' : (rankNum === 3 ? 'text-orange-300' : 'text-slate-400'))}">${rankText}</span>
-                  <span class="truncate ${isMe ? 'text-cyan-200' : 'text-white'}">${escapeHtml(entry.name)}</span>
-                  ${isMe ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-cyan-400 text-slate-950 font-black shrink-0">YOU</span>' : ''}
-                  ${entry.isBot ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-200 border border-amber-400/60 font-black shrink-0">BOT</span>' : ''}
+                  <span class="min-w-[58px] sm:min-w-[64px] shrink-0 font-black ${rankNum === 1 ? 'text-amber-300' : (rankNum === 2 ? 'text-slate-200' : (rankNum === 3 ? 'text-orange-300' : 'text-slate-400'))}">${rankText}</span>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-1.5 min-w-0">
+                      <span class="truncate ${isMe ? 'text-cyan-200' : 'text-white'}">${escapeHtml(entry.name)}</span>
+                      ${isMe ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-cyan-400 text-slate-950 font-black shrink-0">YOU</span>' : ''}
+                      ${entry.isBot ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-200 border border-amber-400/60 font-black shrink-0">BOT</span>' : ''}
+                    </div>
+                    <div class="text-[9px] sm:text-[10px] font-bold text-slate-300 truncate mt-0.5">${escapeHtml(scoreSubText)}</div>
+                  </div>
                 </div>
-                <span class="text-[10px] font-bold text-slate-300 shrink-0">${escapeHtml(entry.note)}</span>
+                <div class="text-right shrink-0">
+                  <div class="font-digital text-sm sm:text-base font-black text-amber-300 leading-tight">${scoreMainText}</div>
+                  ${entry.matchesPlayed > 1 ? `<div class="text-[9px] font-bold text-slate-400 leading-tight">${escapeHtml(entry.note)}</div>` : ''}
+                </div>
               `;
               rankListEl.appendChild(row);
+            });
+          }
+
+          // 全試合の対戦スコア一覧を描画
+          const matchListEl = document.getElementById('tourney-match-results');
+          const matchCountEl = document.getElementById('tourney-match-results-count');
+          if (matchListEl) {
+            const doneMatches = (Array.isArray(t.matchOrder) ? t.matchOrder : Object.keys(t.matches))
+              .map((id) => t.matches[id])
+              .filter((m) => m && !m.isBye && m.status === 'done' && m.p1 && m.p2);
+            if (matchCountEl) matchCountEl.textContent = `全${doneMatches.length}試合`;
+            matchListEl.innerHTML = '';
+            const isJammerRule = s.vsRule === 'jammer';
+            const isRaceRule = s.vsRule === 'race';
+            doneMatches.forEach((m, mIdx) => {
+              const p1 = players[m.p1] || { name: '---' };
+              const p2 = players[m.p2] || { name: '---' };
+              const p1Win = m.winner === m.p1;
+              const p2Win = m.winner === m.p2;
+              const p1ScoreStr = `${Number(m.p1Score || 0).toLocaleString()}pt`;
+              const p2ScoreStr = `${Number(m.p2Score || 0).toLocaleString()}pt`;
+              const p1Extra = isJammerRule
+                ? (m.p1Hp <= 0 ? '💀K.O.' : `❤️${m.p1Hp}`)
+                : (isRaceRule && typeof m.p1Perfect === 'number' ? `✨${m.p1Perfect}神` : '');
+              const p2Extra = isJammerRule
+                ? (m.p2Hp <= 0 ? '💀K.O.' : `❤️${m.p2Hp}`)
+                : (isRaceRule && typeof m.p2Perfect === 'number' ? `✨${m.p2Perfect}神` : '');
+
+              const card = document.createElement('div');
+              card.className = 'tourney-rank-row bg-slate-900/90 border border-slate-700/90 rounded-xl px-2.5 py-2 text-[10px] sm:text-xs';
+              card.style.animationDelay = `${Math.min(mIdx, 10) * 45}ms`;
+              card.innerHTML = `
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9px] sm:text-[10px] font-black ${m.isThirdPlace ? 'text-orange-300' : (m.round === t.totalRounds - 1 ? 'text-amber-300' : 'text-cyan-300')}">${escapeHtml(m.roundLabel || '')}</span>
+                  <span class="text-[9px] text-slate-400 font-bold">MATCH #${mIdx + 1}</span>
+                </div>
+                <div class="grid grid-cols-11 items-center gap-1">
+                  <div class="col-span-5 rounded-lg px-2 py-1 ${p1Win ? 'bg-amber-500/20 border border-amber-400/70' : 'bg-slate-950/70 border border-slate-800 opacity-75'}">
+                    <div class="flex items-center justify-between gap-1">
+                      <span class="font-black truncate ${m.p1 === this.mySlot ? 'text-cyan-200' : (p1Win ? 'text-white' : 'text-slate-400')}">${escapeHtml(p1.name)}</span>
+                      ${p1Win ? '<span class="text-[8px] px-1 rounded bg-amber-400 text-slate-950 font-black shrink-0">WIN</span>' : ''}
+                    </div>
+                    <div class="font-digital font-black ${p1Win ? 'text-amber-300' : 'text-slate-400'} mt-0.5">${p1ScoreStr}${p1Extra ? ` <span class="text-[9px] text-slate-300">${p1Extra}</span>` : ''}</div>
+                  </div>
+                  <div class="col-span-1 text-center font-black text-[10px] text-slate-400">VS</div>
+                  <div class="col-span-5 rounded-lg px-2 py-1 ${p2Win ? 'bg-amber-500/20 border border-amber-400/70' : 'bg-slate-950/70 border border-slate-800 opacity-75'}">
+                    <div class="flex items-center justify-between gap-1">
+                      <span class="font-black truncate ${m.p2 === this.mySlot ? 'text-cyan-200' : (p2Win ? 'text-white' : 'text-slate-400')}">${escapeHtml(p2.name)}</span>
+                      ${p2Win ? '<span class="text-[8px] px-1 rounded bg-amber-400 text-slate-950 font-black shrink-0">WIN</span>' : ''}
+                    </div>
+                    <div class="font-digital font-black ${p2Win ? 'text-amber-300' : 'text-slate-400'} mt-0.5">${p2ScoreStr}${p2Extra ? ` <span class="text-[9px] text-slate-300">${p2Extra}</span>` : ''}</div>
+                  </div>
+                </div>
+              `;
+              matchListEl.appendChild(card);
             });
           }
         } else if (activeMatch) {
@@ -11358,7 +11628,34 @@
             };
             setSpec('p1', p1);
             setSpec('p2', p2);
+
+            // 視点切替ボタンのラベル＆アクティブ状態更新
+            if (this.spectatePovSlot && this.spectatePovSlot !== activeMatch.p1 && this.spectatePovSlot !== activeMatch.p2) {
+              this.spectatePovSlot = null;
+            }
+            const povBoardBtn = document.getElementById('btn-tourney-pov-board');
+            const povP1Btn = document.getElementById('btn-tourney-pov-p1');
+            const povP2Btn = document.getElementById('btn-tourney-pov-p2');
+            if (povP1Btn) povP1Btn.textContent = `👁️ ${p1.name || 'P1'}視点`;
+            if (povP2Btn) povP2Btn.textContent = `👁️ ${p2.name || 'P2'}視点`;
+
+            const activeBtnCls = 'btn-3d px-2 py-1 rounded-lg text-[10px] font-black border bg-amber-400 text-slate-950 border-amber-200 shadow max-w-[130px] truncate';
+            const idleP1Cls = 'btn-3d px-2 py-1 rounded-lg text-[10px] font-black border bg-slate-800 text-cyan-200 border-cyan-400/70 max-w-[130px] truncate';
+            const idleP2Cls = 'btn-3d px-2 py-1 rounded-lg text-[10px] font-black border bg-slate-800 text-fuchsia-200 border-fuchsia-400/70 max-w-[130px] truncate';
+            const idleBoardCls = 'btn-3d px-2 py-1 rounded-lg text-[10px] font-black border bg-slate-800 text-slate-200 border-slate-600';
+
+            if (povBoardBtn) povBoardBtn.className = !this.spectatePovSlot ? activeBtnCls : idleBoardCls;
+            if (povP1Btn) povP1Btn.className = this.spectatePovSlot === activeMatch.p1 ? activeBtnCls : idleP1Cls;
+            if (povP2Btn) povP2Btn.className = this.spectatePovSlot === activeMatch.p2 ? activeBtnCls : idleP2Cls;
+
+            this.renderSpectatePovPanel(data, activeMatch, s);
+            this.renderSpectateItemLog();
           } else {
+            this.spectatePovSlot = null;
+            const povPanel = document.getElementById('tourney-spec-pov-panel');
+            if (povPanel) povPanel.classList.add('hidden');
+            const itemBanner = document.getElementById('tourney-spec-item-banner');
+            if (itemBanner) itemBanner.classList.add('hidden');
             const amINext = (this.mySlot === activeMatch.p1 || this.mySlot === activeMatch.p2);
             if (tagEl) {
               if (t.lastMatchSummary && t.phase === 'advance') {
@@ -11981,6 +12278,153 @@
             </div>
           `;
           colsEl.appendChild(tpBox);
+        }
+      }
+
+      renderSpectatePovPanel(data, activeMatch, s) {
+        const boardGrid = document.getElementById('tourney-spec-board-grid');
+        const povPanel = document.getElementById('tourney-spec-pov-panel');
+        if (!povPanel) return;
+
+        if (!this.spectatePovSlot) {
+          if (boardGrid) boardGrid.classList.remove('hidden');
+          povPanel.classList.add('hidden');
+          return;
+        }
+
+        const players = data.players || {};
+        const pObj = players[this.spectatePovSlot];
+        if (!pObj) {
+          this.spectatePovSlot = null;
+          if (boardGrid) boardGrid.classList.remove('hidden');
+          povPanel.classList.add('hidden');
+          return;
+        }
+
+        if (boardGrid) boardGrid.classList.add('hidden');
+        povPanel.classList.remove('hidden');
+
+        const isP1 = this.spectatePovSlot === activeMatch.p1;
+        povPanel.className = `mt-2 rounded-2xl border-2 ${isP1 ? 'border-cyan-400/90' : 'border-fuchsia-400/90'} bg-slate-950/95 p-2.5 sm:p-3 text-left shadow-xl`;
+
+        const pov = pObj.pov || null;
+        const nameEl = document.getElementById('tourney-pov-name');
+        const scoreEl = document.getElementById('tourney-pov-score');
+        const custEl = document.getElementById('tourney-pov-customer');
+        const badgesEl = document.getElementById('tourney-pov-badges');
+        if (nameEl) nameEl.textContent = pObj.name || 'Player';
+        if (scoreEl) scoreEl.textContent = `${Number(pObj.score || 0).toLocaleString()} pt`;
+        if (custEl) custEl.textContent = `${(pov && pov.customerIndex) || ((pObj.served || 0) + 1)}人目`;
+
+        if (badgesEl) {
+          const tags = [];
+          if (pObj.combo >= 2) tags.push(`<span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-400 text-slate-950">🔥${pObj.combo}連</span>`);
+          if (pov && pov.zoneActive) tags.push('<span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-fuchsia-500 text-white animate-pulse">⚡ZONE</span>');
+          if (pov && pov.autoLeft > 0) tags.push(`<span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-cyan-400 text-slate-950">🤖AUTO ${pov.autoLeft.toFixed(1)}s</span>`);
+          if (pov && pov.stunLeft > 0) tags.push(`<span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-yellow-400 text-slate-950">⚡痺れ ${pov.stunLeft.toFixed(1)}s</span>`);
+          if (pov && pov.screenJammers > 0) tags.push(`<span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-rose-500 text-white">💣お邪魔${pov.screenJammers}枚</span>`);
+          if (pObj.koDefeated) tags.push('<span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-rose-600 text-white">💀K.O.</span>');
+          else if (pObj.finished) tags.push('<span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950">🏁終了</span>');
+          badgesEl.innerHTML = tags.join('');
+        }
+
+        // HP bar in Jammer mode
+        const hpWrap = document.getElementById('tourney-pov-hp-wrap');
+        const hpFill = document.getElementById('tourney-pov-hp-fill');
+        const hpText = document.getElementById('tourney-pov-hp-text');
+        if (hpWrap) {
+          if (s.vsRule === 'jammer') {
+            hpWrap.classList.remove('hidden');
+            const maxHp = pObj.maxHp || this.VS_JAMMER_MAX_HP;
+            const curHp = Math.max(0, typeof pObj.hp === 'number' ? pObj.hp : maxHp);
+            const pct = Math.max(0, Math.min(100, (curHp / Math.max(1, maxHp)) * 100));
+            if (hpFill) {
+              hpFill.style.width = `${pct}%`;
+              hpFill.className = pct <= 25
+                ? 'h-full bg-gradient-to-r from-rose-500 to-red-600 transition-all duration-200'
+                : (pct <= 55 ? 'h-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-200' : 'h-full bg-gradient-to-r from-emerald-400 to-cyan-400 transition-all duration-200');
+            }
+            if (hpText) hpText.textContent = `${curHp}/${maxHp}`;
+          } else {
+            hpWrap.classList.add('hidden');
+          }
+        }
+
+        const priceLabelEl = document.getElementById('tourney-pov-price-label');
+        const priceEl = document.getElementById('tourney-pov-price');
+        const trayTotalEl = document.getElementById('tourney-pov-tray-total');
+        const changeLabelEl = document.getElementById('tourney-pov-change-label');
+        const changeValEl = document.getElementById('tourney-pov-change-val');
+        const trayItemsEl = document.getElementById('tourney-pov-tray-items');
+        const walletItemsEl = document.getElementById('tourney-pov-wallet-items');
+        const lastGradeEl = document.getElementById('tourney-pov-last-grade');
+
+        if (pObj.isBot && !pov) {
+          if (priceLabelEl) priceLabelEl.textContent = '🤖 BOT 思考中';
+          if (priceEl) priceEl.textContent = '暗算処理中';
+          if (trayTotalEl) trayTotalEl.textContent = `神:${pObj.perfectCount || 0}回`;
+          if (changeLabelEl) changeLabelEl.textContent = '処理人数';
+          if (changeValEl) changeValEl.textContent = `${pObj.served || 0}人`;
+          if (trayItemsEl) trayItemsEl.innerHTML = '<span class="text-cyan-300">🤖 BOTが高速でレジ会計を進行中です…</span>';
+          if (walletItemsEl) walletItemsEl.innerHTML = '<span class="text-slate-400">BOT専用アルゴリズムで動作中</span>';
+          if (lastGradeEl) lastGradeEl.textContent = '';
+          return;
+        }
+
+        if (!pov) {
+          if (priceLabelEl) priceLabelEl.textContent = 'お会計金額';
+          if (priceEl) priceEl.textContent = '同期中...';
+          if (trayTotalEl) trayTotalEl.textContent = '¥ 0';
+          if (changeLabelEl) changeLabelEl.textContent = '算出お釣り';
+          if (changeValEl) changeValEl.textContent = '---';
+          if (trayItemsEl) trayItemsEl.textContent = 'カメラ映像を待機中...';
+          if (walletItemsEl) walletItemsEl.textContent = '---';
+          if (lastGradeEl) lastGradeEl.textContent = '';
+          return;
+        }
+
+        if (priceLabelEl) {
+          priceLabelEl.textContent = pov.isLunatic ? `本体価格（税${pov.lunaticTaxRate || 8}%別）` : 'お会計金額';
+        }
+        if (priceEl) priceEl.textContent = `¥ ${Number(pov.displayPrice || pov.price || 0).toLocaleString()}`;
+        if (trayTotalEl) trayTotalEl.textContent = `¥ ${Number(pov.trayTotal || 0).toLocaleString()}`;
+
+        const diff = Number(pov.trayTotal || 0) - Number(pov.price || 0);
+        if (diff < 0) {
+          if (changeLabelEl) changeLabelEl.textContent = '不足額';
+          if (changeValEl) {
+            changeValEl.textContent = `あと ¥${Math.abs(diff).toLocaleString()}`;
+            changeValEl.className = 'font-digital text-xs sm:text-sm font-black text-rose-400';
+          }
+        } else {
+          if (changeLabelEl) changeLabelEl.textContent = '算出お釣り';
+          if (changeValEl) {
+            changeValEl.textContent = diff === 0 ? '¥ 0 (ピッタリ!)' : `¥ ${diff.toLocaleString()}`;
+            changeValEl.className = 'font-digital text-xs sm:text-sm font-black text-cyan-300';
+          }
+        }
+
+        if (lastGradeEl) {
+          const g = pov.lastGrade || '';
+          lastGradeEl.textContent = g === 'PERFECT' ? '直前: ✨PERFECT!' : (g === 'GOOD' ? '直前: 👍GOOD' : (g === 'BAD' ? '直前: 💦BAD' : ''));
+        }
+
+        if (trayItemsEl) {
+          const tc = pov.trayCounts || {};
+          const chips = ALL_DENOMS.filter((d) => Number(tc[d] || 0) > 0).map((d) => {
+            const isBill = d >= 1000;
+            return `<span class="px-1.5 py-0.5 rounded-lg border ${isBill ? 'bg-emerald-950/90 border-emerald-400/70 text-emerald-200' : 'bg-amber-950/80 border-amber-400/70 text-amber-200'} font-digital">¥${d.toLocaleString()}×${tc[d]}</span>`;
+          });
+          trayItemsEl.innerHTML = chips.length > 0 ? chips.join('') : '<span class="text-slate-400">まだトレイに出ていません</span>';
+        }
+
+        if (walletItemsEl) {
+          const wc = pov.walletCounts || {};
+          const wChips = ALL_DENOMS.filter((d) => Number(wc[d] || 0) > 0).map((d) => {
+            const isBill = d >= 1000;
+            return `<span class="px-1.5 py-0.5 rounded-md border ${isBill ? 'bg-slate-800 border-cyan-500/40 text-cyan-200' : 'bg-slate-800 border-slate-600 text-slate-200'} font-digital">¥${d.toLocaleString()}:${wc[d]}</span>`;
+          });
+          walletItemsEl.innerHTML = wChips.length > 0 ? wChips.join('') : '<span class="text-slate-500">空</span>';
         }
       }
 
@@ -12651,7 +13095,8 @@
           koDefeated: Boolean(this.game.vsKoDefeated),
           finished: Boolean(finished),
           failedSuddenDeath: Boolean(failedSuddenDeath),
-          jammerSentCount: this.jammerSentCount || 0
+          jammerSentCount: this.jammerSentCount || 0,
+          pov: this.buildMyPovSnapshot()
         }).catch(() => {});
 
         if (this.lastRoomData) {
@@ -12684,7 +13129,7 @@
         }
       }
 
-      sendJammerFromSlot(fromSlot, fromName, comboCount, isFromBot = false, isZoneActive = false, withCoins = true) {
+      sendJammerFromSlot(fromSlot, fromName, comboCount, isFromBot = false, isZoneActive = false, withCoins = true, isAutoActive = false) {
         if (!this.roomRef || !this.lastRoomData) return null;
         const s = this.lastRoomData.settings || {};
         if (s.vsRule !== 'jammer') return null;
@@ -12698,7 +13143,7 @@
         if (candidates.length === 0) return null;
 
         const target = candidates[Math.floor(Math.random() * candidates.length)];
-        const damage = this.calcJammerAttackDamage(comboCount, isZoneActive, isFromBot);
+        const damage = this.calcJammerAttackDamage(comboCount, isZoneActive, isFromBot, isAutoActive);
 
         let c1 = 0;
         let c10 = 0;
@@ -12744,15 +13189,16 @@
             this.game.triggerVersusSpecialAttackFX(comboCount, c1, c10, target.player.name || '相手', damage, isZoneActive);
           } else {
             const zoneTag = isZoneActive ? '⚡ZONE×1.5! ' : '';
-            this.game.showVersusJammerToast(`${zoneTag}⚔️ ${target.player.name || '相手'} へ ${damage} DMG! (${comboCount}連)`, false);
+            const autoTag = isAutoActive ? '🤖AUTO(威力0.45倍) ' : '';
+            this.game.showVersusJammerToast(`${autoTag}${zoneTag}⚔️ ${target.player.name || '相手'} へ ${damage} DMG! (${comboCount}連)`, false);
           }
         }
         return { damage, coins: c1 + c10, targetSlot: target.slot };
       }
 
-      sendJammerToOpponent(comboCount, isZoneActive = false, withCoins = true) {
+      sendJammerToOpponent(comboCount, isZoneActive = false, withCoins = true, isAutoActive = false) {
         if (!this.mySlot) return;
-        this.sendJammerFromSlot(this.mySlot, this.game.playerName, comboCount, false, isZoneActive, withCoins);
+        this.sendJammerFromSlot(this.mySlot, this.game.playerName, comboCount, false, isZoneActive, withCoins, isAutoActive);
       }
 
       hasAttackableOpponent() {
@@ -12805,6 +13251,7 @@
           ? this.game.getVersusItemCost().toLocaleString()
           : '20,000';
         this.game.showVersusJammerToast(`⚡ スタン発動!! ${target.player.name || '相手'} に 100 DMG ＆ 2秒痺れ（-${costTxt}pt）`, false);
+        this.sendSpectateItemEvent('stun', '⚡スタン', target.player.name || '相手', '100 DMG ＆ 2秒痺れ');
         return true;
       }
 
@@ -12849,6 +13296,7 @@
           ? this.game.getVersusItemCost().toLocaleString()
           : '20,000';
         this.game.showVersusJammerToast(`💣 お邪魔送り発動!! ${target.player.name || '相手'} の画面に${count}枚ばらまき!!（-${costTxt}pt）`, false);
+        this.sendSpectateItemEvent('trayjam', '💣お邪魔送り', target.player.name || '相手', `画面に${count}枚ばらまき`);
         return true;
       }
 
@@ -12864,6 +13312,114 @@
             at: Date.now()
           };
         }).catch(() => {});
+        this.sendSpectateItemEvent('auto', '🤖オート', '', '3秒間オート神会計・攻撃0.45倍');
+      }
+
+      sendSpectateItemEvent(itemType, itemLabel, targetName = '', detail = '') {
+        if (!this.roomRef || !this.mySlot) return;
+        const senderName = this.game.playerName || 'プレイヤー';
+        this.roomRef.child('itemEvent').transaction((cur) => {
+          const nextSeq = (cur && typeof cur.seq === 'number' ? cur.seq : 0) + 1;
+          return {
+            seq: nextSeq,
+            fromSlot: this.mySlot,
+            fromName: senderName,
+            itemType: String(itemType || ''),
+            itemLabel: String(itemLabel || 'アイテム'),
+            targetName: String(targetName || ''),
+            detail: String(detail || ''),
+            at: Date.now()
+          };
+        }).catch(() => {});
+      }
+
+      showSpectateItemNotice(ev) {
+        if (!ev) return;
+        const fromName = ev.fromName || 'プレイヤー';
+        const itemLabel = ev.itemLabel || 'アイテム';
+        const targetPart = ev.targetName ? ` → ${ev.targetName}` : '';
+        const detailPart = ev.detail ? `（${ev.detail}）` : '';
+        const msg = `🎁 ${fromName} が ${itemLabel} を使った！${targetPart}${detailPart}`;
+
+        this.spectateItemLog.unshift({ msg, at: ev.at || Date.now() });
+        if (this.spectateItemLog.length > 4) {
+          this.spectateItemLog = this.spectateItemLog.slice(0, 4);
+        }
+
+        sound.playStampPop();
+        const banner = document.getElementById('tourney-spec-item-banner');
+        const bannerTxt = document.getElementById('tourney-spec-item-banner-text');
+        if (banner && bannerTxt) {
+          bannerTxt.textContent = msg;
+          banner.classList.remove('hidden');
+          banner.classList.remove('animate-pop');
+          void banner.offsetWidth;
+          banner.classList.add('animate-pop');
+          if (this.spectateItemBannerTimer) clearTimeout(this.spectateItemBannerTimer);
+          this.spectateItemBannerTimer = setTimeout(() => {
+            banner.classList.add('hidden');
+          }, 3600);
+        }
+        this.renderSpectateItemLog();
+      }
+
+      renderSpectateItemLog() {
+        const wrap = document.getElementById('tourney-spec-item-log-wrap');
+        const list = document.getElementById('tourney-spec-item-log');
+        if (!wrap || !list) return;
+        if (!this.spectateItemLog || this.spectateItemLog.length === 0) {
+          wrap.classList.add('hidden');
+          list.innerHTML = '';
+          return;
+        }
+        wrap.classList.remove('hidden');
+        list.innerHTML = this.spectateItemLog.map((it, idx) => `
+          <div class="truncate ${idx === 0 ? 'text-amber-200 font-black' : 'text-slate-300'}">${escapeHtml(it.msg)}</div>
+        `).join('');
+      }
+
+      buildMyPovSnapshot() {
+        if (!this.game) return null;
+        const g = this.game;
+        const trayCounts = {};
+        if (Array.isArray(g.trayList)) {
+          g.trayList.forEach((d) => {
+            trayCounts[d] = (trayCounts[d] || 0) + 1;
+          });
+        }
+        const walletCounts = {};
+        if (g.wallet) {
+          ALL_DENOMS.forEach((d) => {
+            const c = Number(g.wallet[d] || 0);
+            if (c > 0) walletCounts[d] = c;
+          });
+        }
+        return {
+          price: Number(g.currentPrice || 0),
+          displayPrice: g.difficulty === 'LUNATIC' ? Number(g.basePrice || 0) : Number(g.currentPrice || 0),
+          isLunatic: g.difficulty === 'LUNATIC',
+          lunaticTaxRate: g.lunaticTaxRate === 10 ? 10 : 8,
+          trayTotal: typeof g.getTrayTotal === 'function' ? Number(g.getTrayTotal() || 0) : 0,
+          trayCounts,
+          walletCounts,
+          lastGrade: String(g.lastJudgmentGrade || ''),
+          autoLeft: Math.max(0, Number((g.vsAutoTimeLeft || 0).toFixed(1))),
+          stunLeft: Math.max(0, Number((g.vsStunTimeLeft || 0).toFixed(1))),
+          zoneActive: Boolean(g.scene3D && g.scene3D.isZoneActive),
+          screenJammers: typeof g.getScreenJammerCount === 'function' ? g.getScreenJammerCount() : 0,
+          customerIndex: Number(g.customerIndex || 1),
+          updatedAt: Date.now()
+        };
+      }
+
+      syncMyLivePov(force = false) {
+        if (!this.roomRef || !this.mySlot || !this.game || !this.game.isVersusRun) return;
+        const now = Date.now();
+        if (!force && now - (this.lastPovSyncAt || 0) < 160) return;
+        this.lastPovSyncAt = now;
+        const pov = this.buildMyPovSnapshot();
+        if (!pov) return;
+        this.roomRef.child('players/' + this.mySlot + '/pov').set(pov).catch(() => {});
       }
 
       sendBlackoutEvent() {
@@ -15858,7 +16414,7 @@
         if (!banner) return;
         if (this.vsAutoTimeLeft > 0 && (this.state === 'PLAYING' || this.state === 'JUDGING')) {
           banner.classList.remove('hidden');
-          if (txt) txt.textContent = `3秒間オート神会計 発動中!! 残り ${this.vsAutoTimeLeft.toFixed(1)}s`;
+          if (txt) txt.textContent = `オート神会計 発動中（攻撃0.45倍） 残り ${this.vsAutoTimeLeft.toFixed(1)}s`;
         } else if (this.vsAutoFinishingTurn && this.state === 'PLAYING') {
           banner.classList.remove('hidden');
           if (txt) txt.textContent = `オート終了間近！今の会計を完了中...`;
@@ -16126,7 +16682,7 @@
           this.showScoreSpendPopup(cost);
           this.updateAutoBanner();
           this.updateVersusHpBar();
-          this.showVersusJammerToast(`🤖 オート発動!! 3秒間自動で神会計!!（-${cost.toLocaleString()}pt / 残${this.vsAutoUsesLeft}回）`, false);
+          this.showVersusJammerToast(`🤖 オート発動!! 3秒間自動で神会計（攻撃0.45倍 / -${cost.toLocaleString()}pt / 残${this.vsAutoUsesLeft}回）`, false);
           if (this.versus) {
             this.versus.sendAutoItemNotice();
             this.versus.syncMyProgress(false, false);
@@ -16358,6 +16914,7 @@
           return;
         }
 
+        this.lastJudgmentGrade = typeof grade !== 'undefined' ? grade : (this.lastJudgmentGrade || '');
         if (this.isVersusRun && this.versus) {
           this.versus.syncMyProgress(false, false);
         }
@@ -17398,7 +17955,8 @@
               }
             }
             const withCoins = this.perfectCount > 0 && this.perfectCount % 3 === 0;
-            this.versus.sendJammerToOpponent(this.combo, Boolean(this.scene3D.isZoneActive), withCoins);
+            const isAutoNow = (this.vsAutoTimeLeft || 0) > 0 || Boolean(this.vsAutoFinishingTurn);
+            this.versus.sendJammerToOpponent(this.combo, Boolean(this.scene3D.isZoneActive), withCoins, isAutoNow);
             this.updateVersusHpBar();
           }
 
@@ -17763,6 +18321,9 @@
 
         const paidTotal = this.getTrayTotal();
         document.getElementById('ui-tray-total').textContent = `¥ ${paidTotal.toLocaleString()}`;
+        if (this.isVersusRun && this.versus && typeof this.versus.syncMyLivePov === 'function') {
+          this.versus.syncMyLivePov(false);
+        }
 
         const visibleContent = document.getElementById('ui-change-visible-content');
         const hiddenBadge = document.getElementById('ui-change-hidden-badge');

@@ -9781,6 +9781,17 @@
         return Math.max(10, Math.round(base * comboMult * zoneMult * autoMult));
       }
 
+      getEffectiveHp(data, slot, playerObj = null) {
+        const p = playerObj || (data && data.players ? data.players[slot] : null) || {};
+        const maxHp = typeof p.maxHp === 'number' && p.maxHp > 0 ? p.maxHp : this.VS_JAMMER_MAX_HP;
+        if (p.koDefeated) return 0;
+        const reportedHp = typeof p.hp === 'number' ? Math.max(0, p.hp) : maxHp;
+        const jam = data && data.jammers && slot ? data.jammers[slot] : null;
+        const totalDmg = jam && typeof jam.totalDamage === 'number' ? Math.max(0, jam.totalDamage) : 0;
+        const dmgBasedHp = Math.max(0, maxHp - totalDmg);
+        return Math.min(reportedHp, dmgBasedHp);
+      }
+
       getPlayerEntries(data) {
         if (!data || !data.players) return [];
         const entries = [];
@@ -10654,29 +10665,51 @@
           // HUD更新（2〜10人対応）
           this.updateOpponentHUD(data);
 
-          // 自分宛てのお邪魔＆HPダメージ受信チェック
+          // 自分宛てのお邪魔＆HPダメージ受信チェック（totalDamage基準で厳密同期）
           if (data.settings && data.settings.vsRule === 'jammer' && data.jammers && this.mySlot) {
             const jam = data.jammers[this.mySlot];
-            if (jam && jam.seq > this.lastJammerSeq) {
-              this.lastJammerSeq = jam.seq;
-              const totalDmg = Number(jam.totalDamage || 0);
-              const deltaDmg = Math.max(0, totalDmg > 0 ? (totalDmg - this.lastReceivedDamage) : Number(jam.damage || 0));
-              if (totalDmg > this.lastReceivedDamage) {
-                this.lastReceivedDamage = totalDmg;
+            if (jam) {
+              const totalDmg = Math.max(0, Number(jam.totalDamage || 0));
+              const maxHp = this.game.vsMaxHp || this.VS_JAMMER_MAX_HP;
+              const expectedHp = Math.max(0, maxHp - totalDmg);
+              const isNewSeq = (jam.seq || 0) > this.lastJammerSeq;
+              const hasMoreDmg = totalDmg > this.lastReceivedDamage;
+              const needsKoSync = (expectedHp <= 0 && !this.game.vsKoDefeated);
+
+              if (isNewSeq || hasMoreDmg || needsKoSync) {
+                if (isNewSeq) this.lastJammerSeq = jam.seq;
+                const deltaDmg = Math.max(0, totalDmg > 0 ? (totalDmg - this.lastReceivedDamage) : (isNewSeq ? Number(jam.damage || 0) : 0));
+                if (totalDmg > this.lastReceivedDamage) {
+                  this.lastReceivedDamage = totalDmg;
+                }
+                const stunSec = isNewSeq ? Number(jam.stunSec || 0) : 0;
+                const trayJamCoins = isNewSeq && Array.isArray(jam.trayJamCoins) ? jam.trayJamCoins : [];
+                const c1 = isNewSeq ? (jam.c1 || 0) : 0;
+                const c10 = isNewSeq ? (jam.c10 || 0) : 0;
+                if (c1 > 0 || c10 > 0 || deltaDmg > 0 || stunSec > 0 || trayJamCoins.length > 0 || needsKoSync) {
+                  this.game.receiveVersusJammer(
+                    c1,
+                    c10,
+                    jam.fromCombo || 1,
+                    jam.fromName || 'ライバル',
+                    deltaDmg,
+                    Boolean(jam.isZone),
+                    stunSec,
+                    trayJamCoins,
+                    expectedHp
+                  );
+                }
               }
-              const stunSec = Number(jam.stunSec || 0);
-              const trayJamCoins = Array.isArray(jam.trayJamCoins) ? jam.trayJamCoins : [];
-              if ((jam.c1 || 0) > 0 || (jam.c10 || 0) > 0 || deltaDmg > 0 || stunSec > 0 || trayJamCoins.length > 0) {
-                this.game.receiveVersusJammer(
-                  jam.c1 || 0,
-                  jam.c10 || 0,
-                  jam.fromCombo || 1,
-                  jam.fromName || 'ライバル',
-                  deltaDmg,
-                  Boolean(jam.isZone),
-                  stunSec,
-                  trayJamCoins
-                );
+            }
+            // フェイルセーフ：ローカルで既にHP0(K.O.)なのにDB側が未反映なら再同期
+            const myDbP = data.players && data.players[this.mySlot];
+            if ((this.game.vsKoDefeated || (typeof this.game.vsHp === 'number' && this.game.vsHp <= 0)) && myDbP && (!myDbP.koDefeated || (typeof myDbP.hp === 'number' && myDbP.hp > 0))) {
+              const nowMs = Date.now();
+              if (!this._lastKoResyncAt || nowMs - this._lastKoResyncAt > 800) {
+                this._lastKoResyncAt = nowMs;
+                this.game.vsHp = 0;
+                this.game.vsKoDefeated = true;
+                this.syncMyProgress(true, true);
               }
             }
           }
@@ -10693,19 +10726,22 @@
             return;
           }
 
-          // お邪魔HP制モード：KOにより生存者が1人だけになった場合は即勝利確定！
+          // お邪魔HP制モード：KOにより生存者が1人だけになった場合は即勝利確定！（totalDamage基準の統一HPを使用）
           if (data.settings && data.settings.vsRule === 'jammer' && participants.length >= 2 && !data.winner) {
-            const alive = participants.filter(({ player }) => {
-              const hpVal = typeof player.hp === 'number' ? player.hp : this.VS_JAMMER_MAX_HP;
+            const alive = participants.filter(({ slot, player }) => {
+              const hpVal = this.getEffectiveHp(data, slot, player);
               return !player.koDefeated && hpVal > 0 && !player.failedSuddenDeath;
             });
-            const hasAnyKO = participants.some(({ player }) => {
-              const hpVal = typeof player.hp === 'number' ? player.hp : this.VS_JAMMER_MAX_HP;
+            const hasAnyKO = participants.some(({ slot, player }) => {
+              const hpVal = this.getEffectiveHp(data, slot, player);
               return Boolean(player.koDefeated) || hpVal <= 0;
             });
             if (hasAnyKO && alive.length === 1) {
               const survivor = alive[0];
               this.claimWinner(survivor.slot, `💥 ${survivor.player.name} が相手をK.O.（HP 0）にして勝利！`);
+              return;
+            } else if (hasAnyKO && alive.length === 0) {
+              this.resolveScoreWinner(data);
               return;
             }
           }
@@ -10939,24 +10975,45 @@
             this.updateOpponentHUD(data);
             if (data.settings && data.settings.vsRule === 'jammer' && data.jammers && this.mySlot) {
               const jam = data.jammers[this.mySlot];
-              if (jam && jam.seq > this.lastJammerSeq) {
-                this.lastJammerSeq = jam.seq;
-                const totalDmg = Number(jam.totalDamage || 0);
-                const deltaDmg = Math.max(0, totalDmg > 0 ? (totalDmg - this.lastReceivedDamage) : Number(jam.damage || 0));
-                if (totalDmg > this.lastReceivedDamage) this.lastReceivedDamage = totalDmg;
-                const stunSec = Number(jam.stunSec || 0);
-                const trayJamCoins = Array.isArray(jam.trayJamCoins) ? jam.trayJamCoins : [];
-                if ((jam.c1 || 0) > 0 || (jam.c10 || 0) > 0 || deltaDmg > 0 || stunSec > 0 || trayJamCoins.length > 0) {
-                  this.game.receiveVersusJammer(
-                    jam.c1 || 0,
-                    jam.c10 || 0,
-                    jam.fromCombo || 1,
-                    jam.fromName || 'ライバル',
-                    deltaDmg,
-                    Boolean(jam.isZone),
-                    stunSec,
-                    trayJamCoins
-                  );
+              if (jam) {
+                const totalDmg = Math.max(0, Number(jam.totalDamage || 0));
+                const maxHp = this.game.vsMaxHp || this.VS_JAMMER_MAX_HP;
+                const expectedHp = Math.max(0, maxHp - totalDmg);
+                const isNewSeq = (jam.seq || 0) > this.lastJammerSeq;
+                const hasMoreDmg = totalDmg > this.lastReceivedDamage;
+                const needsKoSync = (expectedHp <= 0 && !this.game.vsKoDefeated);
+
+                if (isNewSeq || hasMoreDmg || needsKoSync) {
+                  if (isNewSeq) this.lastJammerSeq = jam.seq;
+                  const deltaDmg = Math.max(0, totalDmg > 0 ? (totalDmg - this.lastReceivedDamage) : (isNewSeq ? Number(jam.damage || 0) : 0));
+                  if (totalDmg > this.lastReceivedDamage) this.lastReceivedDamage = totalDmg;
+                  const stunSec = isNewSeq ? Number(jam.stunSec || 0) : 0;
+                  const trayJamCoins = isNewSeq && Array.isArray(jam.trayJamCoins) ? jam.trayJamCoins : [];
+                  const c1 = isNewSeq ? (jam.c1 || 0) : 0;
+                  const c10 = isNewSeq ? (jam.c10 || 0) : 0;
+                  if (c1 > 0 || c10 > 0 || deltaDmg > 0 || stunSec > 0 || trayJamCoins.length > 0 || needsKoSync) {
+                    this.game.receiveVersusJammer(
+                      c1,
+                      c10,
+                      jam.fromCombo || 1,
+                      jam.fromName || 'ライバル',
+                      deltaDmg,
+                      Boolean(jam.isZone),
+                      stunSec,
+                      trayJamCoins,
+                      expectedHp
+                    );
+                  }
+                }
+              }
+              const myDbP = data.players && data.players[this.mySlot];
+              if ((this.game.vsKoDefeated || (typeof this.game.vsHp === 'number' && this.game.vsHp <= 0)) && myDbP && (!myDbP.koDefeated || (typeof myDbP.hp === 'number' && myDbP.hp > 0))) {
+                const nowMs = Date.now();
+                if (!this._lastKoResyncAt || nowMs - this._lastKoResyncAt > 800) {
+                  this._lastKoResyncAt = nowMs;
+                  this.game.vsHp = 0;
+                  this.game.vsKoDefeated = true;
+                  this.syncMyProgress(true, true);
                 }
               }
             }
@@ -11005,17 +11062,20 @@
           }
 
           if (data.settings && data.settings.vsRule === 'jammer' && participants.length === 2 && !data.winner) {
-            const alive = participants.filter(({ player }) => {
-              const hpVal = typeof player.hp === 'number' ? player.hp : this.VS_JAMMER_MAX_HP;
+            const alive = participants.filter(({ slot, player }) => {
+              const hpVal = this.getEffectiveHp(data, slot, player);
               return !player.koDefeated && hpVal > 0 && !player.failedSuddenDeath;
             });
-            const hasAnyKO = participants.some(({ player }) => {
-              const hpVal = typeof player.hp === 'number' ? player.hp : this.VS_JAMMER_MAX_HP;
+            const hasAnyKO = participants.some(({ slot, player }) => {
+              const hpVal = this.getEffectiveHp(data, slot, player);
               return Boolean(player.koDefeated) || hpVal <= 0;
             });
             if (hasAnyKO && alive.length === 1) {
               const survivor = alive[0];
               this.claimWinner(survivor.slot, `💥 ${survivor.player.name} が相手をK.O.（HP 0）にして勝ち上がり！`);
+              return;
+            } else if (hasAnyKO && alive.length === 0) {
+              this.resolveScoreWinner(data);
               return;
             }
           }
@@ -11233,8 +11293,8 @@
         m.status = 'done';
         m.p1Score = Number(p1Obj.score || 0);
         m.p2Score = Number(p2Obj.score || 0);
-        m.p1Hp = typeof p1Obj.hp === 'number' ? p1Obj.hp : this.VS_JAMMER_MAX_HP;
-        m.p2Hp = typeof p2Obj.hp === 'number' ? p2Obj.hp : this.VS_JAMMER_MAX_HP;
+        m.p1Hp = this.getEffectiveHp(data, m.p1, p1Obj);
+        m.p2Hp = this.getEffectiveHp(data, m.p2, p2Obj);
         m.p1Perfect = Number(p1Obj.perfectCount || 0);
         m.p2Perfect = Number(p2Obj.perfectCount || 0);
         m.p1Served = Number(p1Obj.served || 0);
@@ -11603,19 +11663,20 @@
             if (cdPill) cdPill.classList.add('hidden');
 
             const isJammer = s.vsRule === 'jammer';
-            const setSpec = (prefix, pObj) => {
+            const setSpec = (prefix, slotId, pObj) => {
               const nEl = document.getElementById(`tourney-spec-${prefix}-name`);
               const stEl = document.getElementById(`tourney-spec-${prefix}-status`);
               const mEl = document.getElementById(`tourney-spec-${prefix}-main`);
               const sbEl = document.getElementById(`tourney-spec-${prefix}-sub`);
+              const effHp = isJammer ? this.getEffectiveHp(data, slotId, pObj) : this.VS_JAMMER_MAX_HP;
+              const isKo = Boolean(pObj.koDefeated) || (isJammer && effHp <= 0);
               if (nEl) nEl.textContent = pObj.name || '---';
               if (stEl) {
-                stEl.textContent = pObj.koDefeated ? '💀 K.O.' : (pObj.finished ? '🏁 終了' : (pObj.combo >= 2 ? `🔥 ${pObj.combo}連鎖` : '⚔️ 対戦中'));
+                stEl.textContent = isKo ? '💀 K.O.' : (pObj.finished ? '🏁 終了' : (pObj.combo >= 2 ? `🔥 ${pObj.combo}連鎖` : '⚔️ 対戦中'));
               }
               if (mEl) {
                 if (isJammer) {
-                  const hp = typeof pObj.hp === 'number' ? pObj.hp : this.VS_JAMMER_MAX_HP;
-                  mEl.textContent = hp <= 0 ? '💀 0 HP' : `❤️ ${hp} HP`;
+                  mEl.textContent = effHp <= 0 ? '💀 0 HP' : `❤️ ${effHp} HP`;
                 } else if (s.vsRule === 'race') {
                   mEl.textContent = `✨ ${pObj.perfectCount || 0} / ${s.raceTarget || 7} 神`;
                 } else {
@@ -11626,8 +11687,8 @@
                 sbEl.textContent = `神:${pObj.perfectCount || 0}回 ／ 処理:${pObj.served || 0}人 ／ ${Number(pObj.score || 0).toLocaleString()}pt`;
               }
             };
-            setSpec('p1', p1);
-            setSpec('p2', p2);
+            setSpec('p1', activeMatch.p1, p1);
+            setSpec('p2', activeMatch.p2, p2);
 
             // 視点切替ボタンのラベル＆アクティブ状態更新
             if (this.spectatePovSlot && this.spectatePovSlot !== activeMatch.p1 && this.spectatePovSlot !== activeMatch.p2) {
@@ -12323,7 +12384,8 @@
           if (pov && pov.autoLeft > 0) tags.push(`<span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-cyan-400 text-slate-950">🤖AUTO ${pov.autoLeft.toFixed(1)}s</span>`);
           if (pov && pov.stunLeft > 0) tags.push(`<span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-yellow-400 text-slate-950">⚡痺れ ${pov.stunLeft.toFixed(1)}s</span>`);
           if (pov && pov.screenJammers > 0) tags.push(`<span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-rose-500 text-white">💣お邪魔${pov.screenJammers}枚</span>`);
-          if (pObj.koDefeated) tags.push('<span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-rose-600 text-white">💀K.O.</span>');
+          const povEffHp = s.vsRule === 'jammer' ? this.getEffectiveHp(data, this.spectatePovSlot, pObj) : this.VS_JAMMER_MAX_HP;
+          if (pObj.koDefeated || (s.vsRule === 'jammer' && povEffHp <= 0)) tags.push('<span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-rose-600 text-white">💀K.O.</span>');
           else if (pObj.finished) tags.push('<span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950">🏁終了</span>');
           badgesEl.innerHTML = tags.join('');
         }
@@ -12336,7 +12398,7 @@
           if (s.vsRule === 'jammer') {
             hpWrap.classList.remove('hidden');
             const maxHp = pObj.maxHp || this.VS_JAMMER_MAX_HP;
-            const curHp = Math.max(0, typeof pObj.hp === 'number' ? pObj.hp : maxHp);
+            const curHp = this.getEffectiveHp(data, this.spectatePovSlot, pObj);
             const pct = Math.max(0, Math.min(100, (curHp / Math.max(1, maxHp)) * 100));
             if (hpFill) {
               hpFill.style.width = `${pct}%`;
@@ -12946,11 +13008,13 @@
             maxCombo: isMe ? Math.max(player.maxCombo || 0, this.game.maxCombo || 0) : (player.maxCombo || 0),
             served: isMe ? Math.max(player.served || 0, Math.max(0, this.game.customerIndex - 1)) : (player.served || 0),
             hp: isMe
-              ? Math.max(0, typeof this.game.vsHp === 'number' ? this.game.vsHp : this.VS_JAMMER_MAX_HP)
-              : Math.max(0, typeof player.hp === 'number' ? player.hp : this.VS_JAMMER_MAX_HP),
+              ? Math.min(Math.max(0, typeof this.game.vsHp === 'number' ? this.game.vsHp : this.VS_JAMMER_MAX_HP), this.getEffectiveHp(data, slot, player))
+              : this.getEffectiveHp(data, slot, player),
             maxHp: typeof player.maxHp === 'number' ? player.maxHp : this.VS_JAMMER_MAX_HP,
             damageDealt: isMe ? Math.max(player.damageDealt || 0, this.damageDealtTotal || 0) : (player.damageDealt || 0),
-            koDefeated: isMe ? Boolean(this.game.vsKoDefeated || player.koDefeated) : Boolean(player.koDefeated),
+            koDefeated: isMe
+              ? Boolean(this.game.vsKoDefeated || player.koDefeated || this.getEffectiveHp(data, slot, player) <= 0)
+              : Boolean(player.koDefeated || this.getEffectiveHp(data, slot, player) <= 0),
             jammerSentCount: isMe ? Math.max(player.jammerSentCount || 0, this.jammerSentCount || 0) : (player.jammerSentCount || 0),
             jammerHitCount: player.jammerHitCount || 0,
             failedSuddenDeath: Boolean(player.failedSuddenDeath)
@@ -13083,49 +13147,76 @@
       syncMyProgress(finished = false, failedSuddenDeath = false) {
         if (!this.roomRef || !this.mySlot) return;
         const served = Math.max(0, this.game.customerIndex - (finished ? 1 : 0));
-        this.roomRef.child('players/' + this.mySlot).update({
+        const curHp = Math.max(0, typeof this.game.vsHp === 'number' ? this.game.vsHp : this.VS_JAMMER_MAX_HP);
+        const isKoNow = Boolean(this.game.vsKoDefeated) || (this.game.isVersusJammerMode() && curHp <= 0);
+        const finalHp = isKoNow ? 0 : curHp;
+        const isFinishedNow = Boolean(finished || isKoNow);
+        const isSuddenFailNow = Boolean(failedSuddenDeath || isKoNow);
+
+        const tryClaimKoOrSuddenDeath = () => {
+          if (!this.lastRoomData || this.lastRoomData.winner) return false;
+          const active = this.getActiveParticipants(this.lastRoomData);
+          if (isSuddenFailNow && active.length === 2) {
+            const other = active.find((x) => x.slot !== this.mySlot);
+            if (other) {
+              const reasonMsg = isKoNow
+                ? `💥 ${this.game.playerName} のHPが0になりK.O.！`
+                : `💀 ${this.game.playerName} がサドンデスで脱落！`;
+              this.claimWinner(other.slot, reasonMsg);
+              return true;
+            }
+          }
+          return false;
+        };
+
+        const updatePayload = {
           score: this.game.score || 0,
           combo: this.game.combo || 0,
           maxCombo: this.game.maxCombo || 0,
           perfectCount: this.game.perfectCount || 0,
           served: served,
-          hp: Math.max(0, typeof this.game.vsHp === 'number' ? this.game.vsHp : this.VS_JAMMER_MAX_HP),
+          hp: finalHp,
           maxHp: this.game.vsMaxHp || this.VS_JAMMER_MAX_HP,
           damageDealt: this.damageDealtTotal || 0,
-          koDefeated: Boolean(this.game.vsKoDefeated),
-          finished: Boolean(finished),
-          failedSuddenDeath: Boolean(failedSuddenDeath),
+          koDefeated: isKoNow,
+          finished: isFinishedNow,
+          failedSuddenDeath: isSuddenFailNow,
           jammerSentCount: this.jammerSentCount || 0,
           pov: this.buildMyPovSnapshot()
-        }).catch(() => {});
+        };
+
+        const updatePromise = this.roomRef.child('players/' + this.mySlot).update(updatePayload);
 
         if (this.lastRoomData) {
           const s = this.lastRoomData.settings || this.getDefaultSettings();
           if (s.vsRule === 'race' && (this.game.perfectCount || 0) >= (s.raceTarget || 7)) {
             this.claimWinner(this.mySlot, `⚡ ${this.game.playerName} が先に ${s.raceTarget || 7}人 PERFECTを達成！`);
+            updatePromise.catch(() => {});
             return;
-          }
-          // 2人対戦時のサドンデス即決着（3人以上では他の生存者が続行し、全員終了時に順位決定）
-          const active = this.getActiveParticipants(this.lastRoomData);
-          if ((failedSuddenDeath || this.game.vsKoDefeated) && active.length === 2) {
-            const other = active.find((x) => x.slot !== this.mySlot);
-            if (other) {
-              const reasonMsg = this.game.vsKoDefeated
-                ? `💥 ${this.game.playerName} のHPが0になりK.O.！`
-                : `💀 ${this.game.playerName} がサドンデスで脱落！`;
-              this.claimWinner(other.slot, reasonMsg);
-              return;
-            }
           }
         }
 
-        if (finished && !this.finishWaitTimeout) {
+        updatePromise.then(() => {
+          tryClaimKoOrSuddenDeath();
+        }).catch(() => {
+          // 書き込み失敗時でも勝敗確定を止めない
+          tryClaimKoOrSuddenDeath();
+        });
+
+        // 即時チェックも並行実行
+        const claimedImmediately = tryClaimKoOrSuddenDeath();
+
+        // K.O.または終了時に万一winnerが確定しない場合の確実なフェイルセーフ
+        if ((isFinishedNow || isKoNow) && !this.finishWaitTimeout) {
+          const waitMs = (isKoNow || claimedImmediately) ? 1400 : 3500;
           this.finishWaitTimeout = setTimeout(() => {
             this.finishWaitTimeout = null;
-            if (!this.resultShown && this.lastRoomData) {
-              this.resolveScoreWinner(this.lastRoomData);
+            if (!this.resultShown && this.lastRoomData && !this.lastRoomData.winner) {
+              if (!tryClaimKoOrSuddenDeath()) {
+                this.resolveScoreWinner(this.lastRoomData);
+              }
             }
-          }, 3500);
+          }, waitMs);
         }
       }
 
@@ -16800,8 +16891,8 @@
         this.updateVersusItemButtons();
       }
 
-      receiveVersusJammer(c1, c10, fromCombo, fromName = 'ライバル', damage = 0, isZoneAttack = false, stunSec = 0, trayJamCoins = []) {
-        if (!this.isVersusRun || this.state === 'RESULT') return;
+      receiveVersusJammer(c1, c10, fromCombo, fromName = 'ライバル', damage = 0, isZoneAttack = false, stunSec = 0, trayJamCoins = [], expectedHp = null) {
+        if (!this.isVersusRun || (this.state === 'RESULT' && this.vsKoDefeated)) return;
         const hasCoins = (c1 || 0) > 0 || (c10 || 0) > 0;
         const dmg = Math.max(0, Math.round(Number(damage) || 0));
         const stunDur = Math.max(0, Number(stunSec) || 0);
@@ -16824,9 +16915,16 @@
           }
         }
 
-        if (dmg > 0 && this.isVersusJammerMode()) {
-          this.vsHp = Math.max(0, (this.vsHp || 0) - dmg);
-          this.updateVersusHpBar(dmg);
+        if (this.isVersusJammerMode()) {
+          if (dmg > 0) {
+            this.vsHp = Math.max(0, (this.vsHp || 0) - dmg);
+          }
+          if (typeof expectedHp === 'number' && !isNaN(expectedHp)) {
+            this.vsHp = Math.max(0, Math.min(this.vsHp || 0, Math.round(expectedHp)));
+          }
+          if (dmg > 0 || (typeof expectedHp === 'number' && expectedHp <= 0)) {
+            this.updateVersusHpBar(dmg);
+          }
         }
 
         // 被弾演出（コイン付き攻撃は大演出、通常HP攻撃は軽快な被弾演出）

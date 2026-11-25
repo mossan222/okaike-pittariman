@@ -10644,11 +10644,28 @@
         }
 
         const r0Count = bracketSize / 2;
+        // 1回戦の試合が上下ブロックに均等に分散されるようビット反転順で配置（例: 10人→上山1試合・下山1試合、残り6人は2回戦からシード参加）
+        const spreadOrder = [];
+        if (r0Count <= 1) {
+          spreadOrder.push(0);
+        } else {
+          const bits = Math.round(Math.log2(r0Count));
+          for (let i = 0; i < r0Count; i++) {
+            let rev = 0;
+            for (let b = 0; b < bits; b++) {
+              rev = (rev << 1) | ((i >> b) & 1);
+            }
+            spreadOrder.push(rev);
+          }
+        }
+
         for (let i = 0; i < r0Count; i++) {
           matches[`r0_m${i}`].p1 = slots[i] || null;
         }
-        for (let i = r0Count; i < n; i++) {
-          matches[`r0_m${i - r0Count}`].p2 = slots[i] || null;
+        const extraCount = Math.max(0, n - r0Count);
+        for (let k = 0; k < extraCount; k++) {
+          const targetIdx = spreadOrder[k];
+          matches[`r0_m${targetIdx}`].p2 = slots[r0Count + k] || null;
         }
 
         for (let i = 0; i < r0Count; i++) {
@@ -10659,6 +10676,7 @@
             m.winner = m.p1;
             if (m.nextMatchId && matches[m.nextMatchId]) {
               matches[m.nextMatchId][m.nextSlotKey] = m.p1;
+              matches[m.nextMatchId][m.nextSlotKey + 'IsSeed'] = true;
             }
           }
         }
@@ -11398,6 +11416,7 @@
               rowCls += 'bg-slate-800/80 text-slate-200 ';
             }
 
+            const isSeedSlot = Boolean(m[slotKey + 'IsSeed']);
             const rightTag = isByeEmpty
               ? '<span class="text-[9px] text-slate-500 font-bold">シード</span>'
               : (isWin
@@ -11406,7 +11425,9 @@
                   ? '<span class="text-[9px] text-rose-400/80 font-bold">LOSE</span>'
                   : (m.status === 'done' && !m.isBye
                     ? `<span class="font-digital text-[10px] text-slate-400">${s.vsRule === 'jammer' ? `❤️${hpVal}` : scoreVal.toLocaleString()}</span>`
-                    : '')));
+                    : (isSeedSlot && pObj
+                      ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-sky-500/25 text-sky-200 border border-sky-400/50 font-black">シード</span>'
+                      : ''))));
 
             const labelName = isByeEmpty ? '--- BYE ---' : (pObj ? pObj.name : 'TBD');
             return `
@@ -11429,7 +11450,8 @@
         for (let r = 0; r < t.totalRounds; r++) {
           const roundMatches = t.matchOrder
             .map((id) => t.matches[id])
-            .filter((m) => m && m.round === r && !m.isThirdPlace);
+            .filter((m) => m && m.round === r && !m.isThirdPlace && !m.isBye);
+          const hasR0Bye = (r === 0 && t.matchOrder.some((id) => t.matches[id] && t.matches[id].round === 0 && t.matches[id].isBye));
           const thirdMatch = (r === t.totalRounds - 1 && t.matches['third_place']) ? t.matches['third_place'] : null;
 
           const col = document.createElement('div');
@@ -11441,9 +11463,20 @@
           col.appendChild(header);
 
           const wrap = document.createElement('div');
-          wrap.className = 'flex-1 flex flex-col justify-around gap-3';
-
-          roundMatches.forEach((m) => wrap.appendChild(buildMatchCard(m)));
+          if (hasR0Bye) {
+            wrap.className = 'relative flex-1';
+            wrap.setAttribute('data-r0-aligned', 'true');
+            roundMatches.forEach((m) => {
+              const cardEl = buildMatchCard(m);
+              cardEl.style.position = 'absolute';
+              cardEl.style.left = '0';
+              cardEl.style.right = '0';
+              wrap.appendChild(cardEl);
+            });
+          } else {
+            wrap.className = 'flex-1 flex flex-col justify-around gap-3';
+            roundMatches.forEach((m) => wrap.appendChild(buildMatchCard(m)));
+          }
 
           if (thirdMatch) {
             const tpWrap = document.createElement('div');
@@ -11468,6 +11501,35 @@
         const svg = document.getElementById('tourney-bracket-svg');
         if (!stage || !svg || !t || !t.matches) return;
 
+        // 1回戦にシード省略がある場合、実際に試合する1回戦カードを2回戦の接続先スロットの高さに合わせて配置
+        const r0Wrap = stage.querySelector('[data-r0-aligned="true"]');
+        if (r0Wrap) {
+          const wrapRect = r0Wrap.getBoundingClientRect();
+          const r0Cards = Array.from(r0Wrap.querySelectorAll('[data-tourney-match-id]'));
+          let prevBottom = -8;
+          let maxBottom = 0;
+          r0Cards.forEach((cardEl) => {
+            const mid = cardEl.getAttribute('data-tourney-match-id');
+            const m = t.matches[mid];
+            if (!m || !m.nextMatchId) return;
+            const toEl = stage.querySelector(`[data-tourney-match-id="${m.nextMatchId}"]`);
+            if (!toEl) return;
+            const tRect = toEl.getBoundingClientRect();
+            const targetCenterY = (tRect.top - wrapRect.top) + (m.nextSlotKey === 'p1' ? tRect.height * 0.28 : tRect.height * 0.72);
+            const cardH = cardEl.offsetHeight || 76;
+            let top = Math.max(0, targetCenterY - cardH * 0.5);
+            if (top < prevBottom + 8) {
+              top = prevBottom + 8;
+            }
+            cardEl.style.top = `${Math.round(top)}px`;
+            prevBottom = top + cardH;
+            if (prevBottom > maxBottom) maxBottom = prevBottom;
+          });
+          if (maxBottom > 0) {
+            r0Wrap.style.minHeight = `${Math.ceil(maxBottom + 6)}px`;
+          }
+        }
+
         const stageRect = stage.getBoundingClientRect();
         svg.setAttribute('width', Math.ceil(stage.scrollWidth));
         svg.setAttribute('height', Math.ceil(stage.scrollHeight));
@@ -11475,7 +11537,7 @@
 
         for (const id of t.matchOrder) {
           const m = t.matches[id];
-          if (!m || !m.nextMatchId || m.isThirdPlace) continue;
+          if (!m || !m.nextMatchId || m.isThirdPlace || m.isBye) continue;
           const fromEl = stage.querySelector(`[data-tourney-match-id="${m.id}"]`);
           const toEl = stage.querySelector(`[data-tourney-match-id="${m.nextMatchId}"]`);
           if (!fromEl || !toEl) continue;

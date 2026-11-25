@@ -2128,9 +2128,9 @@
     <!-- ULTRA-COMPACT TOP HUD & POS BAR -->
     <header id="game-top-header" class="w-full max-w-3xl mx-auto px-1.5 pt-1 sm:px-3 sm:pt-1.5 pointer-events-auto">
       <div class="bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl px-2 py-1 sm:px-3 sm:py-1.5 shadow-lg">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-1">
-          <!-- Row 1 (Mobile) / Left (PC): Mode Badge, Score, Combo, Customer & Time -->
-          <div class="flex items-center justify-between sm:justify-start gap-1 sm:gap-1.5 flex-wrap min-w-0">
+        <div class="flex items-center justify-between gap-1.5 flex-wrap mb-1">
+          <!-- Left: Mode Badge, Score, Combo, Customer & Time -->
+          <div class="flex items-center justify-between sm:justify-start gap-1 sm:gap-1.5 flex-wrap flex-1 min-w-0">
             <div class="flex items-center gap-1 sm:gap-1.5 flex-wrap min-w-0">
               <span id="ui-mode-badge" class="text-[9px] sm:text-[11px] font-black px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950 leading-none">
                 NORMAL
@@ -2166,59 +2166,16 @@
             </div>
           </div>
 
-          <!-- Row 2 (Mobile) / Right (PC): Control Buttons (Wrapped safely so Home button never clips) -->
-          <div class="flex items-center justify-end gap-1 flex-wrap">
-            <!-- Change Display ON/OFF Toggle Button -->
-            <button id="btn-hud-change-toggle" class="btn-3d bg-emerald-900/90 hover:bg-emerald-800 border border-emerald-400 text-emerald-200 font-extrabold text-[9px] sm:text-[10px] px-1.5 h-6 sm:h-7 rounded-lg flex items-center justify-center gap-0.5 shadow shrink-0" title="お釣り表示 ON/OFF">
-              <span id="hud-change-icon">👁️</span>
-              <span id="hud-change-label" class="hidden sm:inline">お釣りON</span>
+          <!-- Right Controls: Only Settings & Back to Title -->
+          <div class="flex items-center justify-end gap-1.5 shrink-0">
+            <button id="btn-hud-settings" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-amber-400/70 text-amber-200 font-black text-[10px] sm:text-xs px-2 sm:px-2.5 h-6 sm:h-7 rounded-lg flex items-center justify-center gap-1 shadow shrink-0" title="設定を開く">
+              <span>⚙️</span>
+              <span>設定</span>
             </button>
 
-            <!-- Friendly AI Guide (Helper) ON/OFF Toggle Button -->
-            <button id="btn-hud-helper-toggle" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 font-extrabold text-[9px] sm:text-[10px] px-1.5 h-6 sm:h-7 rounded-lg flex items-center justify-center gap-0.5 shadow shrink-0" title="お助け店長ガイド ON/OFF">
-              <span id="hud-helper-icon">👨‍🍳</span>
-              <span id="hud-helper-label" class="hidden sm:inline">店長OFF</span>
-            </button>
-
-            <!-- Dopagaki Mode ON/OFF Toggle Button -->
-            <button id="btn-hud-dopa-toggle" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-fuchsia-500/60 text-fuchsia-300 font-black text-[9px] sm:text-[10px] px-1.5 h-6 sm:h-7 rounded-lg flex items-center justify-center gap-0.5 shadow shrink-0" title="ドパガキモード ON/OFF（プレイ影響なし）">
-              <span id="hud-dopa-icon">🌈</span>
-              <span id="hud-dopa-label" class="hidden sm:inline">ドパOFF</span>
-            </button>
-
-            <!-- Popup Transparency Quick Toggle Button (0%=不透明, 100%=完全透明) -->
-            <button id="btn-hud-popup-opacity" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-amber-400/70 text-amber-200 font-black text-[9px] sm:text-[10px] px-1.5 h-6 sm:h-7 rounded-lg flex items-center justify-center gap-0.5 shadow shrink-0" title="ポップ透明度を切り替え（0%=クッキリ / 50%=半透明 / 100%=完全透明）">
-              <span>👻</span>
-              <span id="hud-popup-opacity-label" class="font-digital">50%</span>
-            </button>
-
-            <!-- BGM Toggle Button -->
-            <button id="btn-bgm-toggle" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-slate-600 px-1.5 h-6 sm:h-7 rounded-lg flex items-center justify-center text-[10px] font-bold text-amber-300 shadow shrink-0" title="BGM ON/OFF">
-              🎵
-            </button>
-
-            <!-- SE Toggle Button -->
-            <button id="btn-sound-toggle" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-slate-600 w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center text-xs shadow shrink-0" title="効果音 ON/OFF">
-              🔊
-            </button>
-
-            <!-- Vibration Toggle Button -->
-            <button id="btn-hud-vibe-toggle" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-cyan-400/70 w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center text-xs shadow shrink-0" title="バイブレーション ON/OFF">
-              📳
-            </button>
-
-            <!-- PC Key Config Button (PC only so mobile HUD stays clean) -->
-            <button id="btn-hud-keyconfig" class="hidden sm:flex btn-3d bg-slate-800 hover:bg-slate-700 border border-sky-400/70 w-6 h-6 sm:w-7 sm:h-7 rounded-lg items-center justify-center text-xs shadow shrink-0" title="PCキー設定変更">
-              ⌨️
-            </button>
-
-            <button id="btn-hud-mode" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 font-extrabold text-[9px] sm:text-[11px] px-1.5 h-6 sm:h-7 rounded-lg flex items-center justify-center gap-0.5 shadow shrink-0" title="モード選択へ戻る">
-              <span>🎮</span>
-              <span class="hidden md:inline">モード</span>
-            </button>
-
-            <button id="btn-hud-title" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 font-extrabold text-[9px] sm:text-[11px] px-1.5 h-6 sm:h-7 rounded-lg flex items-center justify-center gap-0.5 shadow shrink-0" title="タイトル画面へ戻る">
+            <button id="btn-hud-title" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 font-extrabold text-[10px] sm:text-xs px-2 sm:px-2.5 h-6 sm:h-7 rounded-lg flex items-center justify-center gap-1 shadow shrink-0" title="タイトル画面へ戻る">
               <span>🏠</span>
+              <span class="hidden sm:inline">タイトル</span>
             </button>
           </div>
         </div>
@@ -3022,6 +2979,91 @@
   </div>
 
   <!-- =========================================================================
+       MODAL: IN-GAME SETTINGS (#modal-game-settings)
+       ========================================================================= -->
+  <div id="modal-game-settings" class="fixed inset-0 z-[78] hidden items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-md" style="z-index: 78;">
+    <div class="max-w-md w-full bg-slate-900/95 border-2 border-amber-400 rounded-3xl p-4 sm:p-5 shadow-2xl max-h-[92vh] overflow-y-auto custom-scroll text-left">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <span class="text-[10px] font-black text-amber-400 tracking-wider uppercase">IN-GAME SETTINGS</span>
+          <h3 class="text-lg sm:text-xl font-black text-white">⚙️ プレイ設定・メニュー</h3>
+        </div>
+        <button id="btn-close-game-settings" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 text-xs font-extrabold px-3 py-1.5 rounded-xl">
+          ✕ 閉じる
+        </button>
+      </div>
+
+      <!-- Display & Assist Settings -->
+      <div class="bg-slate-950/85 border border-slate-700/80 rounded-2xl p-3 mb-3 space-y-2.5">
+        <div class="text-[10px] font-black text-cyan-300 uppercase tracking-wider">🎮 表示・サポート設定</div>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="btn-hud-change-toggle" type="button" class="btn-3d bg-emerald-900/90 hover:bg-emerald-800 border-2 border-emerald-400 text-emerald-200 font-extrabold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow" title="お釣り表示 ON/OFF">
+            <span id="hud-change-icon">👁️</span>
+            <span id="hud-change-label">お釣りON</span>
+          </button>
+
+          <button id="btn-hud-helper-toggle" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 border-2 border-slate-600 text-slate-300 font-extrabold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow" title="お助け店長ガイド ON/OFF">
+            <span id="hud-helper-icon">👨‍🍳</span>
+            <span id="hud-helper-label">店長OFF</span>
+          </button>
+        </div>
+
+        <button id="btn-hud-dopa-toggle" type="button" class="btn-3d w-full bg-slate-800 hover:bg-slate-700 border-2 border-fuchsia-500/60 text-fuchsia-300 font-black text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow" title="ドパガキモード ON/OFF（プレイ影響なし）">
+          <span id="hud-dopa-icon">🌈</span>
+          <span id="hud-dopa-label">ドパガキモード: OFF</span>
+        </button>
+
+        <!-- Popup Opacity Slider & Quick Step Button -->
+        <div class="bg-slate-900/90 border border-slate-700 rounded-xl px-2.5 py-2 space-y-1.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-[11px] font-black text-amber-200 flex items-center gap-1">
+              <span>👻</span><span>ポップ透明度</span>
+            </span>
+            <button id="btn-hud-popup-opacity" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-amber-400/70 text-amber-200 font-black text-[11px] px-2 py-0.5 rounded-lg flex items-center gap-1 shadow" title="クリックで段階切替">
+              <span id="hud-popup-opacity-label" class="font-digital">50%</span>
+              <span class="text-[9px] text-slate-400">切替</span>
+            </button>
+          </div>
+          <input id="slider-hud-popup-opacity" type="range" min="0" max="100" step="5" value="50" class="w-full accent-amber-400 cursor-pointer h-2 bg-slate-800 rounded-lg" />
+        </div>
+      </div>
+
+      <!-- Sound & Vibration Settings -->
+      <div class="bg-slate-950/85 border border-slate-700/80 rounded-2xl p-3 mb-3 space-y-2">
+        <div class="text-[10px] font-black text-amber-300 uppercase tracking-wider">🔊 サウンド・バイブ</div>
+        <div class="grid grid-cols-3 gap-2">
+          <button id="btn-bgm-toggle" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 border-2 border-amber-400/70 text-amber-300 font-black text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1 shadow" title="BGM ON/OFF">
+            🎵 BGM ON
+          </button>
+
+          <button id="btn-sound-toggle" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 border-2 border-emerald-400/70 text-emerald-300 font-black text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1 shadow" title="効果音 ON/OFF">
+            🔊 SE ON
+          </button>
+
+          <button id="btn-hud-vibe-toggle" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 border-2 border-cyan-400/70 text-cyan-200 font-black text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1 shadow" title="バイブレーション ON/OFF">
+            📳 バイブ
+          </button>
+        </div>
+      </div>
+
+      <!-- Key Config & Navigation -->
+      <div class="grid grid-cols-2 gap-2 mb-3">
+        <button id="btn-hud-keyconfig" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-sky-400/70 text-sky-300 font-black text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow" title="PCキー設定変更">
+          <span>⌨️</span><span>PCキー設定</span>
+        </button>
+
+        <button id="btn-hud-mode" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-slate-600 text-amber-300 font-extrabold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow" title="モード選択へ戻る">
+          <span>🎮</span><span>モード選択へ</span>
+        </button>
+      </div>
+
+      <button id="btn-done-game-settings" type="button" class="btn-3d w-full bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-slate-950 font-black text-sm py-2.5 rounded-xl border-b-4 border-amber-700 shadow">
+        ✅ プレイに戻る
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================================================================
        MODAL: PC KEYBOARD CONFIG (#modal-key-config)
        ========================================================================= -->
   <div id="modal-key-config" class="fixed inset-0 z-[80] hidden items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md" style="z-index: 80;">
@@ -3428,6 +3470,12 @@
           el.classList.remove('flex');
         }
       });
+
+      const gameSettingsModal = document.getElementById('modal-game-settings');
+      if (gameSettingsModal && activeId !== 'screen-game') {
+        gameSettingsModal.classList.add('hidden');
+        gameSettingsModal.classList.remove('flex');
+      }
 
       const clerkBubble = document.getElementById('clerk-bubble');
       if (clerkBubble) {
@@ -4783,8 +4831,8 @@
       syncSoundButtonsUI() {
         const hudBgmBtn = document.getElementById('btn-bgm-toggle');
         if (hudBgmBtn) {
-          hudBgmBtn.textContent = this.bgmEnabled ? '🎵' : '🔕';
-          hudBgmBtn.className = `btn-3d border px-1.5 h-6 sm:h-7 rounded-lg flex items-center justify-center text-[10px] font-bold shadow shrink-0 ${
+          hudBgmBtn.textContent = this.bgmEnabled ? '🎵 BGM ON' : '🔕 BGM OFF';
+          hudBgmBtn.className = `btn-3d border-2 py-2.5 px-2 rounded-xl flex items-center justify-center gap-1 text-xs font-black shadow ${
             this.bgmEnabled
               ? 'bg-slate-800 hover:bg-slate-700 border-amber-400/70 text-amber-300'
               : 'bg-slate-900 border-slate-700 text-slate-500'
@@ -4793,7 +4841,12 @@
 
         const hudSeBtn = document.getElementById('btn-sound-toggle');
         if (hudSeBtn) {
-          hudSeBtn.textContent = this.seEnabled ? '🔊' : '🔇';
+          hudSeBtn.textContent = this.seEnabled ? '🔊 SE ON' : '🔇 SE OFF';
+          hudSeBtn.className = `btn-3d border-2 py-2.5 px-2 rounded-xl flex items-center justify-center gap-1 text-xs font-black shadow ${
+            this.seEnabled
+              ? 'bg-slate-800 hover:bg-slate-700 border-emerald-400/70 text-emerald-300'
+              : 'bg-slate-900 border-slate-700 text-slate-500'
+          }`;
         }
 
         document.querySelectorAll('.bgm-label-text').forEach((el) => {
@@ -10928,6 +10981,7 @@
           const el = document.getElementById(id);
           if (el) {
             el.addEventListener('click', () => {
+              this.closeGameSettingsModal();
               sound.init();
               sound.playClick();
               this.openKeyConfigModal();
@@ -10953,12 +11007,40 @@
           });
         }
 
+        const btnHudSettings = document.getElementById('btn-hud-settings');
+        if (btnHudSettings) {
+          btnHudSettings.addEventListener('click', () => {
+            sound.playClick();
+            this.openGameSettingsModal();
+          });
+        }
+        ['btn-close-game-settings', 'btn-done-game-settings'].forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.addEventListener('click', () => {
+              sound.playClick();
+              this.closeGameSettingsModal();
+            });
+          }
+        });
+        const gameSettingsBg = document.getElementById('modal-game-settings');
+        if (gameSettingsBg) {
+          gameSettingsBg.addEventListener('click', (e) => {
+            if (e.target === gameSettingsBg) {
+              sound.playClick();
+              this.closeGameSettingsModal();
+            }
+          });
+        }
+
         document.getElementById('btn-hud-title').addEventListener('click', () => {
+          this.closeGameSettingsModal();
           sound.playReturn();
           this.returnToTitleScreen();
         });
 
         document.getElementById('btn-hud-mode').addEventListener('click', () => {
+          this.closeGameSettingsModal();
           sound.playReturn();
           this.openModeSelectScreen();
         });
@@ -10996,7 +11078,7 @@
         }
 
         // ポップ透明度スライダー（タイトル＆モード選択）＆HUDクイック切替
-        ['slider-title-popup-opacity', 'slider-mode-popup-opacity'].forEach((id) => {
+        ['slider-title-popup-opacity', 'slider-mode-popup-opacity', 'slider-hud-popup-opacity'].forEach((id) => {
           const sl = document.getElementById(id);
           if (sl) {
             sl.addEventListener('input', () => {
@@ -11669,18 +11751,19 @@
         const hudIcon = document.getElementById('hud-change-icon');
         const hudLabel = document.getElementById('hud-change-label');
         if (hudBtn && hudIcon && hudLabel) {
-          const lockMark = this.isRankingRun ? '🔒' : '';
+          const isLocked = this.isRankingRun || this.isVersusRun;
+          const lockMark = isLocked ? '🔒' : '';
           if (this.showChangeDisplay) {
-            hudBtn.className = `btn-3d border font-extrabold text-[9px] sm:text-[10px] px-1.5 h-6 sm:h-7 rounded-lg flex items-center justify-center gap-0.5 shadow shrink-0 ${
-              this.isRankingRun
+            hudBtn.className = `btn-3d border-2 font-extrabold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow ${
+              isLocked
                 ? 'bg-emerald-950/90 border-emerald-500/60 text-emerald-300 cursor-default'
                 : 'bg-emerald-900/90 hover:bg-emerald-800 border-emerald-400 text-emerald-200'
             }`;
             hudIcon.textContent = '👁️';
             hudLabel.textContent = `お釣りON${lockMark}`;
           } else {
-            hudBtn.className = `btn-3d border font-extrabold text-[9px] sm:text-[10px] px-1.5 h-6 sm:h-7 rounded-lg flex items-center justify-center gap-0.5 shadow shrink-0 ${
-              this.isRankingRun
+            hudBtn.className = `btn-3d border-2 font-extrabold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow ${
+              isLocked
                 ? 'bg-purple-950/90 border-purple-500/60 text-purple-300 cursor-default'
                 : 'bg-purple-900/90 hover:bg-purple-800 border-purple-400 text-purple-200'
             }`;
@@ -11688,6 +11771,25 @@
             hudLabel.textContent = `暗算(OFF)${lockMark}`;
           }
         }
+      }
+
+      openGameSettingsModal() {
+        const modal = document.getElementById('modal-game-settings');
+        if (!modal) return;
+        this.syncChangeToggleUI();
+        this.syncHelperToggleUI();
+        this.syncDopagakiUI();
+        this.syncVibrationUI();
+        sound.syncSoundButtonsUI();
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+
+      closeGameSettingsModal() {
+        const modal = document.getElementById('modal-game-settings');
+        if (!modal) return;
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
       }
 
       syncHelperToggleUI() {
@@ -11710,14 +11812,15 @@
         const hudIcon = document.getElementById('hud-helper-icon');
         const hudLabel = document.getElementById('hud-helper-label');
         if (hudBtn && hudIcon && hudLabel) {
-          if (this.aiHelperEnabled) {
-            hudBtn.className = 'btn-3d bg-amber-900/90 hover:bg-amber-800 border border-amber-400 text-amber-200 font-extrabold text-[9px] sm:text-[10px] px-1.5 h-6 sm:h-7 rounded-lg flex items-center justify-center gap-0.5 shadow shrink-0';
+          const lockMark = this.isVersusRun ? '🔒' : '';
+          if (this.aiHelperEnabled && !this.isVersusRun) {
+            hudBtn.className = 'btn-3d bg-amber-900/90 hover:bg-amber-800 border-2 border-amber-400 text-amber-200 font-extrabold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow';
             hudIcon.textContent = '💡';
-            hudLabel.textContent = '店長ON';
+            hudLabel.textContent = '店長ガイド ON';
           } else {
-            hudBtn.className = 'btn-3d bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 font-extrabold text-[9px] sm:text-[10px] px-1.5 h-6 sm:h-7 rounded-lg flex items-center justify-center gap-0.5 shadow shrink-0';
+            hudBtn.className = 'btn-3d bg-slate-800 hover:bg-slate-700 border-2 border-slate-600 text-slate-300 font-extrabold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow';
             hudIcon.textContent = '👨‍🍳';
-            hudLabel.textContent = '店長OFF';
+            hudLabel.textContent = `店長ガイド OFF${lockMark}`;
           }
         }
       }
@@ -11826,10 +11929,10 @@
         }
         const hudBtn = document.getElementById('btn-hud-vibe-toggle');
         if (hudBtn) {
-          hudBtn.textContent = on ? '📳' : '📴';
+          hudBtn.textContent = on ? '📳 バイブ ON' : '📴 バイブ OFF';
           hudBtn.className = on
-            ? 'btn-3d bg-slate-800 hover:bg-slate-700 border border-cyan-400/70 w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center text-xs shadow shrink-0'
-            : 'btn-3d bg-slate-900 hover:bg-slate-800 border border-slate-700 w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center text-xs opacity-60 shadow shrink-0';
+            ? 'btn-3d bg-slate-800 hover:bg-slate-700 border-2 border-cyan-400/70 text-cyan-200 py-2.5 px-2 rounded-xl flex items-center justify-center gap-1 text-xs font-black shadow'
+            : 'btn-3d bg-slate-900 hover:bg-slate-800 border-2 border-slate-700 text-slate-500 py-2.5 px-2 rounded-xl flex items-center justify-center gap-1 text-xs font-black shadow';
         }
         const lobbyBtn = document.getElementById('btn-vs-lobby-vibe');
         if (lobbyBtn) {
@@ -11885,9 +11988,9 @@
         const hudLabel = document.getElementById('hud-dopa-label');
         if (hudBtn && hudLabel) {
           hudBtn.className = on
-            ? 'btn-3d bg-gradient-to-r from-fuchsia-500 via-amber-400 to-cyan-400 border border-white text-slate-950 font-black text-[9px] sm:text-[10px] px-1.5 h-6 sm:h-7 rounded-lg flex items-center justify-center gap-0.5 shadow shrink-0 animate-pulse'
-            : 'btn-3d bg-slate-800 hover:bg-slate-700 border border-fuchsia-500/60 text-fuchsia-300 font-black text-[9px] sm:text-[10px] px-1.5 h-6 sm:h-7 rounded-lg flex items-center justify-center gap-0.5 shadow shrink-0';
-          hudLabel.textContent = on ? 'ドパON' : 'ドパOFF';
+            ? 'btn-3d w-full bg-gradient-to-r from-fuchsia-500 via-amber-400 to-cyan-400 border-2 border-white text-slate-950 font-black text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-lg animate-pulse'
+            : 'btn-3d w-full bg-slate-800 hover:bg-slate-700 border-2 border-fuchsia-500/60 text-fuchsia-300 font-black text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow';
+          hudLabel.textContent = on ? 'ドパガキモード: ON!!' : 'ドパガキモード: OFF';
         }
       }
 
@@ -12893,7 +12996,7 @@
             localStorage.setItem(POPUP_OPACITY_STORAGE_KEY, String(this.popupOpacityPct));
           } catch (e) {}
         }
-        ['slider-title-popup-opacity', 'slider-mode-popup-opacity'].forEach((id) => {
+        ['slider-title-popup-opacity', 'slider-mode-popup-opacity', 'slider-hud-popup-opacity'].forEach((id) => {
           const sl = document.getElementById(id);
           if (sl) sl.value = String(this.popupOpacityPct);
         });

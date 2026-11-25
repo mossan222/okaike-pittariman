@@ -8,6 +8,13 @@
 <!-- OGP / リンクプレビュー設定 -->
   <meta name="description" content="端数を合わせてお釣りをまとめろ！3Dのカルトンに硬貨・紙幣を出して小銭枚数最小を目指す爽快暗算パズル。通常・ハード・EX・消費税暗算のルナティックや2〜10人のオンライン対戦にも対応！">
   <meta name="theme-color" content="#16120e">
+  <!-- PWA設定（ホーム画面アプリ化・全画面起動） -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ピッタリマン">
+  <link rel="apple-touch-icon" href="./assets/img/icon-192.png">
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="お会計ピッタリマン">
@@ -16586,8 +16593,27 @@
       }
     })();
   </script>
+  <!-- PWA Service Worker 登録（ネット優先で最新自動同期） -->
+  <script>
+    (function registerPWA() {
+      if (!('serviceWorker' in navigator)) return;
+      if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') return;
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+          .then((reg) => {
+            document.addEventListener('visibilitychange', () => {
+              if (!document.hidden) {
+                reg.update().catch(() => {});
+              }
+            });
+          })
+          .catch(() => {});
+      });
+    })();
+  </script>
 </body>
 </html>
+
 
 
 

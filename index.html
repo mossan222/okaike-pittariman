@@ -3216,12 +3216,12 @@
         </div>
       </div>
 
-      <!-- Animated Tournament Bracket Tree Container -->
-      <div class="bg-slate-950/90 border border-slate-700/90 rounded-2xl p-3 mb-3 overflow-x-auto custom-scroll">
-        <div id="tourney-bracket-stage" class="relative min-w-max mx-auto">
-          <svg id="tourney-bracket-svg" class="absolute inset-0 pointer-events-none" style="z-index: 1;"></svg>
-          <div id="tourney-bracket-columns" class="relative flex items-stretch gap-6 sm:gap-10" style="z-index: 2;">
-            <!-- Populated by JS -->
+      <!-- Animated Tournament Bracket Tree Container (Bottom-to-Top Standard Tree) -->
+      <div class="bg-slate-950/90 border border-slate-700/90 rounded-2xl p-3 mb-3 overflow-x-auto custom-scroll" style="-webkit-overflow-scrolling: touch;">
+        <div id="tourney-bracket-stage" class="relative mx-auto">
+          <svg id="tourney-bracket-svg" class="absolute top-0 left-0 pointer-events-none" style="z-index: 1;"></svg>
+          <div id="tourney-bracket-columns" class="relative" style="z-index: 2;">
+            <!-- Populated by JS (Vertical Tournament Tree) -->
           </div>
         </div>
       </div>
@@ -10644,19 +10644,23 @@
         }
 
         const r0Count = bracketSize / 2;
-        // 1回戦の試合が上下ブロックに均等に分散されるようビット反転順で配置（例: 10人→上山1試合・下山1試合、残り6人は2回戦からシード参加）
+        // 標準トーナメント表（下から上へ勝ち上がる形）に合わせて1回戦をバランス配置（奇数枠優先→偶数枠）
+        // 例: 9人→左端シード＋2・3番目が1回戦＋残り6人シード / 10人→左山1試合・右山1試合＋残り6人シード
         const spreadOrder = [];
         if (r0Count <= 1) {
           spreadOrder.push(0);
         } else {
           const bits = Math.round(Math.log2(r0Count));
+          const bitRev = [];
           for (let i = 0; i < r0Count; i++) {
             let rev = 0;
             for (let b = 0; b < bits; b++) {
               rev = (rev << 1) | ((i >> b) & 1);
             }
-            spreadOrder.push(rev);
+            bitRev.push(rev);
           }
+          bitRev.filter((idx) => idx % 2 === 1).forEach((idx) => spreadOrder.push(idx));
+          bitRev.filter((idx) => idx % 2 === 0).forEach((idx) => spreadOrder.push(idx));
         }
 
         for (let i = 0; i < r0Count; i++) {
@@ -11369,201 +11373,314 @@
           }
         }
 
+        const stageEl = document.getElementById('tourney-bracket-stage');
+        const svgEl = document.getElementById('tourney-bracket-svg');
         const colsEl = document.getElementById('tourney-bracket-columns');
-        if (!colsEl) return;
+        if (!stageEl || !svgEl || !colsEl) return;
         colsEl.innerHTML = '';
+        svgEl.innerHTML = '';
 
-        const buildMatchCard = (m) => {
-          const p1 = m.p1 ? players[m.p1] : null;
-          const p2 = m.p2 ? players[m.p2] : null;
-          const isActive = (m.id === t.activeMatchId && !isChampion);
-          const isJustFinished = (animateAdvance && m.id === t.lastFinishedMatchId);
-          const isNextTargetSlot = (animateAdvance && t.lastFinishedMatchId && t.matches[t.lastFinishedMatchId] && t.matches[t.lastFinishedMatchId].nextMatchId === m.id);
-          const nextSlotKey = isNextTargetSlot ? t.matches[t.lastFinishedMatchId].nextSlotKey : null;
+        // 敗退済みスロットの判定（葉ノードのスタイル用）
+        const eliminatedSlots = new Set();
+        t.matchOrder.forEach((id) => {
+          const m = t.matches[id];
+          if (m && !m.isThirdPlace && m.loser) eliminatedSlots.add(m.loser);
+        });
 
-          const card = document.createElement('div');
-          card.setAttribute('data-tourney-match-id', m.id);
-          card.className = `rounded-2xl border-2 bg-slate-900/95 p-1.5 shadow-lg transition-all ${
-            isDrawFlicker
-              ? 'tourney-match-draw border-cyan-400'
-              : (isActive
-                ? 'tourney-match-active border-amber-400'
-                : (m.isThirdPlace ? 'border-orange-500/60' : (m.status === 'done' ? 'border-slate-700' : 'border-slate-800')))
-          }`;
+        // 1. 最下段（葉ノード）に全参加者を左から右へ均等配置（シードは1枠、1回戦ペアは2枠）
+        const r0Count = t.bracketSize / 2;
+        const leaves = [];
+        const matchOutPos = {}; // matchId -> { x, y }
+        const labelColW = 68;
+        const padLeft = labelColW + 14;
+        const padRight = 18;
+        const leafStep = 88;
+        const leafCardW = 80;
+        const leafCardH = 54;
+        const topChampH = 62;
+        const rowGap = 68;
 
-          const renderRow = (slotKey, slotId, pObj) => {
-            const isWin = Boolean(m.winner && m.winner === slotId);
-            const isLose = Boolean(m.loser && m.loser === slotId);
-            const isMe = Boolean(slotId && slotId === this.mySlot);
-            const isByeEmpty = Boolean(m.isBye && slotKey === 'p2');
-            const scoreVal = slotKey === 'p1' ? m.p1Score : m.p2Score;
-            const hpVal = slotKey === 'p1' ? m.p1Hp : m.p2Hp;
-            const nameCls = isDrawFlicker && pObj ? 'tourney-draw-name' : '';
+        for (let i = 0; i < r0Count; i++) {
+          const m0 = t.matches[`r0_m${i}`];
+          if (!m0) continue;
+          if (m0.isBye) {
+            if (m0.p1) {
+              const idx = leaves.length;
+              const cx = padLeft + idx * leafStep + leafCardW * 0.5;
+              leaves.push({ slotId: m0.p1, isSeed: true, cx, r0Id: m0.id });
+              matchOutPos[m0.id] = { x: cx, y: null, isSeedLeaf: true };
+            }
+          } else {
+            const idx1 = leaves.length;
+            const cx1 = padLeft + idx1 * leafStep + leafCardW * 0.5;
+            leaves.push({ slotId: m0.p1, isSeed: false, cx: cx1, r0Id: m0.id });
 
-            let rowCls = 'flex items-center justify-between gap-1.5 px-2 py-1.5 rounded-xl text-[11px] sm:text-xs font-black ';
-            if (isWin) {
-              rowCls += m.isThirdPlace
-                ? 'bg-orange-500/25 border border-orange-400 text-orange-200 '
-                : 'bg-amber-500/25 border border-amber-400 text-amber-200 ';
-              if (isJustFinished) rowCls += 'tourney-winner-pop ';
-            } else if (isLose) {
-              rowCls += 'bg-slate-950/70 text-slate-500 line-through opacity-65 ';
-            } else if (isNextTargetSlot && nextSlotKey === slotKey) {
-              rowCls += 'bg-slate-800/90 border border-amber-300 text-white tourney-advance-glow ';
-            } else if (isMe) {
-              rowCls += 'bg-cyan-950/80 border border-cyan-400/80 text-cyan-200 ';
+            const idx2 = leaves.length;
+            const cx2 = padLeft + idx2 * leafStep + leafCardW * 0.5;
+            leaves.push({ slotId: m0.p2, isSeed: false, cx: cx2, r0Id: m0.id });
+
+            matchOutPos[m0.id] = { x: (cx1 + cx2) * 0.5, y: null, x1: cx1, x2: cx2, isSeedLeaf: false };
+          }
+        }
+
+        const totalLeafCount = Math.max(2, leaves.length);
+        const treeWidth = Math.max(320, padLeft + totalLeafCount * leafStep - (leafStep - leafCardW) + padRight);
+        const finalY = topChampH + 14;
+        const roundY = (r) => finalY + (t.totalRounds - 1 - r) * rowGap;
+        const leafTopY = roundY(0) + rowGap;
+        const treeHeight = leafTopY + leafCardH + 16;
+
+        // 各ラウンドの座標計算
+        for (let i = 0; i < r0Count; i++) {
+          const m0 = t.matches[`r0_m${i}`];
+          if (!m0 || !matchOutPos[m0.id]) continue;
+          matchOutPos[m0.id].y = m0.isBye ? leafTopY : roundY(0);
+        }
+        for (let r = 1; r < t.totalRounds; r++) {
+          const cnt = t.bracketSize / Math.pow(2, r + 1);
+          for (let i = 0; i < cnt; i++) {
+            const mid = `r${r}_m${i}`;
+            const c1 = matchOutPos[`r${r - 1}_m${i * 2}`];
+            const c2 = matchOutPos[`r${r - 1}_m${i * 2 + 1}`];
+            if (!c1 || !c2) continue;
+            matchOutPos[mid] = {
+              x: (c1.x + c2.x) * 0.5,
+              y: roundY(r),
+              x1: c1.x,
+              y1: c1.y,
+              x2: c2.x,
+              y2: c2.y
+            };
+          }
+        }
+
+        const thirdMatch = t.matches['third_place'] || null;
+        const thirdExtraH = thirdMatch ? 116 : 0;
+        const totalStageH = treeHeight + thirdExtraH;
+
+        stageEl.style.width = `${treeWidth}px`;
+        stageEl.style.height = `${totalStageH}px`;
+        colsEl.style.width = `${treeWidth}px`;
+        colsEl.style.height = `${totalStageH}px`;
+        svgEl.setAttribute('width', Math.ceil(treeWidth));
+        svgEl.setAttribute('height', Math.ceil(totalStageH));
+
+        const addSvgPath = (dStr, stroke, width, isWinAnim = false) => {
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          path.setAttribute('d', dStr);
+          path.setAttribute('fill', 'none');
+          path.setAttribute('stroke', stroke);
+          path.setAttribute('stroke-width', String(width));
+          path.setAttribute('stroke-linecap', 'round');
+          path.setAttribute('stroke-linejoin', 'round');
+          if (isWinAnim) path.setAttribute('class', 'tourney-line-win');
+          svgEl.appendChild(path);
+        };
+
+        // 2. 左端に各段のラウンドラベルを配置
+        for (let r = 0; r < t.totalRounds; r++) {
+          const hasRealMatch = t.matchOrder.some((id) => {
+            const m = t.matches[id];
+            return m && m.round === r && !m.isBye && !m.isThirdPlace;
+          });
+          if (!hasRealMatch) continue;
+          const lbl = document.createElement('div');
+          const yPos = roundY(r);
+          lbl.className = 'absolute left-1 flex items-center justify-center text-[9px] sm:text-[10px] font-black text-amber-300/90 bg-slate-900/90 border border-amber-500/35 rounded-lg px-1.5 py-0.5 text-center leading-tight';
+          lbl.style.top = `${Math.round(yPos - 12)}px`;
+          lbl.style.width = `${labelColW - 6}px`;
+          lbl.textContent = this.getTournamentRoundLabel(r, t.totalRounds).replace(/^[^\s]+\s+/, '');
+          colsEl.appendChild(lbl);
+        }
+
+        // 3. SVGトーナメント線 & 各試合ノードを描画
+        for (let r = 0; r < t.totalRounds; r++) {
+          const cnt = t.bracketSize / Math.pow(2, r + 1);
+          for (let i = 0; i < cnt; i++) {
+            const mid = `r${r}_m${i}`;
+            const m = t.matches[mid];
+            const pos = matchOutPos[mid];
+            if (!m || m.isBye || !pos) continue;
+
+            const yFrom1 = r === 0 ? leafTopY : pos.y1;
+            const yFrom2 = r === 0 ? leafTopY : pos.y2;
+            const yM = pos.y;
+            const x1 = pos.x1;
+            const x2 = pos.x2;
+            const xM = pos.x;
+
+            const isActive = (m.id === t.activeMatchId && !isChampion);
+            const isJustFinished = (animateAdvance && m.id === t.lastFinishedMatchId);
+            const p1Won = Boolean(m.winner && m.winner === m.p1);
+            const p2Won = Boolean(m.winner && m.winner === m.p2);
+
+            const baseStroke = isActive ? '#38bdf8' : '#475569';
+            const baseW = isActive ? 2.8 : 2.2;
+            const leftStroke = p1Won ? '#fbbf24' : (p2Won ? '#334155' : baseStroke);
+            const rightStroke = p2Won ? '#fbbf24' : (p1Won ? '#334155' : baseStroke);
+            const leftW = p1Won ? 4 : (p2Won ? 2 : baseW);
+            const rightW = p2Won ? 4 : (p1Won ? 2 : baseW);
+
+            // 敗者側を先に描き、勝者側の金色ラインを上に重ねる
+            if (p1Won) {
+              addSvgPath(`M ${x2} ${yFrom2} V ${yM} H ${xM}`, rightStroke, rightW, false);
+              addSvgPath(`M ${x1} ${yFrom1} V ${yM} H ${xM}`, leftStroke, leftW, isJustFinished);
+            } else if (p2Won) {
+              addSvgPath(`M ${x1} ${yFrom1} V ${yM} H ${xM}`, leftStroke, leftW, false);
+              addSvgPath(`M ${x2} ${yFrom2} V ${yM} H ${xM}`, rightStroke, rightW, isJustFinished);
             } else {
-              rowCls += 'bg-slate-800/80 text-slate-200 ';
+              addSvgPath(`M ${x1} ${yFrom1} V ${yM} H ${xM}`, leftStroke, leftW, false);
+              addSvgPath(`M ${x2} ${yFrom2} V ${yM} H ${xM}`, rightStroke, rightW, false);
             }
 
-            const isSeedSlot = Boolean(m[slotKey + 'IsSeed']);
-            const rightTag = isByeEmpty
-              ? '<span class="text-[9px] text-slate-500 font-bold">シード</span>'
-              : (isWin
-                ? `<span class="tourney-win-badge text-[9px] px-1.5 py-0.5 rounded ${m.isThirdPlace ? 'bg-orange-400' : 'bg-amber-400'} text-slate-950 font-black">${m.isThirdPlace ? '3RD!' : 'WIN!'}</span>`
-                : (isLose
-                  ? '<span class="text-[9px] text-rose-400/80 font-bold">LOSE</span>'
-                  : (m.status === 'done' && !m.isBye
-                    ? `<span class="font-digital text-[10px] text-slate-400">${s.vsRule === 'jammer' ? `❤️${hpVal}` : scoreVal.toLocaleString()}</span>`
-                    : (isSeedSlot && pObj
-                      ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-sky-500/25 text-sky-200 border border-sky-400/50 font-black">シード</span>'
-                      : ''))));
+            // 決勝戦から上の優勝ボックスへの線
+            if (r === t.totalRounds - 1) {
+              const champTopLineEnd = topChampH - 6;
+              addSvgPath(
+                `M ${xM} ${yM} V ${champTopLineEnd}`,
+                m.winner ? '#fbbf24' : '#475569',
+                m.winner ? 4 : 2.2,
+                isJustFinished
+              );
+            }
 
-            const labelName = isByeEmpty ? '--- BYE ---' : (pObj ? pObj.name : 'TBD');
+            // 試合の交点にステータスバッジ（対戦中 / 勝者名 / 待機中）を配置
+            const node = document.createElement('div');
+            node.setAttribute('data-tourney-match-id', m.id);
+            node.style.position = 'absolute';
+            node.style.left = `${Math.round(xM)}px`;
+            node.style.top = `${Math.round(yM)}px`;
+            node.style.transform = 'translate(-50%, -50%)';
+            node.style.maxWidth = `${Math.max(84, Math.min(132, Math.abs(x2 - x1) - 8))}px`;
+
+            if (m.winner) {
+              const winP = players[m.winner];
+              const isMeWin = m.winner === this.mySlot;
+              node.className = `px-2 py-0.5 rounded-full border-2 text-[9px] sm:text-[10px] font-black shadow-md whitespace-nowrap truncate ${
+                isMeWin
+                  ? 'bg-cyan-950/95 border-cyan-400 text-cyan-200'
+                  : 'bg-slate-900/95 border-amber-400 text-amber-200'
+              } ${isJustFinished ? 'tourney-winner-pop' : ''}`;
+              node.textContent = `★ ${winP ? winP.name : 'WIN'}`;
+            } else if (isActive) {
+              node.className = 'tourney-match-active px-2.5 py-0.5 rounded-full border-2 border-amber-300 bg-gradient-to-r from-amber-500 via-orange-500 to-fuchsia-500 text-slate-950 text-[10px] font-black shadow-lg whitespace-nowrap';
+              node.textContent = isPlaying ? '📺 LIVE' : '⚔️ NEXT';
+            } else {
+              node.className = 'px-1.5 py-0.5 rounded-full border border-slate-600 bg-slate-900/95 text-slate-400 text-[9px] font-bold whitespace-nowrap';
+              node.textContent = (m.p1 && m.p2) ? 'VS' : '…';
+            }
+            colsEl.appendChild(node);
+          }
+        }
+
+        // 4. てっぺんの優勝ボックス（👑 CHAMPION）
+        const finalPos = matchOutPos[`r${t.totalRounds - 1}_m0`];
+        if (finalPos) {
+          const champBox = document.createElement('div');
+          const champP = t.championSlot ? players[t.championSlot] : null;
+          champBox.style.position = 'absolute';
+          champBox.style.left = `${Math.round(finalPos.x)}px`;
+          champBox.style.top = '4px';
+          champBox.style.transform = 'translateX(-50%)';
+          champBox.className = `px-3 py-1.5 rounded-2xl border-2 text-center shadow-lg min-w-[126px] max-w-[200px] ${
+            champP
+              ? 'bg-gradient-to-r from-amber-500/30 via-yellow-500/25 to-orange-500/30 border-amber-300 text-amber-200 tourney-winner-pop'
+              : 'bg-slate-900/95 border-slate-600 text-slate-400'
+          }`;
+          champBox.innerHTML = `
+            <div class="text-[9px] font-black tracking-wider ${champP ? 'text-amber-300' : 'text-slate-500'}">👑 CHAMPION</div>
+            <div class="text-xs font-black truncate ${champP ? 'text-white' : 'text-slate-500'}">${champP ? escapeHtml(champP.name) : '???'}</div>
+          `;
+          colsEl.appendChild(champBox);
+        }
+
+        // 5. 最下段（葉ノード）に全参加者のカードを横一列で配置
+        leaves.forEach((leaf) => {
+          const pObj = leaf.slotId ? players[leaf.slotId] : null;
+          const isMe = Boolean(leaf.slotId && leaf.slotId === this.mySlot);
+          const isElim = Boolean(leaf.slotId && eliminatedSlots.has(leaf.slotId));
+          const isChampLeaf = Boolean(t.championSlot && leaf.slotId === t.championSlot);
+          const nameCls = isDrawFlicker && pObj ? 'tourney-draw-name' : '';
+
+          const card = document.createElement('div');
+          card.style.position = 'absolute';
+          card.style.left = `${Math.round(leaf.cx - leafCardW * 0.5)}px`;
+          card.style.top = `${Math.round(leafTopY)}px`;
+          card.style.width = `${leafCardW}px`;
+          card.style.height = `${leafCardH}px`;
+
+          let cls = 'rounded-xl border-2 px-1 py-1 flex flex-col items-center justify-center text-center shadow transition-all ';
+          if (isDrawFlicker) {
+            cls += 'tourney-match-draw bg-slate-900 border-cyan-400 text-white ';
+          } else if (isChampLeaf) {
+            cls += 'bg-amber-500/25 border-amber-300 text-amber-100 shadow-[0_0_16px_rgba(251,191,36,0.6)] ';
+          } else if (isElim) {
+            cls += 'bg-slate-950/80 border-slate-800 text-slate-500 opacity-60 ';
+          } else if (isMe) {
+            cls += 'bg-cyan-950/90 border-cyan-400 text-cyan-100 shadow-[0_0_12px_rgba(56,189,248,0.45)] ';
+          } else {
+            cls += 'bg-slate-900/95 border-slate-600 text-slate-100 ';
+          }
+          card.className = cls;
+
+          const topTag = leaf.isSeed
+            ? '<span class="text-[8px] px-1.5 py-0 rounded-full bg-sky-500/25 text-sky-300 border border-sky-400/50 font-black leading-tight mb-0.5">シード</span>'
+            : (isMe ? '<span class="text-[8px] px-1.5 py-0 rounded-full bg-cyan-400 text-slate-950 font-black leading-tight mb-0.5">YOU</span>' : '');
+          const labelName = pObj ? pObj.name : 'TBD';
+          card.innerHTML = `
+            ${topTag}
+            <div class="text-[10px] font-black leading-tight w-full break-words line-clamp-2 ${isElim ? 'line-through' : ''} ${nameCls}">${escapeHtml(labelName)}</div>
+          `;
+          colsEl.appendChild(card);
+        });
+
+        // 6. 3位決定戦カード（有効な場合はツリーの下中央に配置）
+        if (thirdMatch) {
+          const tp1 = thirdMatch.p1 ? players[thirdMatch.p1] : null;
+          const tp2 = thirdMatch.p2 ? players[thirdMatch.p2] : null;
+          const isTpActive = (thirdMatch.id === t.activeMatchId && !isChampion);
+          const tpBox = document.createElement('div');
+          tpBox.setAttribute('data-tourney-match-id', thirdMatch.id);
+          tpBox.style.position = 'absolute';
+          tpBox.style.left = `${Math.round(treeWidth * 0.5)}px`;
+          tpBox.style.top = `${Math.round(treeHeight + 8)}px`;
+          tpBox.style.transform = 'translateX(-50%)';
+          tpBox.style.width = '240px';
+          tpBox.className = `rounded-2xl border-2 bg-slate-900/95 p-2 shadow-lg ${
+            isTpActive ? 'tourney-match-active border-amber-300' : 'border-orange-500/60'
+          }`;
+
+          const renderTpRow = (slotId, pObj) => {
+            const isWin = Boolean(thirdMatch.winner && thirdMatch.winner === slotId);
+            const isLose = Boolean(thirdMatch.loser && thirdMatch.loser === slotId);
+            const isMe = Boolean(slotId && slotId === this.mySlot);
+            const rCls = isWin
+              ? 'bg-orange-500/25 border border-orange-400 text-orange-200'
+              : (isLose ? 'bg-slate-950/70 text-slate-500 line-through opacity-65' : (isMe ? 'bg-cyan-950/80 border border-cyan-400 text-cyan-200' : 'bg-slate-800/80 text-slate-200'));
+            const tag = isWin
+              ? '<span class="tourney-win-badge text-[9px] px-1.5 py-0.5 rounded bg-orange-400 text-slate-950 font-black">3RD!</span>'
+              : (isLose ? '<span class="text-[9px] text-rose-400/80 font-bold">4位</span>' : '');
             return `
-              <div class="${rowCls}">
-                <span class="truncate ${nameCls}">${isMe ? '▶ ' : ''}${escapeHtml(labelName)}</span>
-                <span class="shrink-0">${rightTag}</span>
+              <div class="flex items-center justify-between gap-1.5 px-2 py-1 rounded-lg text-[10px] font-black ${rCls}">
+                <span class="truncate">${isMe ? '▶ ' : ''}${escapeHtml(pObj ? pObj.name : '準決勝敗者')}</span>
+                <span class="shrink-0">${tag}</span>
               </div>
             `;
           };
 
-          card.innerHTML = `
+          tpBox.innerHTML = `
+            <div class="text-center text-[10px] font-black text-orange-300 mb-1">🥉 3位決定戦</div>
             <div class="space-y-1">
-              ${renderRow('p1', m.p1, p1)}
-              ${renderRow('p2', m.p2, p2)}
+              ${renderTpRow(thirdMatch.p1, tp1)}
+              ${renderTpRow(thirdMatch.p2, tp2)}
             </div>
           `;
-          return card;
-        };
-
-        for (let r = 0; r < t.totalRounds; r++) {
-          const roundMatches = t.matchOrder
-            .map((id) => t.matches[id])
-            .filter((m) => m && m.round === r && !m.isThirdPlace && !m.isBye);
-          const hasR0Bye = (r === 0 && t.matchOrder.some((id) => t.matches[id] && t.matches[id].round === 0 && t.matches[id].isBye));
-          const thirdMatch = (r === t.totalRounds - 1 && t.matches['third_place']) ? t.matches['third_place'] : null;
-
-          const col = document.createElement('div');
-          col.className = 'flex flex-col justify-around gap-3 min-w-[175px] sm:min-w-[205px]';
-
-          const header = document.createElement('div');
-          header.className = 'text-center text-[11px] font-black text-amber-300 bg-slate-900 border border-amber-500/40 rounded-xl py-1 px-2 mb-1';
-          header.textContent = this.getTournamentRoundLabel(r, t.totalRounds);
-          col.appendChild(header);
-
-          const wrap = document.createElement('div');
-          if (hasR0Bye) {
-            wrap.className = 'relative flex-1';
-            wrap.setAttribute('data-r0-aligned', 'true');
-            roundMatches.forEach((m) => {
-              const cardEl = buildMatchCard(m);
-              cardEl.style.position = 'absolute';
-              cardEl.style.left = '0';
-              cardEl.style.right = '0';
-              wrap.appendChild(cardEl);
-            });
-          } else {
-            wrap.className = 'flex-1 flex flex-col justify-around gap-3';
-            roundMatches.forEach((m) => wrap.appendChild(buildMatchCard(m)));
-          }
-
-          if (thirdMatch) {
-            const tpWrap = document.createElement('div');
-            tpWrap.className = 'mt-3 pt-2 border-t border-dashed border-orange-500/40';
-            const tpLabel = document.createElement('div');
-            tpLabel.className = 'text-center text-[10px] font-black text-orange-300 mb-1';
-            tpLabel.textContent = '🥉 3位決定戦';
-            tpWrap.appendChild(tpLabel);
-            tpWrap.appendChild(buildMatchCard(thirdMatch));
-            wrap.appendChild(tpWrap);
-          }
-
-          col.appendChild(wrap);
-          colsEl.appendChild(col);
+          colsEl.appendChild(tpBox);
         }
-
-        requestAnimationFrame(() => this.drawTournamentConnectors(t, animateAdvance));
       }
 
       drawTournamentConnectors(t, animateAdvance = false) {
-        const stage = document.getElementById('tourney-bracket-stage');
-        const svg = document.getElementById('tourney-bracket-svg');
-        if (!stage || !svg || !t || !t.matches) return;
-
-        // 1回戦にシード省略がある場合、実際に試合する1回戦カードを2回戦の接続先スロットの高さに合わせて配置
-        const r0Wrap = stage.querySelector('[data-r0-aligned="true"]');
-        if (r0Wrap) {
-          const wrapRect = r0Wrap.getBoundingClientRect();
-          const r0Cards = Array.from(r0Wrap.querySelectorAll('[data-tourney-match-id]'));
-          let prevBottom = -8;
-          let maxBottom = 0;
-          r0Cards.forEach((cardEl) => {
-            const mid = cardEl.getAttribute('data-tourney-match-id');
-            const m = t.matches[mid];
-            if (!m || !m.nextMatchId) return;
-            const toEl = stage.querySelector(`[data-tourney-match-id="${m.nextMatchId}"]`);
-            if (!toEl) return;
-            const tRect = toEl.getBoundingClientRect();
-            const targetCenterY = (tRect.top - wrapRect.top) + (m.nextSlotKey === 'p1' ? tRect.height * 0.28 : tRect.height * 0.72);
-            const cardH = cardEl.offsetHeight || 76;
-            let top = Math.max(0, targetCenterY - cardH * 0.5);
-            if (top < prevBottom + 8) {
-              top = prevBottom + 8;
-            }
-            cardEl.style.top = `${Math.round(top)}px`;
-            prevBottom = top + cardH;
-            if (prevBottom > maxBottom) maxBottom = prevBottom;
-          });
-          if (maxBottom > 0) {
-            r0Wrap.style.minHeight = `${Math.ceil(maxBottom + 6)}px`;
-          }
-        }
-
-        const stageRect = stage.getBoundingClientRect();
-        svg.setAttribute('width', Math.ceil(stage.scrollWidth));
-        svg.setAttribute('height', Math.ceil(stage.scrollHeight));
-        svg.innerHTML = '';
-
-        for (const id of t.matchOrder) {
-          const m = t.matches[id];
-          if (!m || !m.nextMatchId || m.isThirdPlace || m.isBye) continue;
-          const fromEl = stage.querySelector(`[data-tourney-match-id="${m.id}"]`);
-          const toEl = stage.querySelector(`[data-tourney-match-id="${m.nextMatchId}"]`);
-          if (!fromEl || !toEl) continue;
-
-          const fRect = fromEl.getBoundingClientRect();
-          const tRect = toEl.getBoundingClientRect();
-
-          const x1 = fRect.right - stageRect.left;
-          const y1 = fRect.top - stageRect.top + fRect.height * 0.5;
-          const x2 = tRect.left - stageRect.left;
-          const y2 = tRect.top - stageRect.top + (m.nextSlotKey === 'p1' ? tRect.height * 0.28 : tRect.height * 0.72);
-          const midX = (x1 + x2) * 0.5;
-
-          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-          path.setAttribute('d', `M ${x1} ${y1} H ${midX} V ${y2} H ${x2}`);
-          path.setAttribute('fill', 'none');
-          const isWon = Boolean(m.winner);
-          path.setAttribute('stroke', isWon ? '#fbbf24' : '#334155');
-          path.setAttribute('stroke-width', isWon ? '3.5' : '2');
-          path.setAttribute('stroke-linecap', 'round');
-          path.setAttribute('stroke-linejoin', 'round');
-          if (isWon && animateAdvance && m.id === t.lastFinishedMatchId) {
-            path.setAttribute('class', 'tourney-line-win');
-          }
-          svg.appendChild(path);
-        }
+        // 縦型トーナメントツリー描画時にSVGコネクタも同時生成するため互換維持用
       }
 
       playTournamentChampionFX() {

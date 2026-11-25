@@ -1157,6 +1157,24 @@
   <!-- VERSUS RULE ROULETTE OVERLAY (#vs-roulette-overlay) -->
   <div id="vs-roulette-overlay" class="fixed inset-0 z-[76] hidden items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md select-none" style="z-index: 76;"></div>
 
+  <!-- SKIN UNLOCK TOAST NOTIFICATION (#skin-unlock-toast) -->
+  <div id="skin-unlock-toast" class="fixed top-4 left-1/2 -translate-x-1/2 z-[95] hidden max-w-sm w-[92vw] pointer-events-auto" style="z-index: 95;">
+    <div class="bg-gradient-to-r from-amber-500 via-yellow-400 to-orange-500 p-[2px] rounded-2xl shadow-[0_0_28px_rgba(251,191,36,0.8)] animate-pop">
+      <div class="bg-slate-950/95 rounded-2xl px-3.5 py-2.5 flex items-center justify-between gap-2.5">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="text-2xl shrink-0">🎨</span>
+          <div class="min-w-0 text-left">
+            <div class="text-[10px] font-black text-amber-300 tracking-wider uppercase">NEW SKIN UNLOCKED!!</div>
+            <div id="skin-unlock-toast-text" class="text-xs sm:text-sm font-black text-white leading-snug truncate">新スキンが解放されました！</div>
+          </div>
+        </div>
+        <button id="btn-toast-open-skins" type="button" class="btn-3d shrink-0 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-[11px] px-2.5 py-1.5 rounded-xl">
+          着せ替え
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- VERSUS MATCH START INTRO OVERLAY (#vs-intro-overlay) -->
   <div id="vs-intro-overlay" class="fixed inset-0 z-[75] hidden overflow-hidden select-none" style="z-index: 75;"></div>
 
@@ -1188,6 +1206,9 @@
           </button>
           <button id="btn-title-stats" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-emerald-400/70 text-[10px] sm:text-[11px] font-black px-2 py-1 rounded-xl text-emerald-300 flex items-center gap-1" title="マイ戦績・弱点分析を見る">
             <span>📊</span><span>戦績</span>
+          </button>
+          <button id="btn-title-skins" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-pink-400/70 text-[10px] sm:text-[11px] font-black px-2 py-1 rounded-xl text-pink-300 flex items-center gap-1" title="カルトン・店員・コインのスキン着せ替え">
+            <span>🎨</span><span>スキン</span>
           </button>
         </div>
       </div>
@@ -1510,6 +1531,9 @@
         <div class="flex items-center gap-1.5">
           <button id="btn-mode-stats" class="btn-3d bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-400/60 text-xs font-extrabold px-2.5 py-1.5 rounded-xl">
             📊 戦績・分析
+          </button>
+          <button id="btn-mode-skins" class="btn-3d bg-slate-800 hover:bg-slate-700 text-pink-300 border border-pink-400/60 text-xs font-extrabold px-2.5 py-1.5 rounded-xl">
+            🎨 スキン
           </button>
           <button id="btn-mode-keyconfig" class="btn-3d bg-slate-800 hover:bg-slate-700 text-sky-300 border border-sky-400/60 text-xs font-extrabold px-2.5 py-1.5 rounded-xl">
             ⌨️ キー設定
@@ -3053,14 +3077,18 @@
         </div>
       </div>
 
-      <!-- Key Config & Navigation -->
-      <div class="grid grid-cols-2 gap-2 mb-3">
-        <button id="btn-hud-keyconfig" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-sky-400/70 text-sky-300 font-black text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow" title="PCキー設定変更">
-          <span>⌨️</span><span>PCキー設定</span>
+      <!-- Skins, Key Config & Navigation -->
+      <div class="grid grid-cols-3 gap-2 mb-3">
+        <button id="btn-hud-skins" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-pink-400/70 text-pink-300 font-black text-xs py-2.5 px-1.5 rounded-xl flex items-center justify-center gap-1 shadow" title="スキン着せ替え">
+          <span>🎨</span><span>スキン</span>
         </button>
 
-        <button id="btn-hud-mode" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-slate-600 text-amber-300 font-extrabold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow" title="モード選択へ戻る">
-          <span>🎮</span><span>モード選択へ</span>
+        <button id="btn-hud-keyconfig" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-sky-400/70 text-sky-300 font-black text-xs py-2.5 px-1.5 rounded-xl flex items-center justify-center gap-1 shadow" title="PCキー設定変更">
+          <span>⌨️</span><span>キー設定</span>
+        </button>
+
+        <button id="btn-hud-mode" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 border border-slate-600 text-amber-300 font-extrabold text-xs py-2.5 px-1.5 rounded-xl flex items-center justify-center gap-1 shadow" title="モード選択へ戻る">
+          <span>🎮</span><span>モード選択</span>
         </button>
       </div>
 
@@ -3179,6 +3207,61 @@
       </div>
     </div>
   </div>
+  <!-- =========================================================================
+       MODAL: SKINS & CUSTOMIZATION (#modal-skins)
+       ========================================================================= -->
+  <div id="modal-skins" class="fixed inset-0 z-[84] hidden items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md" style="z-index: 84;">
+    <div class="max-w-xl w-full bg-slate-900/95 border-2 border-pink-400 rounded-3xl p-4 sm:p-6 shadow-2xl max-h-[94vh] overflow-y-auto custom-scroll text-left">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <span class="text-[10px] font-black text-pink-400 tracking-wider uppercase">SKINS &amp; CUSTOMIZATION</span>
+          <h3 class="text-lg sm:text-2xl font-black text-white">🎨 カルトン＆店員＆コイン着せ替え</h3>
+        </div>
+        <button id="btn-close-skins" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 text-xs font-extrabold px-3 py-1.5 rounded-xl">
+          ✕ 閉じる
+        </button>
+      </div>
+
+      <!-- Unlock Progress Summary -->
+      <div class="bg-slate-950/90 border border-pink-500/35 rounded-2xl p-2.5 mb-3">
+        <div class="flex flex-wrap items-center justify-between gap-2 text-[10px] sm:text-xs font-bold text-slate-300">
+          <span>👤 処理人数: <strong id="skins-stat-served" class="font-digital text-amber-300">0人</strong></span>
+          <span>✨ PERFECT: <strong id="skins-stat-perfect" class="font-digital text-emerald-300">0回</strong></span>
+          <span>⚔️ 対戦勝利: <strong id="skins-stat-vswins" class="font-digital text-fuchsia-300">0勝</strong></span>
+          <span>👑 最高: <strong id="skins-stat-maxscore" class="font-digital text-cyan-300">0pt</strong></span>
+        </div>
+        <div class="mt-1.5 flex items-center justify-between text-[10px] font-black text-pink-300">
+          <span>解放状況（フリープレイ・ランキング・対戦すべてカウントされます！）</span>
+          <span id="skins-unlock-ratio" class="font-digital">3 / 15</span>
+        </div>
+      </div>
+
+      <!-- Category Tabs -->
+      <div class="grid grid-cols-3 gap-1.5 mb-3 bg-slate-950 p-1 rounded-2xl border border-slate-800">
+        <button id="tab-skin-tray" type="button" class="btn-3d py-2 px-2 rounded-xl font-black text-xs transition-colors bg-pink-500 text-white shadow">
+          🟦 カルトン
+        </button>
+        <button id="tab-skin-clerk" type="button" class="btn-3d py-2 px-2 rounded-xl font-black text-xs transition-colors bg-slate-800 text-slate-300 hover:bg-slate-700">
+          👩‍🍳 店員さん
+        </button>
+        <button id="tab-skin-coin" type="button" class="btn-3d py-2 px-2 rounded-xl font-black text-xs transition-colors bg-slate-800 text-slate-300 hover:bg-slate-700">
+          🪙 コイン色
+        </button>
+      </div>
+
+      <!-- Skin Cards Container -->
+      <div id="skins-grid" class="custom-scroll max-h-[50vh] overflow-y-auto space-y-2 pr-1 mb-4">
+        <!-- Populated by SkinManager -->
+      </div>
+
+      <div class="flex items-center justify-end pt-2 border-t border-slate-800">
+        <button id="btn-skins-done" type="button" class="btn-3d bg-gradient-to-r from-pink-500 via-fuchsia-500 to-amber-400 hover:from-pink-400 hover:to-amber-300 text-slate-950 font-black text-xs sm:text-sm px-6 py-2.5 rounded-xl border-b-4 border-fuchsia-900 shadow">
+          ✅ 完了
+        </button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- =========================================================================
        MAIN GAME SCRIPT
@@ -4421,6 +4504,460 @@
             `).join('');
           }
         }
+      }
+    }
+
+
+    /*************************************************************************
+     * 3.55. カルトン＆店員＆コイン スキン解放・着せ替えマネージャー (SkinManager)
+     *************************************************************************/
+    const SKINS_STORAGE_KEY = 'pittariman_skins_selected_v1';
+    const SKINS_SEEN_KEY    = 'pittariman_skins_seen_v1';
+
+    class SkinManager {
+      static activeTab = 'tray';
+
+      static CATALOG = {
+        tray: [
+          {
+            id: 'blue',
+            name: '定番ブルーカルトン',
+            desc: 'おなじみの王道レジトレイ。',
+            swatch: 'linear-gradient(135deg, #134da8, #38bdf8)',
+            rimHex: 0x134da8,
+            rimRoughness: 0.35,
+            rimMetalness: 0.12,
+            rimEmissive: 0x000000,
+            rimEmissiveIntensity: 0.0,
+            matRoughness: 0.75,
+            matMetalness: 0.05,
+            conditionLabel: '初期解放',
+            check: () => ({ unlocked: true, pct: 100, progress: '解放済み' })
+          },
+          {
+            id: 'wood',
+            name: '高級木製トレイ',
+            desc: '深みのあるウォルナット木目。高級カフェ・老舗の品格。',
+            swatch: 'linear-gradient(135deg, #5a351e, #a16236)',
+            rimHex: 0x5c341d,
+            rimRoughness: 0.58,
+            rimMetalness: 0.08,
+            rimEmissive: 0x000000,
+            rimEmissiveIntensity: 0.0,
+            matRoughness: 0.65,
+            matMetalness: 0.04,
+            conditionLabel: '通算処理人数 15人以上',
+            check: (m) => ({
+              unlocked: m.served >= 15,
+              pct: Math.min(100, Math.round((m.served / 15) * 100)),
+              progress: `${Math.min(m.served, 15)} / 15人`
+            })
+          },
+          {
+            id: 'sakura',
+            name: '桜ピンクカルトン',
+            desc: '華やかな桜色の和モダンカルトン。',
+            swatch: 'linear-gradient(135deg, #f472b6, #fbcfe8)',
+            rimHex: 0xec4899,
+            rimRoughness: 0.30,
+            rimMetalness: 0.18,
+            rimEmissive: 0x4c0519,
+            rimEmissiveIntensity: 0.12,
+            matRoughness: 0.65,
+            matMetalness: 0.06,
+            conditionLabel: '通算PERFECT 20回以上',
+            check: (m) => ({
+              unlocked: m.perfect >= 20,
+              pct: Math.min(100, Math.round((m.perfect / 20) * 100)),
+              progress: `${Math.min(m.perfect, 20)} / 20回`
+            })
+          },
+          {
+            id: 'cyber',
+            name: 'サイバーネオン',
+            desc: '漆黒グリッド×発光シアンフレームの未来レジ。',
+            swatch: 'linear-gradient(135deg, #0f172a, #06b6d4)',
+            rimHex: 0x06b6d4,
+            rimRoughness: 0.22,
+            rimMetalness: 0.65,
+            rimEmissive: 0x0891b2,
+            rimEmissiveIntensity: 0.55,
+            matRoughness: 0.45,
+            matMetalness: 0.35,
+            conditionLabel: 'オンライン対戦 1勝（または処理50人）',
+            check: (m) => ({
+              unlocked: m.vsWins >= 1 || m.served >= 50,
+              pct: Math.min(100, Math.max(m.vsWins >= 1 ? 100 : 0, Math.round((m.served / 50) * 100))),
+              progress: m.vsWins >= 1 ? '対戦勝利達成!' : `対戦${m.vsWins}/1勝 or ${Math.min(m.served, 50)}/50人`
+            })
+          },
+          {
+            id: 'gold',
+            name: '純金カルトン',
+            desc: 'まばゆい24金フレーム×深紅ベルベットの極上トレイ。',
+            swatch: 'linear-gradient(135deg, #f59e0b, #fef08a, #b45309)',
+            rimHex: 0xfbbf24,
+            rimRoughness: 0.16,
+            rimMetalness: 0.92,
+            rimEmissive: 0x78350f,
+            rimEmissiveIntensity: 0.28,
+            matRoughness: 0.72,
+            matMetalness: 0.12,
+            conditionLabel: '通算処理100人（または最高100,000pt）',
+            check: (m) => ({
+              unlocked: m.served >= 100 || m.maxScore >= 100000,
+              pct: Math.min(100, Math.max(Math.round((m.served / 100) * 100), Math.round((m.maxScore / 100000) * 100))),
+              progress: `${Math.min(m.served, 100)}/100人 or ${Math.min(m.maxScore, 100000).toLocaleString()}/100,000pt`
+            })
+          }
+        ],
+        clerk: [
+          {
+            id: 'default',
+            name: '定番コンビニ店員',
+            desc: '爽やかな緑エプロン＆イエローキャップ。',
+            swatch: 'linear-gradient(135deg, #10b981, #fbbf24)',
+            capHex: 0x10b981,
+            visorHex: 0xfbbf24,
+            badgeHex: 0xfef08a,
+            collarHex: 0xfef08a,
+            sleeveHex: 0xf8fafc,
+            hairHex: 0x3e2723,
+            conditionLabel: '初期解放',
+            check: () => ({ unlocked: true, pct: 100, progress: '解放済み' })
+          },
+          {
+            id: 'cafe',
+            name: 'おしゃれカフェ店員',
+            desc: '落ち着いたブラウンエプロン＆ベレー帽風スタイル。',
+            swatch: 'linear-gradient(135deg, #78350f, #fde68a)',
+            capHex: 0x451a03,
+            visorHex: 0x78350f,
+            badgeHex: 0xfde68a,
+            collarHex: 0xfef3c7,
+            sleeveHex: 0xfef3c7,
+            hairHex: 0x4a2c20,
+            conditionLabel: '通算処理人数 10人以上',
+            check: (m) => ({
+              unlocked: m.served >= 10,
+              pct: Math.min(100, Math.round((m.served / 10) * 100)),
+              progress: `${Math.min(m.served, 10)} / 10人`
+            })
+          },
+          {
+            id: 'suit',
+            name: 'ビシッとスーツ店員',
+            desc: '黒スーツ×真紅ネクタイのプロフェッショナル会計士。',
+            swatch: 'linear-gradient(135deg, #0f172a, #dc2626)',
+            capHex: 0x0f172a,
+            visorHex: 0x1e293b,
+            badgeHex: 0xfbbf24,
+            collarHex: 0xffffff,
+            sleeveHex: 0x0f172a,
+            hairHex: 0x1e1b18,
+            conditionLabel: '通算PERFECT 30回以上',
+            check: (m) => ({
+              unlocked: m.perfect >= 30,
+              pct: Math.min(100, Math.round((m.perfect / 30) * 100)),
+              progress: `${Math.min(m.perfect, 30)} / 30回`
+            })
+          },
+          {
+            id: 'maid',
+            name: 'メイド服店員',
+            desc: '黒ドレス×純白フリルエプロン＆カチューシャ風コーデ。',
+            swatch: 'linear-gradient(135deg, #18181b, #ffffff, #f472b6)',
+            capHex: 0xf8fafc,
+            visorHex: 0xf472b6,
+            badgeHex: 0xf9a8d4,
+            collarHex: 0xffffff,
+            sleeveHex: 0x18181b,
+            hairHex: 0x5c3317,
+            conditionLabel: '通算処理60人（または対戦3勝）',
+            check: (m) => ({
+              unlocked: m.served >= 60 || m.vsWins >= 3,
+              pct: Math.min(100, Math.max(Math.round((m.served / 60) * 100), Math.round((m.vsWins / 3) * 100))),
+              progress: `${Math.min(m.served, 60)}/60人 or 対戦${Math.min(m.vsWins, 3)}/3勝`
+            })
+          },
+          {
+            id: 'gold_vip',
+            name: '純金VIP店長',
+            desc: '黄金タキシード＆蝶ネクタイを纏う伝説のレジマスター。',
+            swatch: 'linear-gradient(135deg, #f59e0b, #fef08a, #7c2d12)',
+            capHex: 0xf59e0b,
+            visorHex: 0xfef08a,
+            badgeHex: 0xffffff,
+            collarHex: 0xfef08a,
+            sleeveHex: 0xd97706,
+            hairHex: 0x29150a,
+            conditionLabel: '最高300,000pt（または通算処理150人）',
+            check: (m) => ({
+              unlocked: m.maxScore >= 300000 || m.served >= 150,
+              pct: Math.min(100, Math.max(Math.round((m.maxScore / 300000) * 100), Math.round((m.served / 150) * 100))),
+              progress: `${Math.min(m.maxScore, 300000).toLocaleString()}/300,000pt or ${Math.min(m.served, 150)}/150人`
+            })
+          }
+        ],
+        coin: [
+          {
+            id: 'default',
+            name: 'リアル硬貨',
+            desc: '本物そっくりの標準カラー硬貨。',
+            swatch: 'linear-gradient(135deg, #f3e3ad, #f1f5f9, #d47f4a)',
+            conditionLabel: '初期解放',
+            check: () => ({ unlocked: true, pct: 100, progress: '解放済み' })
+          },
+          {
+            id: 'gold',
+            name: 'オール純金メダル',
+            desc: '1円玉から500円玉まで全部ピカピカの純金仕様！',
+            swatch: 'linear-gradient(135deg, #fde047, #f59e0b, #b45309)',
+            conditionLabel: '通算処理人数 30人以上',
+            check: (m) => ({
+              unlocked: m.served >= 30,
+              pct: Math.min(100, Math.round((m.served / 30) * 100)),
+              progress: `${Math.min(m.served, 30)} / 30人`
+            })
+          },
+          {
+            id: 'pastel',
+            name: 'パステルマカロン',
+            desc: 'ミント・ピンク・ラベンダーのポップで可愛い硬貨。',
+            swatch: 'linear-gradient(135deg, #fbcfe8, #a7f3d0, #ddd6fe)',
+            conditionLabel: '通算処理人数 40人以上',
+            check: (m) => ({
+              unlocked: m.served >= 40,
+              pct: Math.min(100, Math.round((m.served / 40) * 100)),
+              progress: `${Math.min(m.served, 40)} / 40人`
+            })
+          },
+          {
+            id: 'platinum',
+            name: 'プラチナ＆アイス',
+            desc: '透き通る銀白×氷青メタリックのクールな硬貨。',
+            swatch: 'linear-gradient(135deg, #f8fafc, #bae6fd, #64748b)',
+            conditionLabel: '通算PERFECT 50回以上',
+            check: (m) => ({
+              unlocked: m.perfect >= 50,
+              pct: Math.min(100, Math.round((m.perfect / 50) * 100)),
+              progress: `${Math.min(m.perfect, 50)} / 50回`
+            })
+          },
+          {
+            id: 'neon',
+            name: 'ネオンサイバー',
+            desc: '漆黒コインに金種ごとのネオン発光リング＆数字！',
+            swatch: 'linear-gradient(135deg, #090d16, #22d3ee, #e879f9)',
+            conditionLabel: 'オンライン対戦 2勝（または処理80人）',
+            check: (m) => ({
+              unlocked: m.vsWins >= 2 || m.served >= 80,
+              pct: Math.min(100, Math.max(Math.round((m.vsWins / 2) * 100), Math.round((m.served / 80) * 100))),
+              progress: `対戦${Math.min(m.vsWins, 2)}/2勝 or ${Math.min(m.served, 80)}/80人`
+            })
+          }
+        ]
+      };
+
+      static getMetrics() {
+        const stats = StatsManager.load();
+        const maxScore = RankingManager.getOverallMaxScore();
+        return {
+          served: Math.max(0, Number(stats.totalServed) || 0),
+          perfect: Math.max(0, Number(stats.totalPerfect) || 0),
+          vsWins: Math.max(0, Number(stats.vsStats && stats.vsStats.wins) || 0),
+          koWins: Math.max(0, Number(stats.vsStats && stats.vsStats.koWins) || 0),
+          maxScore: Math.max(0, Number(maxScore) || 0)
+        };
+      }
+
+      static getSelected() {
+        const fallback = { tray: 'blue', clerk: 'default', coin: 'default' };
+        try {
+          const raw = localStorage.getItem(SKINS_STORAGE_KEY);
+          if (!raw) return fallback;
+          const parsed = JSON.parse(raw);
+          const m = SkinManager.getMetrics();
+          const out = { ...fallback };
+          ['tray', 'clerk', 'coin'].forEach((cat) => {
+            const candidate = SkinManager.CATALOG[cat].find((s) => s.id === parsed[cat]);
+            if (candidate && candidate.check(m).unlocked) {
+              out[cat] = candidate.id;
+            }
+          });
+          return out;
+        } catch (e) {
+          return fallback;
+        }
+      }
+
+      static setSelected(category, skinId) {
+        if (!SkinManager.CATALOG[category]) return false;
+        const item = SkinManager.CATALOG[category].find((s) => s.id === skinId);
+        if (!item) return false;
+        const m = SkinManager.getMetrics();
+        if (!item.check(m).unlocked) return false;
+        const cur = SkinManager.getSelected();
+        cur[category] = skinId;
+        try {
+          localStorage.setItem(SKINS_STORAGE_KEY, JSON.stringify(cur));
+        } catch (e) {}
+        return true;
+      }
+
+      static getSkinDef(category, id) {
+        const list = SkinManager.CATALOG[category] || [];
+        return list.find((s) => s.id === id) || list[0];
+      }
+
+      static getAllUnlockedKeys() {
+        const m = SkinManager.getMetrics();
+        const keys = [];
+        ['tray', 'clerk', 'coin'].forEach((cat) => {
+          SkinManager.CATALOG[cat].forEach((s) => {
+            if (s.check(m).unlocked) keys.push(`${cat}:${s.id}`);
+          });
+        });
+        return keys;
+      }
+
+      static initSeenUnlocksIfNeeded() {
+        try {
+          if (!localStorage.getItem(SKINS_SEEN_KEY)) {
+            localStorage.setItem(SKINS_SEEN_KEY, JSON.stringify(SkinManager.getAllUnlockedKeys()));
+          }
+        } catch (e) {}
+      }
+
+      static checkNewUnlocks() {
+        const currentKeys = SkinManager.getAllUnlockedKeys();
+        let seen = [];
+        try {
+          const raw = localStorage.getItem(SKINS_SEEN_KEY);
+          seen = raw ? JSON.parse(raw) : [];
+          if (!Array.isArray(seen)) seen = [];
+        } catch (e) {
+          seen = [];
+        }
+        const seenSet = new Set(seen);
+        const newlyUnlocked = [];
+        currentKeys.forEach((k) => {
+          if (!seenSet.has(k)) {
+            const [cat, id] = k.split(':');
+            const def = SkinManager.getSkinDef(cat, id);
+            if (def) newlyUnlocked.push({ category: cat, ...def });
+          }
+        });
+        if (newlyUnlocked.length > 0) {
+          try {
+            localStorage.setItem(SKINS_SEEN_KEY, JSON.stringify(currentKeys));
+          } catch (e) {}
+        }
+        return newlyUnlocked;
+      }
+
+      static renderToModal(onSelectCallback = null) {
+        const m = SkinManager.getMetrics();
+        const sel = SkinManager.getSelected();
+
+        const elServed = document.getElementById('skins-stat-served');
+        const elPerf = document.getElementById('skins-stat-perfect');
+        const elVs = document.getElementById('skins-stat-vswins');
+        const elMax = document.getElementById('skins-stat-maxscore');
+        const elRatio = document.getElementById('skins-unlock-ratio');
+
+        if (elServed) elServed.textContent = `${m.served.toLocaleString()}人`;
+        if (elPerf) elPerf.textContent = `${m.perfect.toLocaleString()}回`;
+        if (elVs) elVs.textContent = `${m.vsWins.toLocaleString()}勝`;
+        if (elMax) elMax.textContent = `${m.maxScore.toLocaleString()}pt`;
+
+        const totalSkins = ['tray', 'clerk', 'coin'].reduce((a, c) => a + SkinManager.CATALOG[c].length, 0);
+        const unlockedCount = SkinManager.getAllUnlockedKeys().length;
+        if (elRatio) elRatio.textContent = `${unlockedCount} / ${totalSkins} 解放済み`;
+
+        ['tray', 'clerk', 'coin'].forEach((cat) => {
+          const btn = document.getElementById(`tab-skin-${cat}`);
+          if (!btn) return;
+          btn.className = SkinManager.activeTab === cat
+            ? 'btn-3d py-2 px-2 rounded-xl font-black text-xs transition-colors bg-pink-500 text-white shadow'
+            : 'btn-3d py-2 px-2 rounded-xl font-black text-xs transition-colors bg-slate-800 text-slate-300 hover:bg-slate-700';
+        });
+
+        const grid = document.getElementById('skins-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        const cat = SkinManager.activeTab;
+        const list = SkinManager.CATALOG[cat] || [];
+        list.forEach((skin) => {
+          const st = skin.check(m);
+          const isEquipped = sel[cat] === skin.id;
+
+          const card = document.createElement('div');
+          card.className = `rounded-2xl p-3 border-2 flex items-center justify-between gap-3 transition-colors ${
+            isEquipped
+              ? 'bg-pink-950/55 border-pink-400 shadow-lg'
+              : (st.unlocked
+                ? 'bg-slate-800/85 border-slate-700 hover:border-slate-500'
+                : 'bg-slate-950/85 border-slate-800 opacity-85')
+          }`;
+
+          const badgeHtml = isEquipped
+            ? '<span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-pink-400 text-slate-950 shrink-0">装備中</span>'
+            : (st.unlocked
+              ? '<span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-500/25 text-emerald-300 border border-emerald-400/60 shrink-0">解放済み</span>'
+              : '<span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 shrink-0">🔒 未解放</span>');
+
+          const progressBarHtml = !st.unlocked
+            ? `<div class="mt-1.5">
+                 <div class="flex items-center justify-between text-[10px] text-amber-300 font-bold mb-0.5">
+                   <span>条件: ${escapeHtml(skin.conditionLabel)}</span>
+                   <span class="font-digital">${escapeHtml(st.progress)}</span>
+                 </div>
+                 <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                   <div class="h-full bg-gradient-to-r from-pink-500 to-amber-400 rounded-full" style="width: ${st.pct}%;"></div>
+                 </div>
+               </div>`
+            : `<div class="text-[10px] text-slate-400 font-bold mt-0.5">条件: ${escapeHtml(skin.conditionLabel)}</div>`;
+
+          card.innerHTML = `
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <div class="w-11 h-11 rounded-xl border-2 ${isEquipped ? 'border-white' : 'border-slate-600'} shrink-0 shadow-inner" style="background: ${skin.swatch};"></div>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-xs sm:text-sm font-black ${st.unlocked ? 'text-white' : 'text-slate-400'}">${escapeHtml(skin.name)}</span>
+                  ${badgeHtml}
+                </div>
+                <p class="text-[10px] sm:text-[11px] text-slate-300 leading-snug mt-0.5">${escapeHtml(skin.desc)}</p>
+                ${progressBarHtml}
+              </div>
+            </div>
+            <div class="shrink-0">
+              ${
+                st.unlocked
+                  ? `<button type="button" data-equip-cat="${cat}" data-equip-id="${skin.id}" class="btn-3d px-3 py-2 rounded-xl font-black text-xs ${
+                      isEquipped
+                        ? 'bg-pink-400 text-slate-950 cursor-default'
+                        : 'bg-emerald-400 hover:bg-emerald-300 text-slate-950 border-b-2 border-emerald-700'
+                    }">${isEquipped ? '✓ 使用中' : '着替える'}</button>`
+                  : `<span class="text-lg text-slate-600 px-2">🔒</span>`
+              }
+            </div>
+          `;
+
+          const btn = card.querySelector('button[data-equip-id]');
+          if (btn && !isEquipped) {
+            btn.addEventListener('click', () => {
+              if (SkinManager.setSelected(cat, skin.id)) {
+                sound.playPerfectFanfare();
+                SkinManager.renderToModal(onSelectCallback);
+                if (typeof onSelectCallback === 'function') onSelectCallback();
+              }
+            });
+          }
+
+          grid.appendChild(card);
+        });
       }
     }
 
@@ -6011,41 +6548,130 @@
      *************************************************************************/
     const textureCache = {};
 
-    function getCoinTexture(denom) {
-      if (textureCache['coin_' + denom]) return textureCache['coin_' + denom];
+    function getCoinSkinPalette(denom, coinSkinId = 'default') {
       const cfg = DENOM_CONFIG[denom];
+      if (coinSkinId === 'gold') {
+        return {
+          color: '#fde047',
+          rimColor: '#b45309',
+          textColor: '#451a03',
+          highlight: '#fffbeb',
+          metalness: 0.94,
+          roughness: 0.12
+        };
+      }
+      if (coinSkinId === 'platinum') {
+        return {
+          color: denom === 500 ? '#e0f2fe' : '#f1f5f9',
+          rimColor: denom === 500 ? '#38bdf8' : '#64748b',
+          textColor: '#0f172a',
+          highlight: '#ffffff',
+          metalness: 0.95,
+          roughness: 0.10
+        };
+      }
+      if (coinSkinId === 'pastel') {
+        const map = {
+          500: { c: '#fef08a', r: '#f59e0b' },
+          100: { c: '#bae6fd', r: '#38bdf8' },
+          50:  { c: '#ddd6fe', r: '#a78bfa' },
+          10:  { c: '#fbcfe8', r: '#f472b6' },
+          5:   { c: '#fed7aa', r: '#fb923c' },
+          1:   { c: '#bbf7d0', r: '#34d399' }
+        };
+        const p = map[denom] || { c: '#fbcfe8', r: '#f472b6' };
+        return {
+          color: p.c,
+          rimColor: p.r,
+          textColor: '#1e293b',
+          highlight: '#ffffff',
+          metalness: 0.35,
+          roughness: 0.28
+        };
+      }
+      if (coinSkinId === 'neon') {
+        const neonMap = {
+          500: '#fde047',
+          100: '#22d3ee',
+          50:  '#c084fc',
+          10:  '#fb7185',
+          5:   '#fb923c',
+          1:   '#4ade80'
+        };
+        const nc = neonMap[denom] || '#22d3ee';
+        return {
+          color: '#0f172a',
+          rimColor: nc,
+          textColor: nc,
+          highlight: nc,
+          isNeon: true,
+          metalness: 0.65,
+          roughness: 0.18
+        };
+      }
+      return {
+        color: cfg.color,
+        rimColor: cfg.rimColor,
+        textColor: '#1f2937',
+        highlight: '#ffffff',
+        metalness: cfg.metalness,
+        roughness: cfg.roughness
+      };
+    }
+
+    function getCoinTexture(denom, coinSkinId = 'default') {
+      const cacheKey = `coin_${coinSkinId}_${denom}`;
+      if (textureCache[cacheKey]) return textureCache[cacheKey];
+      const cfg = DENOM_CONFIG[denom];
+      const pal = getCoinSkinPalette(denom, coinSkinId);
       const canvas = document.createElement('canvas');
       canvas.width = 256;
       canvas.height = 256;
       const ctx = canvas.getContext('2d');
       const cx = 128, cy = 128;
 
-      const grad = ctx.createRadialGradient(cx - 35, cy - 35, 10, cx, cy, 128);
-      grad.addColorStop(0, '#ffffff');
-      grad.addColorStop(0.25, cfg.color);
-      grad.addColorStop(0.88, cfg.rimColor);
-      grad.addColorStop(1, '#333333');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 126, 0, Math.PI * 2);
-      ctx.fill();
+      if (pal.isNeon) {
+        const grad = ctx.createRadialGradient(cx, cy, 12, cx, cy, 126);
+        grad.addColorStop(0, '#1e293b');
+        grad.addColorStop(0.82, '#090d16');
+        grad.addColorStop(1, pal.rimColor);
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 126, 0, Math.PI * 2);
+        ctx.fill();
 
-      // キラッと光るスペキュラ・ハイライトリム
-      ctx.save();
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 120, -Math.PI * 0.85, -Math.PI * 0.15);
-      ctx.stroke();
-      ctx.restore();
+        ctx.strokeStyle = pal.rimColor;
+        ctx.lineWidth = 10;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 114, 0, Math.PI * 2);
+        ctx.stroke();
+      } else {
+        const grad = ctx.createRadialGradient(cx - 35, cy - 35, 10, cx, cy, 128);
+        grad.addColorStop(0, pal.highlight);
+        grad.addColorStop(0.25, pal.color);
+        grad.addColorStop(0.88, pal.rimColor);
+        grad.addColorStop(1, '#333333');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 126, 0, Math.PI * 2);
+        ctx.fill();
 
-      ctx.strokeStyle = cfg.rimColor;
-      ctx.lineWidth = 6;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 114, 0, Math.PI * 2);
-      ctx.stroke();
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 120, -Math.PI * 0.85, -Math.PI * 0.15);
+        ctx.stroke();
+        ctx.restore();
 
-      ctx.fillStyle = 'rgba(0,0,0,0.22)';
+        ctx.strokeStyle = pal.rimColor;
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 114, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = pal.isNeon ? pal.rimColor : 'rgba(0,0,0,0.22)';
       for (let i = 0; i < 36; i++) {
         const ang = (i / 36) * Math.PI * 2;
         ctx.beginPath();
@@ -6053,21 +6679,22 @@
         ctx.fill();
       }
 
-      ctx.fillStyle = '#1f2937';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
       if (cfg.hasHole) {
         ctx.font = '900 54px "M PLUS Rounded 1c", sans-serif';
-        ctx.fillStyle = 'rgba(255,255,255,0.6)';
-        ctx.fillText(String(denom), cx + 2, 54 + 2);
-        ctx.fillStyle = '#1e293b';
+        if (!pal.isNeon) {
+          ctx.fillStyle = 'rgba(255,255,255,0.6)';
+          ctx.fillText(String(denom), cx + 2, 54 + 2);
+        }
+        ctx.fillStyle = pal.textColor;
         ctx.fillText(String(denom), cx, 54);
 
         ctx.font = '800 28px "M PLUS Rounded 1c", sans-serif';
         ctx.fillText('円', cx, 204);
 
-        ctx.fillStyle = cfg.rimColor;
+        ctx.fillStyle = pal.rimColor;
         ctx.beginPath();
         ctx.arc(cx, cy, 33, 0, Math.PI * 2);
         ctx.fill();
@@ -6083,18 +6710,20 @@
       } else {
         const fontSize = denom === 500 ? 78 : (denom === 100 ? 82 : 92);
         ctx.font = `900 ${fontSize}px "M PLUS Rounded 1c", sans-serif`;
-        ctx.fillStyle = 'rgba(255,255,255,0.55)';
-        ctx.fillText(String(denom), cx + 2, cy - 4 + 2);
-        ctx.fillStyle = '#1f2937';
+        if (!pal.isNeon) {
+          ctx.fillStyle = 'rgba(255,255,255,0.55)';
+          ctx.fillText(String(denom), cx + 2, cy - 4 + 2);
+        }
+        ctx.fillStyle = pal.textColor;
         ctx.fillText(String(denom), cx, cy - 4);
 
         ctx.font = '800 26px "M PLUS Rounded 1c", sans-serif';
-        ctx.fillText('日本国', cx, 46);
+        ctx.fillText(pal.isNeon ? 'CYBER' : '日本国', cx, 46);
       }
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.anisotropy = 4;
-      textureCache['coin_' + denom] = tex;
+      textureCache[cacheKey] = tex;
       return tex;
     }
 
@@ -6157,27 +6786,92 @@
       return tex;
     }
 
-    function getTrayMatTexture() {
-      if (textureCache.trayMat) return textureCache.trayMat;
+    function getTrayMatTexture(skinId = 'blue') {
+      const cacheKey = `trayMat_${skinId}`;
+      if (textureCache[cacheKey]) return textureCache[cacheKey];
       const canvas = document.createElement('canvas');
       canvas.width = 256;
       canvas.height = 256;
       const ctx = canvas.getContext('2d');
 
-      ctx.fillStyle = '#0f3f8c';
-      ctx.fillRect(0, 0, 256, 256);
-
-      for (let y = 12; y < 256; y += 16) {
-        for (let x = 12; x < 256; x += 16) {
-          ctx.fillStyle = 'rgba(255,255,255,0.16)';
+      if (skinId === 'wood') {
+        ctx.fillStyle = '#6b3e26';
+        ctx.fillRect(0, 0, 256, 256);
+        for (let y = 0; y < 256; y += 6) {
+          ctx.fillStyle = (y % 12 === 0) ? 'rgba(42, 20, 8, 0.22)' : 'rgba(180, 120, 70, 0.16)';
+          ctx.fillRect(0, y, 256, 3 + (y % 5));
+        }
+        ctx.strokeStyle = 'rgba(255, 225, 180, 0.14)';
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 8; i++) {
           ctx.beginPath();
-          ctx.arc(x - 1, y - 1, 3.2, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.moveTo(0, i * 32 + 10);
+          ctx.bezierCurveTo(85, i * 32 + 2, 170, i * 32 + 18, 256, i * 32 + 10);
+          ctx.stroke();
+        }
+      } else if (skinId === 'sakura') {
+        ctx.fillStyle = '#f9a8d4';
+        ctx.fillRect(0, 0, 256, 256);
+        for (let y = 16; y < 256; y += 32) {
+          for (let x = 16; x < 256; x += 32) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = 'rgba(219, 39, 119, 0.28)';
+            ctx.beginPath();
+            ctx.arc(x + 12, y + 12, 3.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      } else if (skinId === 'cyber') {
+        ctx.fillStyle = '#050b16';
+        ctx.fillRect(0, 0, 256, 256);
+        ctx.strokeStyle = 'rgba(34, 211, 238, 0.35)';
+        ctx.lineWidth = 2;
+        for (let i = 0; i <= 256; i += 32) {
+          ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 256); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(256, i); ctx.stroke();
+        }
+        ctx.fillStyle = 'rgba(232, 121, 249, 0.45)';
+        for (let y = 16; y < 256; y += 32) {
+          for (let x = 16; x < 256; x += 32) {
+            ctx.beginPath();
+            ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      } else if (skinId === 'gold') {
+        ctx.fillStyle = '#7f1d1d';
+        ctx.fillRect(0, 0, 256, 256);
+        ctx.strokeStyle = 'rgba(251, 191, 36, 0.35)';
+        ctx.lineWidth = 2;
+        for (let y = 0; y < 256; y += 32) {
+          for (let x = 0; x < 256; x += 32) {
+            ctx.beginPath();
+            ctx.moveTo(x + 16, y);
+            ctx.lineTo(x + 32, y + 16);
+            ctx.lineTo(x + 16, y + 32);
+            ctx.lineTo(x, y + 16);
+            ctx.closePath();
+            ctx.stroke();
+          }
+        }
+      } else {
+        ctx.fillStyle = '#0f3f8c';
+        ctx.fillRect(0, 0, 256, 256);
+        for (let y = 12; y < 256; y += 16) {
+          for (let x = 12; x < 256; x += 16) {
+            ctx.fillStyle = 'rgba(255,255,255,0.16)';
+            ctx.beginPath();
+            ctx.arc(x - 1, y - 1, 3.2, 0, Math.PI * 2);
+            ctx.fill();
 
-          ctx.fillStyle = 'rgba(0, 15, 45, 0.45)';
-          ctx.beginPath();
-          ctx.arc(x + 1, y + 1, 3.2, 0, Math.PI * 2);
-          ctx.fill();
+            ctx.fillStyle = 'rgba(0, 15, 45, 0.45)';
+            ctx.beginPath();
+            ctx.arc(x + 1, y + 1, 3.2, 0, Math.PI * 2);
+            ctx.fill();
+          }
         }
       }
 
@@ -6185,7 +6879,7 @@
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.RepeatWrapping;
       tex.repeat.set(3, 2);
-      textureCache.trayMat = tex;
+      textureCache[cacheKey] = tex;
       return tex;
     }
 
@@ -6214,45 +6908,132 @@
       return tex;
     }
 
-    function getClerkApronTexture() {
-      if (textureCache.apron) return textureCache.apron;
+    function getClerkApronTexture(skinId = 'default') {
+      const cacheKey = `apron_${skinId}`;
+      if (textureCache[cacheKey]) return textureCache[cacheKey];
       const canvas = document.createElement('canvas');
       canvas.width = 256;
       canvas.height = 256;
       const ctx = canvas.getContext('2d');
-
-      ctx.fillStyle = '#f8fafc';
-      ctx.fillRect(0, 0, 256, 256);
-
-      ctx.fillStyle = '#10b981';
-      ctx.fillRect(24, 48, 208, 208);
-
-      ctx.strokeStyle = '#fbbf24';
-      ctx.lineWidth = 6;
-      ctx.strokeRect(28, 52, 200, 196);
-
-      ctx.fillStyle = '#fbbf24';
-      ctx.beginPath();
-      ctx.arc(128, 128, 42, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#064e3b';
-      ctx.font = '900 54px "M PLUS Rounded 1c", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('¥', 128, 132);
 
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(148, 66, 62, 24);
-      ctx.strokeStyle = '#0f172a';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(148, 66, 62, 24);
-      ctx.fillStyle = '#0f172a';
-      ctx.font = '800 14px sans-serif';
-      ctx.fillText('店員', 179, 78);
+      if (skinId === 'cafe') {
+        ctx.fillStyle = '#fef3c7';
+        ctx.fillRect(0, 0, 256, 256);
+        ctx.fillStyle = '#78350f';
+        ctx.fillRect(26, 48, 204, 208);
+        ctx.strokeStyle = '#fde68a';
+        ctx.lineWidth = 5;
+        ctx.strokeRect(32, 54, 192, 194);
+        ctx.fillStyle = '#fde68a';
+        ctx.beginPath();
+        ctx.arc(128, 132, 40, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#451a03';
+        ctx.font = '900 44px "M PLUS Rounded 1c", sans-serif';
+        ctx.fillText('☕', 128, 135);
+      } else if (skinId === 'suit') {
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, 0, 256, 256);
+        // 白シャツVゾーン
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(86, 0);
+        ctx.lineTo(170, 0);
+        ctx.lineTo(128, 138);
+        ctx.closePath();
+        ctx.fill();
+        // 真紅のネクタイ
+        ctx.fillStyle = '#dc2626';
+        ctx.beginPath();
+        ctx.moveTo(118, 18);
+        ctx.lineTo(138, 18);
+        ctx.lineTo(144, 118);
+        ctx.lineTo(128, 142);
+        ctx.lineTo(112, 118);
+        ctx.closePath();
+        ctx.fill();
+        // 金ボタン
+        ctx.fillStyle = '#fbbf24';
+        ctx.beginPath(); ctx.arc(128, 178, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(128, 212, 8, 0, Math.PI * 2); ctx.fill();
+      } else if (skinId === 'maid') {
+        ctx.fillStyle = '#18181b';
+        ctx.fillRect(0, 0, 256, 256);
+        // 白いフリルエプロン
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(52, 54, 152, 202);
+        // フリル波線
+        for (let y = 58; y < 252; y += 18) {
+          ctx.beginPath(); ctx.arc(52, y, 9, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath(); ctx.arc(204, y, 9, 0, Math.PI * 2); ctx.fill();
+        }
+        // ピンクのリボン
+        ctx.fillStyle = '#f472b6';
+        ctx.beginPath();
+        ctx.moveTo(128, 72); ctx.lineTo(92, 52); ctx.lineTo(92, 92); ctx.closePath(); ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(128, 72); ctx.lineTo(164, 52); ctx.lineTo(164, 92); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#db2777';
+        ctx.beginPath(); ctx.arc(128, 72, 11, 0, Math.PI * 2); ctx.fill();
+        // ハートマーク
+        ctx.fillStyle = '#f472b6';
+        ctx.font = '900 44px "M PLUS Rounded 1c", sans-serif';
+        ctx.fillText('♥', 128, 156);
+      } else if (skinId === 'gold_vip') {
+        const g = ctx.createLinearGradient(0, 0, 256, 256);
+        g.addColorStop(0, '#f59e0b');
+        g.addColorStop(0.5, '#fef08a');
+        g.addColorStop(1, '#b45309');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 256, 256);
+        // 白シャツVゾーン
+        ctx.fillStyle = '#fffbeb';
+        ctx.beginPath();
+        ctx.moveTo(88, 0); ctx.lineTo(168, 0); ctx.lineTo(128, 118); ctx.closePath(); ctx.fill();
+        // 黒蝶ネクタイ
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath(); ctx.moveTo(128, 38); ctx.lineTo(96, 22); ctx.lineTo(96, 54); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(128, 38); ctx.lineTo(160, 22); ctx.lineTo(160, 54); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#fbbf24';
+        ctx.beginPath(); ctx.arc(128, 38, 8, 0, Math.PI * 2); ctx.fill();
+        // VIPエンブレム
+        ctx.fillStyle = '#78350f';
+        ctx.font = '900 42px "M PLUS Rounded 1c", sans-serif';
+        ctx.fillText('👑', 128, 168);
+      } else {
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(0, 0, 256, 256);
+
+        ctx.fillStyle = '#10b981';
+        ctx.fillRect(24, 48, 208, 208);
+
+        ctx.strokeStyle = '#fbbf24';
+        ctx.lineWidth = 6;
+        ctx.strokeRect(28, 52, 200, 196);
+
+        ctx.fillStyle = '#fbbf24';
+        ctx.beginPath();
+        ctx.arc(128, 128, 42, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#064e3b';
+        ctx.font = '900 54px "M PLUS Rounded 1c", sans-serif';
+        ctx.fillText('¥', 128, 132);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(148, 66, 62, 24);
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(148, 66, 62, 24);
+        ctx.fillStyle = '#0f172a';
+        ctx.font = '800 14px sans-serif';
+        ctx.fillText('店員', 179, 78);
+      }
 
       const tex = new THREE.CanvasTexture(canvas);
-      textureCache.apron = tex;
+      textureCache[cacheKey] = tex;
       return tex;
     }
 
@@ -6381,10 +7162,11 @@
 
         const innerFloorGeo = new THREE.BoxGeometry(trayWidth - 0.36, 0.14, trayDepth - 0.36);
         const innerFloorMat = new THREE.MeshStandardMaterial({
-          map: getTrayMatTexture(),
+          map: getTrayMatTexture(this.activeTraySkin || 'blue'),
           roughness: 0.75,
           metalness: 0.05
         });
+        this.trayInnerMat = innerFloorMat;
         const innerFloor = new THREE.Mesh(innerFloorGeo, innerFloorMat);
         innerFloor.position.set(0, 0.07, 0);
         innerFloor.receiveShadow = true;
@@ -6460,10 +7242,13 @@
           if (this.scene.fog) this.scene.fog.color.setHex(0x1a1410);
         }
         if (!this.isDopagakiMode) {
-          if (this.trayRimMat) {
-            this.trayRimMat.color.setHex(0x134da8);
-            this.trayRimMat.emissive.setHex(0x000000);
-            this.trayRimMat.emissiveIntensity = 0.0;
+          const tDef = SkinManager.getSkinDef('tray', this.activeTraySkin || 'blue');
+          if (this.trayRimMat && tDef) {
+            this.trayRimMat.color.setHex(tDef.rimHex);
+            this.trayRimMat.emissive.setHex(tDef.rimEmissive || 0x000000);
+            this.trayRimMat.emissiveIntensity = tDef.rimEmissiveIntensity || 0.0;
+            this.trayRimMat.roughness = tDef.rimRoughness;
+            this.trayRimMat.metalness = tDef.rimMetalness;
           }
           if (this.dopaRainbowLight) {
             this.dopaRainbowLight.intensity = 0;
@@ -6485,6 +7270,63 @@
       setDopagakiMode(active) {
         this.isDopagakiMode = Boolean(active);
         this.syncSceneMood();
+      }
+
+      applySkins(selected) {
+        if (!selected) return;
+        this.activeTraySkin = selected.tray || 'blue';
+        this.activeClerkSkin = selected.clerk || 'default';
+        this.activeCoinSkin = selected.coin || 'default';
+
+        // 1. カルトン適用
+        const tDef = SkinManager.getSkinDef('tray', this.activeTraySkin);
+        if (this.trayInnerMat) {
+          this.trayInnerMat.map = getTrayMatTexture(this.activeTraySkin);
+          this.trayInnerMat.roughness = tDef.matRoughness;
+          this.trayInnerMat.metalness = tDef.matMetalness;
+          this.trayInnerMat.needsUpdate = true;
+        }
+        if (this.trayRimMat && !this.isDopagakiMode) {
+          this.trayRimMat.color.setHex(tDef.rimHex);
+          this.trayRimMat.emissive.setHex(tDef.rimEmissive || 0x000000);
+          this.trayRimMat.emissiveIntensity = tDef.rimEmissiveIntensity || 0.0;
+          this.trayRimMat.roughness = tDef.rimRoughness;
+          this.trayRimMat.metalness = tDef.rimMetalness;
+        }
+
+        // 2. 店員さん適用
+        const cDef = SkinManager.getSkinDef('clerk', this.activeClerkSkin);
+        if (this.clerkTorsoMat) {
+          this.clerkTorsoMat.map = getClerkApronTexture(this.activeClerkSkin);
+          this.clerkTorsoMat.needsUpdate = true;
+        }
+        if (this.clerkCapMat) this.clerkCapMat.color.setHex(cDef.capHex);
+        if (this.clerkVisorMat) this.clerkVisorMat.color.setHex(cDef.visorHex);
+        if (this.clerkBadgeMat) this.clerkBadgeMat.color.setHex(cDef.badgeHex);
+        if (this.clerkCollarMat) this.clerkCollarMat.color.setHex(cDef.collarHex);
+        if (this.clerkSleeveMat) this.clerkSleeveMat.color.setHex(cDef.sleeveHex);
+        if (this.clerkHairMat) this.clerkHairMat.color.setHex(cDef.hairHex);
+
+        // 3. コイン色適用（タイトル回転コイン＆現在トレイ上のコインを即更新）
+        const refreshCoinMesh = (mesh, denom) => {
+          if (!mesh || !DENOM_CONFIG[denom] || DENOM_CONFIG[denom].type !== 'coin') return;
+          if (!Array.isArray(mesh.material) || mesh.material.length < 3) return;
+          const pal = getCoinSkinPalette(denom, this.activeCoinSkin);
+          const tex = getCoinTexture(denom, this.activeCoinSkin);
+          mesh.material[0].color.set(pal.rimColor);
+          mesh.material[0].emissive.set(pal.isNeon ? pal.rimColor : '#000000');
+          mesh.material[0].emissiveIntensity = pal.isNeon ? 0.45 : 0.0;
+          mesh.material[0].metalness = Math.min(0.96, pal.metalness + 0.08);
+          mesh.material[0].roughness = Math.max(0.08, pal.roughness - 0.05);
+          [1, 2].forEach((idx) => {
+            mesh.material[idx].map = tex;
+            mesh.material[idx].metalness = pal.metalness * 0.82;
+            mesh.material[idx].roughness = Math.max(0.10, pal.roughness - 0.04);
+            mesh.material[idx].needsUpdate = true;
+          });
+        };
+        this.titleOrbitCoins.forEach((c) => refreshCoinMesh(c.mesh, c.mesh.userData && c.mesh.userData.denom));
+        this.trayItems.forEach((it) => refreshCoinMesh(it.mesh, it.denom));
       }
 
       triggerDamageShake(intensity = 0.42, duration = 0.48) {
@@ -6564,6 +7406,7 @@
           roughness: 0.55,
           metalness: 0.05
         });
+        this.clerkTorsoMat = torsoMat;
         const torso = new THREE.Mesh(torsoGeo, torsoMat);
         torso.position.set(0, 0.86, 0);
         torso.rotation.y = -Math.PI / 2;
@@ -6573,6 +7416,7 @@
 
         const collarGeo = new THREE.TorusGeometry(0.43, 0.085, 10, 20);
         const collarMat = new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.5 });
+        this.clerkCollarMat = collarMat;
         const collar = new THREE.Mesh(collarGeo, collarMat);
         collar.position.set(0, 1.68, 0);
         collar.rotation.x = Math.PI / 2;
@@ -6609,6 +7453,7 @@
         this.clerkHeadGroup.add(rightEar);
 
         const hairMat = new THREE.MeshStandardMaterial({ color: 0x3e2723, roughness: 0.7 });
+        this.clerkHairMat = hairMat;
         const backHairGeo = new THREE.SphereGeometry(0.66, 20, 20, 0, Math.PI * 2, 0, Math.PI * 0.65);
         const backHair = new THREE.Mesh(backHairGeo, hairMat);
         backHair.rotation.x = -0.35;
@@ -6686,6 +7531,8 @@
         const capGroup = new THREE.Group();
         const capMat = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.45 });
         const visorMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, roughness: 0.4 });
+        this.clerkCapMat = capMat;
+        this.clerkVisorMat = visorMat;
 
         const capDomeGeo = new THREE.SphereGeometry(0.67, 20, 16, 0, Math.PI * 2, 0, Math.PI * 0.48);
         const capDome = new THREE.Mesh(capDomeGeo, capMat);
@@ -6700,6 +7547,7 @@
 
         const badgeGeo = new THREE.CircleGeometry(0.135, 16);
         const badgeMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+        this.clerkBadgeMat = badgeMat;
         const badge = new THREE.Mesh(badgeGeo, badgeMat);
         badge.position.set(0, 0.42, 0.62);
         badge.rotation.x = -0.25;
@@ -6708,6 +7556,7 @@
         this.clerkHeadGroup.add(capGroup);
 
         const sleeveMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.5 });
+        this.clerkSleeveMat = sleeveMat;
         const armGeo = new THREE.CylinderGeometry(0.14, 0.12, 0.80, 12);
         const handGeo = new THREE.SphereGeometry(0.15, 12, 12);
 
@@ -6998,17 +7847,21 @@
         let mesh;
 
         if (cfg.type === 'coin') {
+          const coinSkin = this.activeCoinSkin || 'default';
+          const pal = getCoinSkinPalette(denom, coinSkin);
           const geo = new THREE.CylinderGeometry(cfg.radius, cfg.radius, cfg.thickness, 40);
-          const topTex = getCoinTexture(denom);
+          const topTex = getCoinTexture(denom, coinSkin);
           const sideMat = new THREE.MeshStandardMaterial({
-            color: cfg.rimColor,
-            metalness: Math.min(0.96, cfg.metalness + 0.08),
-            roughness: Math.max(0.08, cfg.roughness - 0.05)
+            color: pal.rimColor,
+            emissive: pal.isNeon ? pal.rimColor : '#000000',
+            emissiveIntensity: pal.isNeon ? 0.45 : 0.0,
+            metalness: Math.min(0.96, pal.metalness + 0.08),
+            roughness: Math.max(0.08, pal.roughness - 0.05)
           });
           const faceMat = new THREE.MeshStandardMaterial({
             map: topTex,
-            metalness: cfg.metalness * 0.82,
-            roughness: Math.max(0.10, cfg.roughness - 0.04)
+            metalness: pal.metalness * 0.82,
+            roughness: Math.max(0.10, pal.roughness - 0.04)
           });
           mesh = new THREE.Mesh(geo, [sideMat, faceMat, faceMat]);
         } else {
@@ -10409,6 +11262,7 @@
           answerCount: this.game.runAnswerCount || 0,
           mistakeLogs: this.game.mistakeLogs || []
         });
+        this.game.checkAndNotifyNewSkins();
 
         const ruleLabel = isJammer
           ? '❤️ HPお邪魔バトル'
@@ -10601,6 +11455,8 @@
         this.syncDopagakiUI();
         this.syncVibrationUI();
         this.syncRuleToggleUI();
+        SkinManager.initSeenUnlocksIfNeeded();
+        this.applyCurrentSkins();
         this.updateUnlockAndCumulativeUI();
         sound.syncSoundButtonsUI();
       }
@@ -11137,6 +11993,47 @@
             }
           });
         }
+
+        // スキン着せ替えモーダル
+        ['btn-title-skins', 'btn-mode-skins', 'btn-hud-skins', 'btn-toast-open-skins'].forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.addEventListener('click', () => {
+              this.closeGameSettingsModal();
+              this.hideSkinUnlockToast();
+              sound.playClick();
+              this.openSkinsModal();
+            });
+          }
+        });
+        const closeSkins = () => {
+          sound.playReturn();
+          const m = document.getElementById('modal-skins');
+          if (m) {
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+          }
+        };
+        const btnCloseSkins = document.getElementById('btn-close-skins');
+        const btnDoneSkins = document.getElementById('btn-skins-done');
+        if (btnCloseSkins) btnCloseSkins.addEventListener('click', closeSkins);
+        if (btnDoneSkins) btnDoneSkins.addEventListener('click', closeSkins);
+        const skinsModalBg = document.getElementById('modal-skins');
+        if (skinsModalBg) {
+          skinsModalBg.addEventListener('click', (e) => {
+            if (e.target === skinsModalBg) closeSkins();
+          });
+        }
+        ['tray', 'clerk', 'coin'].forEach((cat) => {
+          const tabBtn = document.getElementById(`tab-skin-${cat}`);
+          if (tabBtn) {
+            tabBtn.addEventListener('click', () => {
+              sound.playClick();
+              SkinManager.activeTab = cat;
+              SkinManager.renderToModal(() => this.applyCurrentSkins());
+            });
+          }
+        });
 
         // ソロレシートPNG保存＆コピー
         const btnResSave = document.getElementById('btn-res-receipt-save');
@@ -12970,6 +13867,48 @@
           m.classList.remove('hidden');
           m.classList.add('flex');
         }
+      }
+
+      applyCurrentSkins() {
+        const selected = SkinManager.getSelected();
+        if (this.scene3D && typeof this.scene3D.applySkins === 'function') {
+          this.scene3D.applySkins(selected);
+        }
+      }
+
+      openSkinsModal() {
+        SkinManager.renderToModal(() => this.applyCurrentSkins());
+        const m = document.getElementById('modal-skins');
+        if (m) {
+          m.classList.remove('hidden');
+          m.classList.add('flex');
+        }
+      }
+
+      hideSkinUnlockToast() {
+        if (this._skinToastTimer) {
+          clearTimeout(this._skinToastTimer);
+          this._skinToastTimer = null;
+        }
+        const el = document.getElementById('skin-unlock-toast');
+        if (el) el.classList.add('hidden');
+      }
+
+      checkAndNotifyNewSkins() {
+        const newly = SkinManager.checkNewUnlocks();
+        if (!newly || newly.length === 0) return;
+        const el = document.getElementById('skin-unlock-toast');
+        const txt = document.getElementById('skin-unlock-toast-text');
+        if (!el || !txt) return;
+        const names = newly.map((s) => `「${s.name}」`).join('・');
+        txt.textContent = newly.length === 1
+          ? `${names} を解放しました！`
+          : `${names} など${newly.length}種を解放！`;
+        el.classList.remove('hidden');
+        if (this._skinToastTimer) clearTimeout(this._skinToastTimer);
+        this._skinToastTimer = setTimeout(() => {
+          el.classList.add('hidden');
+        }, 6500);
       }
 
       exportSoloReceipt(action = 'download', btnEl = null) {
@@ -16038,6 +16977,7 @@
           answerCount: this.runAnswerCount,
           mistakeLogs: this.mistakeLogs
         });
+        this.checkAndNotifyNewSkins();
 
         const avgSpdStr = this.runAnswerCount > 0 ? `${(this.runAnswerTimeSum / this.runAnswerCount).toFixed(2)}秒/人` : '--.-秒/人';
         this.lastSoloReceiptInfo = {

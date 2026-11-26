@@ -1,14 +1,21 @@
 {
+  "id": "/",
   "name": "お会計ピッタリマン - 3D小銭スッキリ暗算パズル",
   "short_name": "ピッタリマン",
-  "description": "端数を合わせてお釣りをまとめろ！3Dのカルトンに硬貨・紙幣を出して小銭枚数最小を目指す爽快暗算パズル。",
+  "description": "端数を合わせてお釣りをまとめろ！3Dのカルトンに硬貨・紙幣を出して小銭枚数最小を目指す爽快暗算パズル。通常・ハード・EX・消費税暗算のルナティックや2〜10人のオンライン対戦にも対応！",
   "start_url": "./",
-  "scope": "./",
+  "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "background_color": "#16120e",
   "theme_color": "#16120e",
   "lang": "ja",
+  "launch_handler": {
+    "client_mode": [
+      "focus-existing",
+      "auto"
+    ]
+  },
   "icons": [
     {
       "src": "./assets/img/icon-192.png",

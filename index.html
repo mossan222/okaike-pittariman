@@ -2883,19 +2883,24 @@
       </div>
 
       <!-- Room Code Banner -->
-      <div class="bg-slate-950 border-2 border-amber-400/70 rounded-2xl px-3.5 py-2.5 mb-3 flex items-center justify-between gap-2">
-        <div class="text-left">
-          <div class="text-[10px] font-black text-amber-300">ルームコード（友達に共有）</div>
-          <div id="vs-room-code-display" class="font-digital text-3xl sm:text-4xl font-black text-white tracking-[0.25em] leading-none mt-0.5">0000</div>
+      <div class="bg-slate-950 border-2 border-amber-400/70 rounded-2xl px-3.5 py-2.5 mb-3">
+        <div class="flex items-center justify-between gap-2">
+          <div class="text-left">
+            <div class="text-[10px] font-black text-amber-300">ルームコード（友達に共有）</div>
+            <div id="vs-room-code-display" class="font-digital text-3xl sm:text-4xl font-black text-white tracking-[0.25em] leading-none mt-0.5">0000</div>
+          </div>
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 shrink-0">
+            <button id="btn-vs-copy-code" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-400/70 font-black text-[11px] px-2.5 py-1.5 rounded-xl">
+              📋 コード
+            </button>
+            <button id="btn-vs-copy-invite" type="button" class="btn-3d bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-slate-950 font-black text-xs px-3 py-2 rounded-xl border-b-4 border-amber-700 shadow">
+              🔗 招待URLコピー
+            </button>
+          </div>
         </div>
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 shrink-0">
-          <button id="btn-vs-copy-code" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-400/70 font-black text-[11px] px-2.5 py-1.5 rounded-xl">
-            📋 コード
-          </button>
-          <button id="btn-vs-copy-invite" type="button" class="btn-3d bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-slate-950 font-black text-xs px-3 py-2 rounded-xl border-b-4 border-amber-700 shadow">
-            🔗 招待URLコピー
-          </button>
-        </div>
+        <p class="mt-2 pt-1.5 border-t border-slate-800 text-[10px] sm:text-[11px] text-slate-300 text-left leading-snug">
+          📱 <strong class="text-amber-200">iPhoneの方へ：</strong>iOSの仕様上、招待URLはホーム画面に追加したアプリには直接繋がらずブラウザで開きます。アプリで参加したい場合は、上の4桁コードをコピーしてアプリ側から入室してください。
+        </p>
       </div>
 
       <!-- Random Match Bot Auto-Fill Countdown Bar (Shown only in Random Match waiting room) -->
@@ -3778,7 +3783,7 @@
 
   <!-- APP VERSION BADGE (Bottom-Left, Non-Interactive, iPhone Safe-Area Adjusted) -->
   <div id="app-version-badge" class="fixed z-[60] pointer-events-none select-none font-digital text-[10px] sm:text-[11px] font-bold tracking-wider text-slate-300/80 bg-slate-950/55 border border-slate-700/50 rounded-md px-1.5 py-0.5 leading-none" style="z-index: 60; left: calc(env(safe-area-inset-left, 0px) + 18px); bottom: calc(env(safe-area-inset-bottom, 0px) + 6px);">
-    ver.1.97
+    ver.1.99
   </div>
 
   <!-- =========================================================================
@@ -3788,7 +3793,7 @@
     /*************************************************************************
      * 1. 定数・金種データ・2種類ランキング初期データ定義
      *************************************************************************/
-    const APP_VERSION = 'ver.1.97';
+    const APP_VERSION = 'ver.1.99';
     (() => {
       const vb = document.getElementById('app-version-badge');
       if (vb) vb.textContent = APP_VERSION;
@@ -10166,6 +10171,10 @@
             name: cleanName,
             bestScore: bestScore
           });
+          const roomInput = document.getElementById('input-vs-room-my-name');
+          if (roomInput) {
+            roomInput.classList.remove('border-amber-400', 'ring-2', 'ring-amber-400/70');
+          }
           const btn = document.getElementById('btn-vs-room-update-name');
           if (btn) {
             btn.textContent = '✅ 変更済';
@@ -20563,37 +20572,65 @@
       switchScreen('screen-title');
       sound.tryAutoStartBGM();
 
-      // 招待URL (?room=XXXX) が指定されている場合：名前登録済みなら自動入室、未登録なら名前入力を促す
+      // 招待URL (?room=XXXX) から直接ルームへ自動入室する共通ハンドラ（初回起動＆PWA launchQueue両対応）
+      const handleInviteRoomAutoJoin = (rawRoomCode) => {
+        const inviteRoom = String(rawRoomCode || '').trim();
+        if (!/^\d{4}$/.test(inviteRoom) || !game.versus) return;
+        if (game.versus.roomCode === inviteRoom && game.versus.roomRef) return;
+        if (game.versus.roomRef) {
+          game.versus.leaveRoom();
+        }
+        game.versus.openLobby();
+        const codeInput = document.getElementById('input-vs-room-code');
+        if (codeInput) codeInput.value = inviteRoom;
+
+        const savedName = (RankingManager.getSavedPlayerName() || '').trim();
+        const hasValidName = Boolean(savedName && savedName !== '名無しの会計士');
+
+        let attempts = 0;
+        const tryAutoJoin = async () => {
+          attempts++;
+          if (!game.versus.getDb() && attempts < 12) {
+            setTimeout(tryAutoJoin, 250);
+            return;
+          }
+          const ok = await game.versus.joinRoomByCode(inviteRoom, false);
+          if (ok && !hasValidName) {
+            // 名前未登録のまま入室した場合は、待機ルーム内の名前入力欄を強調してすぐ変更できるようにする
+            const roomMyNameInput = document.getElementById('input-vs-room-my-name');
+            if (roomMyNameInput) {
+              roomMyNameInput.placeholder = 'ここで名前を変更できます！';
+              roomMyNameInput.classList.add('border-amber-400', 'ring-2', 'ring-amber-400/70');
+            }
+          }
+        };
+        setTimeout(tryAutoJoin, 200);
+      };
+
       try {
         const urlParams = new URLSearchParams(window.location.search);
         const inviteRoom = (urlParams.get('room') || '').trim();
-        if (/^\d{4}$/.test(inviteRoom) && game.versus) {
+        if (/^\d{4}$/.test(inviteRoom)) {
           try {
             window.history.replaceState({}, '', window.location.pathname + window.location.hash);
           } catch (e) {}
-          game.versus.openLobby();
-          const codeInput = document.getElementById('input-vs-room-code');
-          if (codeInput) codeInput.value = inviteRoom;
+          handleInviteRoomAutoJoin(inviteRoom);
+        }
+      } catch (e) {}
 
-          const savedName = (RankingManager.getSavedPlayerName() || '').trim();
-          const hasValidName = Boolean(savedName && savedName !== '名無しの会計士');
-          if (hasValidName) {
-            setTimeout(() => {
-              game.versus.joinRoomByCode(inviteRoom);
-            }, 300);
-          } else {
-            const inviteBanner = document.getElementById('vs-invite-banner');
-            const inviteBadge = document.getElementById('vs-invite-room-badge');
-            const nameInput = document.getElementById('input-vs-name');
-            if (inviteBadge) inviteBadge.textContent = `ROOM ${inviteRoom}`;
-            if (inviteBanner) inviteBanner.classList.remove('hidden');
-            if (nameInput) {
-              nameInput.classList.add('border-amber-400', 'ring-2', 'ring-amber-400/60');
-              setTimeout(() => {
-                try { nameInput.focus(); } catch (e) {}
-              }, 120);
-            }
-          }
+      // PWA（インストール済みアプリ）が起動中に招待リンクを受け取った場合のハンドラ
+      try {
+        if ('launchQueue' in window && window.launchQueue && typeof window.launchQueue.setConsumer === 'function') {
+          window.launchQueue.setConsumer((launchParams) => {
+            if (!launchParams || !launchParams.targetURL) return;
+            try {
+              const u = new URL(launchParams.targetURL);
+              const qRoom = (u.searchParams.get('room') || '').trim();
+              if (/^\d{4}$/.test(qRoom)) {
+                handleInviteRoomAutoJoin(qRoom);
+              }
+            } catch (e) {}
+          });
         }
       } catch (e) {}
 

@@ -2720,6 +2720,20 @@
         </button>
       </div>
 
+      <!-- Invite URL Banner (Shown when opened via ?room=XXXX without saved name) -->
+      <div id="vs-invite-banner" class="hidden mb-3 bg-gradient-to-r from-amber-950/95 via-fuchsia-950/85 to-cyan-950/90 border-2 border-amber-400 rounded-2xl p-3 text-left shadow-lg">
+        <div class="flex items-center justify-between gap-2 mb-1">
+          <span class="text-xs sm:text-sm font-black text-amber-300">📩 対戦ルームに招待されました！</span>
+          <span id="vs-invite-room-badge" class="font-digital text-xs font-black px-2 py-0.5 rounded-full bg-amber-400 text-slate-950">ROOM ----</span>
+        </div>
+        <p class="text-[11px] sm:text-xs font-bold text-slate-200 leading-snug mb-2">
+          下の欄に<strong>あなたの名前</strong>を入力してから「招待ルームに入室！」を押してください（空欄のまま入室すると「名無しの会計士」になります）。
+        </p>
+        <button id="btn-vs-invite-quick-join" type="button" class="btn-3d w-full bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-slate-950 font-black text-xs sm:text-sm py-2 rounded-xl border-b-4 border-emerald-800 shadow">
+          🚪 この名前で招待ルームに入室！
+        </button>
+      </div>
+
       <!-- Player Name Input -->
       <div class="mb-3.5 text-left">
         <label for="input-vs-name" class="block text-xs font-bold text-fuchsia-300 mb-1">対戦で表示する名前（最大10文字）</label>
@@ -2727,7 +2741,7 @@
           id="input-vs-name"
           type="text"
           maxlength="10"
-          placeholder="名無しの会計士"
+          placeholder="名前を入力（未入力時は名無しの会計士）"
           class="w-full bg-slate-800 border-2 border-slate-600 focus:border-fuchsia-400 rounded-xl px-3.5 py-2.5 text-sm sm:text-base font-extrabold text-white outline-none transition-colors"
         />
       </div>
@@ -2888,6 +2902,21 @@
       <div id="vs-room-bot-countdown-bar" class="hidden mb-2.5 bg-amber-950/80 border border-amber-400/80 rounded-xl px-3 py-1.5 flex items-center justify-between gap-2 text-xs font-black">
         <span class="text-amber-200">🤖 自動マッチング待機中</span>
         <span id="vs-room-bot-countdown-text" class="font-digital text-amber-300">残りをbotで埋めるまで 20.0秒</span>
+      </div>
+
+      <!-- My Player Name Quick Edit in Waiting Room -->
+      <div class="bg-slate-950/85 border border-fuchsia-500/40 rounded-2xl px-3 py-2 mb-2.5 flex items-center gap-2 text-left">
+        <span class="text-xs font-black text-fuchsia-300 shrink-0">👤 あなたの名前</span>
+        <input
+          id="input-vs-room-my-name"
+          type="text"
+          maxlength="10"
+          placeholder="名前を入力..."
+          class="flex-1 min-w-0 bg-slate-900 border border-slate-600 focus:border-fuchsia-400 rounded-lg px-2.5 py-1 text-xs sm:text-sm font-black text-white outline-none"
+        />
+        <button id="btn-vs-room-update-name" type="button" class="btn-3d shrink-0 bg-fuchsia-500 hover:bg-fuchsia-400 text-slate-950 font-black text-[11px] px-2.5 py-1 rounded-lg">
+          変更
+        </button>
       </div>
 
       <!-- Players Box (2〜10人対応) -->
@@ -3749,7 +3778,7 @@
 
   <!-- APP VERSION BADGE (Bottom-Left, Non-Interactive, iPhone Safe-Area Adjusted) -->
   <div id="app-version-badge" class="fixed z-[60] pointer-events-none select-none font-digital text-[10px] sm:text-[11px] font-bold tracking-wider text-slate-300/80 bg-slate-950/55 border border-slate-700/50 rounded-md px-1.5 py-0.5 leading-none" style="z-index: 60; left: calc(env(safe-area-inset-left, 0px) + 18px); bottom: calc(env(safe-area-inset-bottom, 0px) + 6px);">
-    ver.1.94
+    ver.1.96
   </div>
 
   <!-- =========================================================================
@@ -3759,7 +3788,7 @@
     /*************************************************************************
      * 1. 定数・金種データ・2種類ランキング初期データ定義
      *************************************************************************/
-    const APP_VERSION = 'ver.1.94';
+    const APP_VERSION = 'ver.1.96';
     (() => {
       const vb = document.getElementById('app-version-badge');
       if (vb) vb.textContent = APP_VERSION;
@@ -9772,6 +9801,33 @@
           this.joinRoomByCode(code, false);
         });
 
+        const btnInviteQuickJoin = document.getElementById('btn-vs-invite-quick-join');
+        if (btnInviteQuickJoin) {
+          btnInviteQuickJoin.addEventListener('click', () => {
+            sound.init();
+            sound.startBGM();
+            sound.playClick();
+            const code = (document.getElementById('input-vs-room-code').value || '').trim();
+            this.joinRoomByCode(code, false);
+          });
+        }
+
+        const inputVsName = document.getElementById('input-vs-name');
+        if (inputVsName) {
+          inputVsName.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              const code = (document.getElementById('input-vs-room-code').value || '').trim();
+              if (/^\d{4}$/.test(code)) {
+                e.preventDefault();
+                sound.init();
+                sound.startBGM();
+                sound.playClick();
+                this.joinRoomByCode(code, false);
+              }
+            }
+          });
+        }
+
         document.getElementById('input-vs-room-code').addEventListener('keydown', (e) => {
           if (e.key === 'Enter') {
             e.preventDefault();
@@ -9779,6 +9835,22 @@
             this.joinRoomByCode(code, false);
           }
         });
+
+        const btnRoomUpdateName = document.getElementById('btn-vs-room-update-name');
+        const inputRoomMyName = document.getElementById('input-vs-room-my-name');
+        if (btnRoomUpdateName && inputRoomMyName) {
+          const applyRoomName = () => {
+            sound.playClick();
+            this.updateMyRoomPlayerName(inputRoomMyName.value);
+          };
+          btnRoomUpdateName.addEventListener('click', applyRoomName);
+          inputRoomMyName.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              applyRoomName();
+            }
+          });
+        }
 
         document.getElementById('btn-vs-room-leave').addEventListener('click', () => {
           sound.playReturn();
@@ -10019,8 +10091,18 @@
         if (this.game && typeof this.game.clearScreenJammerCoins === 'function') this.game.clearScreenJammerCoins();
         if (this.game && typeof this.game.clearBlackoutFreeze === 'function') this.game.clearBlackoutFreeze();
 
+        const savedRaw = (RankingManager.getSavedPlayerName() || '').trim();
+        const gameRaw = (this.game.playerName || '').trim();
+        const validSaved = (savedRaw && savedRaw !== '名無しの会計士')
+          ? savedRaw
+          : ((gameRaw && gameRaw !== '名無しの会計士') ? gameRaw : '');
         const nameInput = document.getElementById('input-vs-name');
-        if (nameInput) nameInput.value = RankingManager.getSavedPlayerName() || this.game.playerName || '';
+        if (nameInput) {
+          nameInput.value = validSaved;
+          nameInput.classList.remove('border-amber-400', 'ring-2', 'ring-amber-400/60');
+        }
+        const inviteBanner = document.getElementById('vs-invite-banner');
+        if (inviteBanner) inviteBanner.classList.add('hidden');
         const errEl = document.getElementById('vs-lobby-error');
         if (errEl) errEl.classList.add('hidden');
         if (this.randomSizeMode === 'any') {
@@ -10054,10 +10136,42 @@
 
       getEnteredPlayerName() {
         const input = document.getElementById('input-vs-name');
-        const name = RankingManager.normalizeName(input ? input.value : this.game.playerName);
+        const raw = input ? String(input.value || '').trim() : '';
+        const fallback = (this.game.playerName && this.game.playerName !== '名無しの会計士')
+          ? this.game.playerName
+          : '';
+        const chosen = raw || fallback;
+        const name = RankingManager.normalizeName(chosen);
         this.game.playerName = name;
-        RankingManager.setSavedPlayerName(name);
+        if (chosen && chosen !== '名無しの会計士') {
+          RankingManager.setSavedPlayerName(chosen);
+        }
         return name;
+      }
+
+      async updateMyRoomPlayerName(rawInput) {
+        if (!this.roomRef || !this.mySlot) return;
+        const trimmed = String(rawInput || '').trim().slice(0, 10);
+        if (!trimmed) return;
+        const cleanName = RankingManager.normalizeName(trimmed);
+        this.game.playerName = cleanName;
+        if (cleanName !== '名無しの会計士') {
+          RankingManager.setSavedPlayerName(cleanName);
+        }
+        const lobbyInput = document.getElementById('input-vs-name');
+        if (lobbyInput) lobbyInput.value = cleanName;
+        const bestScore = this.getMyBestScore(cleanName);
+        try {
+          await this.roomRef.child(`players/${this.mySlot}`).update({
+            name: cleanName,
+            bestScore: bestScore
+          });
+          const btn = document.getElementById('btn-vs-room-update-name');
+          if (btn) {
+            btn.textContent = '✅ 変更済';
+            setTimeout(() => { btn.textContent = '変更'; }, 1200);
+          }
+        } catch (e) {}
       }
 
       generate4DigitCode() {
@@ -13120,6 +13234,12 @@
         const codeEl = document.getElementById('vs-room-code-display');
         if (codeEl) codeEl.textContent = data.code || '----';
 
+        const roomMyNameInput = document.getElementById('input-vs-room-my-name');
+        if (roomMyNameInput && document.activeElement !== roomMyNameInput && this.mySlot && data.players && data.players[this.mySlot]) {
+          const curMyName = String(data.players[this.mySlot].name || '');
+          roomMyNameInput.value = (curMyName && curMyName !== '名無しの会計士') ? curMyName : '';
+        }
+
         const s = { ...this.getDefaultSettings(), ...(data.settings || {}) };
         const maxP = Math.max(2, Math.min(10, Number(s.maxPlayers) || 4));
         const humans = this.getConnectedHumanEntries(data);
@@ -13447,6 +13567,7 @@
             itemChance: prof.itemChance,
             itemTrayJamUses: 3,
             itemStunUses: 3,
+            cooldownUntil: 0,
             nextActionAt: playStartMs + firstDelay,
             nextJammerAt: playStartMs + Math.max(2400, prof.jamCd - 2200) + idx * 800 + Math.random() * 1400,
             nextItemAt: playStartMs + Math.max(4500, prof.itemCd - 2500) + idx * 1200 + Math.random() * 2000
@@ -13466,6 +13587,7 @@
           if (this.game && typeof this.game.isBlackoutFrozen === 'function' && this.game.isBlackoutFrozen()) {
             for (const st of Object.values(this.botStates)) {
               if (!st.finished) {
+                if (st.cooldownUntil) st.cooldownUntil += 350;
                 st.nextActionAt += 350;
                 st.nextJammerAt += 350;
                 if (st.nextItemAt) st.nextItemAt += 350;
@@ -13641,8 +13763,11 @@
                 }
               }
 
+              // プレイヤーと同じお会計後クールタイム（PERFECT時1450ms / ミス時2450ms）をCPUにも付与
+              const checkoutCooldownMs = isPerfect ? 1450 : 2450;
               const paceJitter = st.cpuLevel >= 8 ? (0.85 + Math.random() * 0.30) : (0.75 + Math.random() * 0.55);
-              st.nextActionAt = now + Math.round(st.paceBase * paceJitter);
+              st.cooldownUntil = now + checkoutCooldownMs;
+              st.nextActionAt = now + checkoutCooldownMs + Math.round(st.paceBase * paceJitter);
               updates[`players/${st.slot}`] = {
                 uid: `bot_${st.slot}`,
                 name: st.name,
@@ -20434,7 +20559,7 @@
       switchScreen('screen-title');
       sound.tryAutoStartBGM();
 
-      // 招待URL (?room=XXXX) が指定されている場合はワンタップで自動入室
+      // 招待URL (?room=XXXX) が指定されている場合：名前登録済みなら自動入室、未登録なら名前入力を促す
       try {
         const urlParams = new URLSearchParams(window.location.search);
         const inviteRoom = (urlParams.get('room') || '').trim();
@@ -20445,9 +20570,26 @@
           game.versus.openLobby();
           const codeInput = document.getElementById('input-vs-room-code');
           if (codeInput) codeInput.value = inviteRoom;
-          setTimeout(() => {
-            game.versus.joinRoomByCode(inviteRoom);
-          }, 300);
+
+          const savedName = (RankingManager.getSavedPlayerName() || '').trim();
+          const hasValidName = Boolean(savedName && savedName !== '名無しの会計士');
+          if (hasValidName) {
+            setTimeout(() => {
+              game.versus.joinRoomByCode(inviteRoom);
+            }, 300);
+          } else {
+            const inviteBanner = document.getElementById('vs-invite-banner');
+            const inviteBadge = document.getElementById('vs-invite-room-badge');
+            const nameInput = document.getElementById('input-vs-name');
+            if (inviteBadge) inviteBadge.textContent = `ROOM ${inviteRoom}`;
+            if (inviteBanner) inviteBanner.classList.remove('hidden');
+            if (nameInput) {
+              nameInput.classList.add('border-amber-400', 'ring-2', 'ring-amber-400/60');
+              setTimeout(() => {
+                try { nameInput.focus(); } catch (e) {}
+              }, 120);
+            }
+          }
         }
       } catch (e) {}
 

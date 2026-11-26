@@ -3737,7 +3737,7 @@
       </button>
 
       <div class="text-[10px] text-rose-300/90 font-bold mb-3 bg-rose-950/50 border border-rose-500/40 rounded-xl px-2.5 py-1.5">
-        ⚠️ Lv.9 は超高速＆ほぼノーミスで神域ZONE連打する最強CPUです（1,000万pt級プレイヤー向け）
+        ⚠️ Lv.9 は超高速＆高精度で神会計を連発する最強CPUです（ZONEなし）
       </div>
 
       <button id="btn-vs-cpu-lv-cancel" type="button" class="btn-3d w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-extrabold text-xs sm:text-sm py-2.5 rounded-xl border border-slate-600">
@@ -10112,7 +10112,7 @@
           6: { pace: 2800, jamPace: 3600, perf: 0.80, exPerf: 0.90,  scoreScale: 1.02, useZone: true,  jamResist: 0.76, jamCd: 9200  },
           7: { pace: 2250, jamPace: 2950, perf: 0.86, exPerf: 0.94,  scoreScale: 1.10, useZone: true,  jamResist: 0.66, jamCd: 8000  },
           8: { pace: 1750, jamPace: 2350, perf: 0.92, exPerf: 0.965, scoreScale: 1.19, useZone: true,  jamResist: 0.56, jamCd: 6700  },
-          9: { pace: 1360, jamPace: 1850, perf: 0.96, exPerf: 0.985, scoreScale: 1.28, useZone: true,  jamResist: 0.45, jamCd: 5500  }
+          9: { pace: 1220, jamPace: 1680, perf: 0.96, exPerf: 0.985, scoreScale: 1.28, useZone: false, jamResist: 0.45, jamCd: 5500  }
         };
         const cfg = table[lv] || table[5];
         const jitter = lv >= 8 ? (0.94 + Math.random() * 0.12) : (0.90 + Math.random() * 0.20);

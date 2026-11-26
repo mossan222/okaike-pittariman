@@ -3737,7 +3737,7 @@
       </button>
 
       <div class="text-[10px] text-rose-300/90 font-bold mb-3 bg-rose-950/50 border border-rose-500/40 rounded-xl px-2.5 py-1.5">
-        ⚠️ Lv.9 は超高速＆高精度で神会計を連発する最強CPUです（ZONEなし）
+        ⚠️ 全CPUはZONEなし。Lv.9 は超高速＆高精度で神会計を連発する最強CPUです
       </div>
 
       <button id="btn-vs-cpu-lv-cancel" type="button" class="btn-3d w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-extrabold text-xs sm:text-sm py-2.5 rounded-xl border border-slate-600">
@@ -10102,17 +10102,17 @@
         const isJammer = vsRule === 'jammer';
         const isExOrLun = (diff === 'EX' || diff === 'LUNATIC');
 
-        // Lv.1〜9の段階テーブル（旧Lv.8基準を新Lv.9とし、Lv.1〜8を滑らかに再配分）
+        // Lv.1〜9の段階テーブル（全レベルZONEなし・Lv.9の高速ペースを基準にLv.1〜8を滑らかに配分）
         const table = {
-          1: { pace: 6800, jamPace: 8000, perf: 0.34, exPerf: 0.52,  scoreScale: 0.52, useZone: false, jamResist: 1.00, jamCd: 15500 },
-          2: { pace: 5900, jamPace: 7000, perf: 0.44, exPerf: 0.62,  scoreScale: 0.62, useZone: false, jamResist: 1.00, jamCd: 14200 },
-          3: { pace: 5000, jamPace: 6000, perf: 0.54, exPerf: 0.70,  scoreScale: 0.72, useZone: false, jamResist: 0.96, jamCd: 13000 },
-          4: { pace: 4200, jamPace: 5150, perf: 0.63, exPerf: 0.78,  scoreScale: 0.82, useZone: false, jamResist: 0.92, jamCd: 11800 },
-          5: { pace: 3450, jamPace: 4350, perf: 0.72, exPerf: 0.84,  scoreScale: 0.92, useZone: true,  jamResist: 0.85, jamCd: 10500 },
-          6: { pace: 2800, jamPace: 3600, perf: 0.80, exPerf: 0.90,  scoreScale: 1.02, useZone: true,  jamResist: 0.76, jamCd: 9200  },
-          7: { pace: 2250, jamPace: 2950, perf: 0.86, exPerf: 0.94,  scoreScale: 1.10, useZone: true,  jamResist: 0.66, jamCd: 8000  },
-          8: { pace: 1750, jamPace: 2350, perf: 0.92, exPerf: 0.965, scoreScale: 1.19, useZone: true,  jamResist: 0.56, jamCd: 6700  },
-          9: { pace: 1220, jamPace: 1680, perf: 0.96, exPerf: 0.985, scoreScale: 1.28, useZone: false, jamResist: 0.45, jamCd: 5500  }
+          1: { pace: 6400, jamPace: 7600, perf: 0.34, exPerf: 0.52,  scoreScale: 0.52, useZone: false, jamResist: 1.00, jamCd: 15500 },
+          2: { pace: 5450, jamPace: 6550, perf: 0.44, exPerf: 0.62,  scoreScale: 0.62, useZone: false, jamResist: 1.00, jamCd: 14200 },
+          3: { pace: 4550, jamPace: 5550, perf: 0.54, exPerf: 0.70,  scoreScale: 0.72, useZone: false, jamResist: 0.96, jamCd: 13000 },
+          4: { pace: 3750, jamPace: 4650, perf: 0.63, exPerf: 0.78,  scoreScale: 0.82, useZone: false, jamResist: 0.92, jamCd: 11800 },
+          5: { pace: 3050, jamPace: 3850, perf: 0.72, exPerf: 0.84,  scoreScale: 0.92, useZone: false, jamResist: 0.85, jamCd: 10500 },
+          6: { pace: 2450, jamPace: 3150, perf: 0.80, exPerf: 0.90,  scoreScale: 1.02, useZone: false, jamResist: 0.76, jamCd: 9200  },
+          7: { pace: 1920, jamPace: 2520, perf: 0.86, exPerf: 0.94,  scoreScale: 1.10, useZone: false, jamResist: 0.66, jamCd: 8000  },
+          8: { pace: 1480, jamPace: 1980, perf: 0.92, exPerf: 0.965, scoreScale: 1.19, useZone: false, jamResist: 0.56, jamCd: 6700  },
+          9: { pace: 1080, jamPace: 1500, perf: 0.96, exPerf: 0.985, scoreScale: 1.28, useZone: false, jamResist: 0.45, jamCd: 5500  }
         };
         const cfg = table[lv] || table[5];
         const jitter = lv >= 8 ? (0.94 + Math.random() * 0.12) : (0.90 + Math.random() * 0.20);
@@ -13401,8 +13401,8 @@
         botEntries.forEach(({ slot, player }, idx) => {
           const prof = this.getBotProfile(player.cpuLevel || 5, diff, s.vsRule || 'score');
           const firstDelay = prof.level >= 9
-            ? (1050 + Math.random() * 550)
-            : (prof.level >= 7 ? (1300 + Math.random() * 750) : (1650 + Math.random() * 2000));
+            ? (920 + Math.random() * 480)
+            : (prof.level >= 7 ? (1180 + Math.random() * 680) : (1550 + Math.random() * 1900));
           this.botStates[slot] = {
             slot,
             name: player.name,

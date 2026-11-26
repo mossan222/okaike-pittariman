@@ -3747,6 +3747,11 @@
   </div>
 
 
+  <!-- APP VERSION BADGE (Bottom-Left, Non-Interactive) -->
+  <div id="app-version-badge" class="fixed bottom-1 left-1.5 sm:bottom-1.5 sm:left-2.5 z-[60] pointer-events-none select-none font-digital text-[10px] sm:text-[11px] font-bold tracking-wider text-slate-300/80 bg-slate-950/55 border border-slate-700/50 rounded-md px-1.5 py-0.5 leading-none" style="z-index: 60;">
+    ver.1.92
+  </div>
+
   <!-- =========================================================================
        MAIN GAME SCRIPT
        ========================================================================= -->
@@ -3754,6 +3759,11 @@
     /*************************************************************************
      * 1. 定数・金種データ・2種類ランキング初期データ定義
      *************************************************************************/
+    const APP_VERSION = 'ver.1.92';
+    (() => {
+      const vb = document.getElementById('app-version-badge');
+      if (vb) vb.textContent = APP_VERSION;
+    })();
     const ALL_DENOMS = [10000, 5000, 1000, 500, 100, 50, 10, 5, 1];
     const BILL_DENOMS = [10000, 5000, 1000];
     const COIN_DENOMS = [500, 100, 50, 10, 5, 1];

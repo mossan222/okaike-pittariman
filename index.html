@@ -2476,7 +2476,7 @@
             <!-- Auto (3s automatic PERFECT play) -->
             <button id="btn-vs-item-auto" type="button" disabled class="hidden pointer-events-auto btn-3d bg-gradient-to-b from-cyan-500 to-blue-700 hover:from-cyan-400 hover:to-blue-600 text-white rounded-xl border-2 border-cyan-300 px-1.5 py-1 shadow-lg flex flex-col items-center justify-center leading-tight disabled:opacity-45 disabled:grayscale disabled:cursor-not-allowed relative">
               <span id="key-hint-item-auto" class="hidden sm:inline-block absolute -top-2 -left-1 font-digital text-[9px] font-black px-1.5 py-0.5 rounded bg-slate-950 text-cyan-300 border border-cyan-400 leading-none">G</span>
-              <div class="text-[10px] sm:text-xs font-black flex items-center gap-0.5"><span>🤖</span><span>オート</span><span id="vs-item-auto-uses" class="text-[9px] px-1 rounded bg-slate-950/70 text-cyan-200">残3</span></div>
+              <div class="text-[10px] sm:text-xs font-black flex items-center gap-0.5"><span>🤖</span><span>オート</span><span id="vs-item-auto-uses" class="text-[9px] px-1 rounded bg-slate-950/70 text-cyan-200">残2</span></div>
               <div id="vs-item-auto-sub" class="text-[9px] sm:text-[10px] font-extrabold text-cyan-100 mt-0.5">あと3回神</div>
             </button>
 
@@ -10859,16 +10859,59 @@
         }
 
         const n = slots.length;
-        let bracketSize = 2;
-        while (bracketSize < n) bracketSize *= 2;
-        const totalRounds = Math.round(Math.log2(bracketSize));
-        const enableThirdPlace = Boolean(thirdPlaceMatch && n >= 4 && totalRounds >= 2);
-
         const matches = {};
         const matchOrder = [];
 
+        // ラウンドごとに偶数なら全員対戦（シード0）、奇数なら1人だけシード（不戦勝）
+        let currentNodes = slots.map((s) => ({ type: 'player', slot: s }));
+        const roundsRaw = [];
+        let byeOnTop = false; // 1回戦は奇数のとき末尾1人がシード、次ラウンド以降は上下交互で連続不戦勝を防止
+        let rIdx = 0;
+
+        while (currentNodes.length > 1) {
+          const k = currentNodes.length;
+          const hasBye = (k % 2 === 1);
+          const nextNodes = [];
+          const rMatches = [];
+
+          if (hasBye && byeOnTop) {
+            nextNodes.push(currentNodes[0]);
+            let idx = 1;
+            let mIdx = 0;
+            while (idx + 1 < k) {
+              const mid = `r${rIdx}_m${mIdx}`;
+              rMatches.push({ id: mid, index: mIdx, c1: currentNodes[idx], c2: currentNodes[idx + 1] });
+              nextNodes.push({ type: 'match', id: mid });
+              idx += 2;
+              mIdx++;
+            }
+          } else {
+            let idx = 0;
+            let mIdx = 0;
+            while (idx + 1 < k) {
+              const mid = `r${rIdx}_m${mIdx}`;
+              rMatches.push({ id: mid, index: mIdx, c1: currentNodes[idx], c2: currentNodes[idx + 1] });
+              nextNodes.push({ type: 'match', id: mid });
+              idx += 2;
+              mIdx++;
+            }
+            if (hasBye) {
+              nextNodes.push(currentNodes[k - 1]);
+            }
+          }
+
+          roundsRaw.push(rMatches);
+          if (hasBye) byeOnTop = !byeOnTop;
+          currentNodes = nextNodes;
+          rIdx++;
+        }
+
+        const totalRounds = Math.max(1, roundsRaw.length);
+        const semiMatchCount = totalRounds >= 2 ? roundsRaw[totalRounds - 2].length : 0;
+        const enableThirdPlace = Boolean(thirdPlaceMatch && n >= 4 && semiMatchCount === 2);
+        const r0SeedSlot = (n % 2 === 1) ? slots[n - 1] : null;
+
         for (let r = 0; r < totalRounds; r++) {
-          const count = bracketSize / Math.pow(2, r + 1);
           const rLabel = this.getTournamentRoundLabel(r, totalRounds);
           if (enableThirdPlace && r === totalRounds - 1) {
             matches['third_place'] = {
@@ -10878,6 +10921,8 @@
               roundLabel: '🥉 3位決定戦',
               p1: null,
               p2: null,
+              source1Id: null,
+              source2Id: null,
               winner: null,
               loser: null,
               p1Score: 0,
@@ -10892,17 +10937,18 @@
             };
             matchOrder.push('third_place');
           }
-          for (let i = 0; i < count; i++) {
-            const id = `r${r}_m${i}`;
-            const nextMatchId = (r + 1 < totalRounds) ? `r${r + 1}_m${Math.floor(i / 2)}` : null;
-            const nextSlotKey = (i % 2 === 0) ? 'p1' : 'p2';
+
+          const rMatches = roundsRaw[r] || [];
+          rMatches.forEach(({ id, index, c1, c2 }) => {
             matches[id] = {
               id,
               round: r,
-              index: i,
+              index,
               roundLabel: rLabel,
-              p1: null,
-              p2: null,
+              p1: c1.type === 'player' ? c1.slot : null,
+              p2: c2.type === 'player' ? c2.slot : null,
+              source1Id: c1.type === 'match' ? c1.id : null,
+              source2Id: c2.type === 'match' ? c2.id : null,
               winner: null,
               loser: null,
               p1Score: 0,
@@ -10912,59 +10958,25 @@
               isBye: false,
               isThirdPlace: false,
               status: 'pending',
-              nextMatchId,
-              nextSlotKey
+              nextMatchId: null,
+              nextSlotKey: null
             };
+            if (c1.type === 'match' && matches[c1.id]) {
+              matches[c1.id].nextMatchId = id;
+              matches[c1.id].nextSlotKey = 'p1';
+            }
+            if (c2.type === 'match' && matches[c2.id]) {
+              matches[c2.id].nextMatchId = id;
+              matches[c2.id].nextSlotKey = 'p2';
+            }
             matchOrder.push(id);
-          }
-        }
-
-        const r0Count = bracketSize / 2;
-        // 標準トーナメント表（下から上へ勝ち上がる形）に合わせて1回戦をバランス配置（奇数枠優先→偶数枠）
-        // 例: 9人→左端シード＋2・3番目が1回戦＋残り6人シード / 10人→左山1試合・右山1試合＋残り6人シード
-        const spreadOrder = [];
-        if (r0Count <= 1) {
-          spreadOrder.push(0);
-        } else {
-          const bits = Math.round(Math.log2(r0Count));
-          const bitRev = [];
-          for (let i = 0; i < r0Count; i++) {
-            let rev = 0;
-            for (let b = 0; b < bits; b++) {
-              rev = (rev << 1) | ((i >> b) & 1);
-            }
-            bitRev.push(rev);
-          }
-          bitRev.filter((idx) => idx % 2 === 1).forEach((idx) => spreadOrder.push(idx));
-          bitRev.filter((idx) => idx % 2 === 0).forEach((idx) => spreadOrder.push(idx));
-        }
-
-        for (let i = 0; i < r0Count; i++) {
-          matches[`r0_m${i}`].p1 = slots[i] || null;
-        }
-        const extraCount = Math.max(0, n - r0Count);
-        for (let k = 0; k < extraCount; k++) {
-          const targetIdx = spreadOrder[k];
-          matches[`r0_m${targetIdx}`].p2 = slots[r0Count + k] || null;
-        }
-
-        for (let i = 0; i < r0Count; i++) {
-          const m = matches[`r0_m${i}`];
-          if (m.p1 && !m.p2) {
-            m.isBye = true;
-            m.status = 'done';
-            m.winner = m.p1;
-            if (m.nextMatchId && matches[m.nextMatchId]) {
-              matches[m.nextMatchId][m.nextSlotKey] = m.p1;
-              matches[m.nextMatchId][m.nextSlotKey + 'IsSeed'] = true;
-            }
-          }
+          });
         }
 
         let firstMatchId = null;
         for (const id of matchOrder) {
           const m = matches[id];
-          if (m.status === 'pending' && m.p1 && m.p2) {
+          if (m && m.status === 'pending' && m.p1 && m.p2) {
             m.status = 'ready';
             firstMatchId = id;
             break;
@@ -10973,7 +10985,9 @@
 
         return {
           id: 't_' + Date.now(),
-          bracketSize,
+          bracketSize: n,
+          leafSlots: slots,
+          r0SeedSlot,
           totalRounds,
           thirdPlaceEnabled: enableThirdPlace,
           phase: 'draw',
@@ -11855,13 +11869,26 @@
           if (m && !m.isThirdPlace && m.loser) eliminatedSlots.add(m.loser);
         });
 
+        // 共通ヘルパー：葉スロット一覧と各ラウンドの試合配列を取得
+        const allOrder = Array.isArray(t.matchOrder) ? t.matchOrder : Object.keys(t.matches);
+        const matchesByRound = Array.from({ length: t.totalRounds }, () => []);
+        allOrder.forEach((id) => {
+          const m = t.matches[id];
+          if (m && !m.isThirdPlace && !m.isBye && typeof m.round === 'number' && matchesByRound[m.round]) {
+            matchesByRound[m.round].push(m);
+          }
+        });
+        const leafSlotOrder = Array.isArray(t.leafSlots) && t.leafSlots.length > 0
+          ? t.leafSlots
+          : Object.keys(players).filter((k) => players[k] && players[k].name);
+
         // === スマホ版（幅640px未満）専用：画面幅にピッタリ収まる左→右トーナメント表 ===
         if (window.innerWidth < 640) {
           const parentW = stageEl.parentElement ? stageEl.parentElement.clientWidth : (window.innerWidth - 32);
           const treeWidth = Math.max(276, Math.floor(parentW - 22));
-          const r0Count = t.bracketSize / 2;
           const leaves = [];
-          const matchOutPos = {}; // matchId -> { x, y }
+          const leafPos = {};
+          const matchOutPos = {}; // matchId -> { x, y, x1, y1, x2, y2 }
 
           const headerH = 24;
           const leafCardH = 34;
@@ -11875,37 +11902,19 @@
           const stepX = treeAreaW / Math.max(1, t.totalRounds);
           const roundX = (r) => Math.round(leafRightX + (r + 0.62) * stepX);
 
-          for (let i = 0; i < r0Count; i++) {
-            const m0 = t.matches[`r0_m${i}`];
-            if (!m0) continue;
-            if (m0.isBye) {
-              if (m0.p1) {
-                const idx = leaves.length;
-                const cy = headerH + idx * leafStep + leafCardH * 0.5;
-                leaves.push({ slotId: m0.p1, isSeed: true, cy, r0Id: m0.id });
-                matchOutPos[m0.id] = { x: leafRightX, y: cy, isSeedLeaf: true };
-              }
-            } else {
-              const idx1 = leaves.length;
-              const cy1 = headerH + idx1 * leafStep + leafCardH * 0.5;
-              leaves.push({ slotId: m0.p1, isSeed: false, cy: cy1, r0Id: m0.id });
+          leafSlotOrder.forEach((slotId, idx) => {
+            const cy = headerH + idx * leafStep + leafCardH * 0.5;
+            const isSeed = Boolean(t.r0SeedSlot && slotId === t.r0SeedSlot);
+            leaves.push({ slotId, isSeed, cy });
+            leafPos[slotId] = { x: leafRightX, y: cy };
+          });
 
-              const idx2 = leaves.length;
-              const cy2 = headerH + idx2 * leafStep + leafCardH * 0.5;
-              leaves.push({ slotId: m0.p2, isSeed: false, cy: cy2, r0Id: m0.id });
-
-              matchOutPos[m0.id] = { x: roundX(0), y: (cy1 + cy2) * 0.5, y1: cy1, y2: cy2, isSeedLeaf: false };
-            }
-          }
-
-          for (let r = 1; r < t.totalRounds; r++) {
-            const cnt = t.bracketSize / Math.pow(2, r + 1);
-            for (let i = 0; i < cnt; i++) {
-              const mid = `r${r}_m${i}`;
-              const c1 = matchOutPos[`r${r - 1}_m${i * 2}`];
-              const c2 = matchOutPos[`r${r - 1}_m${i * 2 + 1}`];
-              if (!c1 || !c2) continue;
-              matchOutPos[mid] = {
+          for (let r = 0; r < t.totalRounds; r++) {
+            matchesByRound[r].forEach((m) => {
+              const c1 = m.source1Id ? matchOutPos[m.source1Id] : (m.p1 ? leafPos[m.p1] : null);
+              const c2 = m.source2Id ? matchOutPos[m.source2Id] : (m.p2 ? leafPos[m.p2] : null);
+              if (!c1 || !c2) return;
+              matchOutPos[m.id] = {
                 x: roundX(r),
                 y: (c1.y + c2.y) * 0.5,
                 x1: c1.x,
@@ -11913,7 +11922,7 @@
                 x2: c2.x,
                 y2: c2.y
               };
-            }
+            });
           }
 
           const totalLeafCount = Math.max(2, leaves.length);
@@ -11974,15 +11983,12 @@
 
           // トーナメント線＆各試合ノード描画（左→右）
           for (let r = 0; r < t.totalRounds; r++) {
-            const cnt = t.bracketSize / Math.pow(2, r + 1);
-            for (let i = 0; i < cnt; i++) {
-              const mid = `r${r}_m${i}`;
-              const m = t.matches[mid];
-              const pos = matchOutPos[mid];
+            for (const m of matchesByRound[r]) {
+              const pos = matchOutPos[m.id];
               if (!m || m.isBye || !pos) continue;
 
-              const xFrom1 = r === 0 ? leafRightX : pos.x1;
-              const xFrom2 = r === 0 ? leafRightX : pos.x2;
+              const xFrom1 = pos.x1;
+              const xFrom2 = pos.x2;
               const xM = pos.x;
               const y1 = pos.y1;
               const y2 = pos.y2;
@@ -12148,10 +12154,10 @@
         }
 
         // === PC・タブレット版（幅640px以上）：従来の下→上縦型トーナメント表 ===
-        // 1. 最下段（葉ノード）に全参加者を左から右へ均等配置（シードは1枠、1回戦ペアは2枠）
-        const r0Count = t.bracketSize / 2;
+        // 1. 最下段（葉ノード）に全参加者を左から右へ均等配置（偶数人はシード0、奇数人はシード1）
         const leaves = [];
-        const matchOutPos = {}; // matchId -> { x, y }
+        const leafPos = {};
+        const matchOutPos = {}; // matchId -> { x, y, x1, y1, x2, y2 }
         const labelColW = 68;
         const padLeft = labelColW + 14;
         const padRight = 18;
@@ -12161,50 +12167,27 @@
         const topChampH = 62;
         const rowGap = 68;
 
-        for (let i = 0; i < r0Count; i++) {
-          const m0 = t.matches[`r0_m${i}`];
-          if (!m0) continue;
-          if (m0.isBye) {
-            if (m0.p1) {
-              const idx = leaves.length;
-              const cx = padLeft + idx * leafStep + leafCardW * 0.5;
-              leaves.push({ slotId: m0.p1, isSeed: true, cx, r0Id: m0.id });
-              matchOutPos[m0.id] = { x: cx, y: null, isSeedLeaf: true };
-            }
-          } else {
-            const idx1 = leaves.length;
-            const cx1 = padLeft + idx1 * leafStep + leafCardW * 0.5;
-            leaves.push({ slotId: m0.p1, isSeed: false, cx: cx1, r0Id: m0.id });
-
-            const idx2 = leaves.length;
-            const cx2 = padLeft + idx2 * leafStep + leafCardW * 0.5;
-            leaves.push({ slotId: m0.p2, isSeed: false, cx: cx2, r0Id: m0.id });
-
-            matchOutPos[m0.id] = { x: (cx1 + cx2) * 0.5, y: null, x1: cx1, x2: cx2, isSeedLeaf: false };
-          }
-        }
-
-        const totalLeafCount = Math.max(2, leaves.length);
+        const totalLeafCount = Math.max(2, leafSlotOrder.length);
         const treeWidth = Math.max(320, padLeft + totalLeafCount * leafStep - (leafStep - leafCardW) + padRight);
         const finalY = topChampH + 14;
         const roundY = (r) => finalY + (t.totalRounds - 1 - r) * rowGap;
         const leafTopY = roundY(0) + rowGap;
         const treeHeight = leafTopY + leafCardH + 16;
 
+        leafSlotOrder.forEach((slotId, idx) => {
+          const cx = padLeft + idx * leafStep + leafCardW * 0.5;
+          const isSeed = Boolean(t.r0SeedSlot && slotId === t.r0SeedSlot);
+          leaves.push({ slotId, isSeed, cx });
+          leafPos[slotId] = { x: cx, y: leafTopY };
+        });
+
         // 各ラウンドの座標計算
-        for (let i = 0; i < r0Count; i++) {
-          const m0 = t.matches[`r0_m${i}`];
-          if (!m0 || !matchOutPos[m0.id]) continue;
-          matchOutPos[m0.id].y = m0.isBye ? leafTopY : roundY(0);
-        }
-        for (let r = 1; r < t.totalRounds; r++) {
-          const cnt = t.bracketSize / Math.pow(2, r + 1);
-          for (let i = 0; i < cnt; i++) {
-            const mid = `r${r}_m${i}`;
-            const c1 = matchOutPos[`r${r - 1}_m${i * 2}`];
-            const c2 = matchOutPos[`r${r - 1}_m${i * 2 + 1}`];
-            if (!c1 || !c2) continue;
-            matchOutPos[mid] = {
+        for (let r = 0; r < t.totalRounds; r++) {
+          matchesByRound[r].forEach((m) => {
+            const c1 = m.source1Id ? matchOutPos[m.source1Id] : (m.p1 ? leafPos[m.p1] : null);
+            const c2 = m.source2Id ? matchOutPos[m.source2Id] : (m.p2 ? leafPos[m.p2] : null);
+            if (!c1 || !c2) return;
+            matchOutPos[m.id] = {
               x: (c1.x + c2.x) * 0.5,
               y: roundY(r),
               x1: c1.x,
@@ -12212,7 +12195,7 @@
               x2: c2.x,
               y2: c2.y
             };
-          }
+          });
         }
 
         const thirdMatch = t.matches['third_place'] || null;
@@ -12256,15 +12239,12 @@
 
         // 3. SVGトーナメント線 & 各試合ノードを描画
         for (let r = 0; r < t.totalRounds; r++) {
-          const cnt = t.bracketSize / Math.pow(2, r + 1);
-          for (let i = 0; i < cnt; i++) {
-            const mid = `r${r}_m${i}`;
-            const m = t.matches[mid];
-            const pos = matchOutPos[mid];
+          for (const m of matchesByRound[r]) {
+            const pos = matchOutPos[m.id];
             if (!m || m.isBye || !pos) continue;
 
-            const yFrom1 = r === 0 ? leafTopY : pos.y1;
-            const yFrom2 = r === 0 ? leafTopY : pos.y2;
+            const yFrom1 = pos.y1;
+            const yFrom2 = pos.y2;
             const yM = pos.y;
             const x1 = pos.x1;
             const x2 = pos.x2;
@@ -13956,7 +13936,8 @@
         this.vsKoDefeated = false;
         this.vsItemCharges = 0;
         this.vsItemPerfectProgress = 0;
-        this.vsAutoUsesLeft = 3;
+        this.vsAutoUsesLeft = 2;
+        this.vsAutoCooldownPerfects = 0;
         this.vsStunUsesLeft = 3;
         this.vsTrayJamUsesLeft = 3;
         this.vsStunTimeLeft = 0;
@@ -16142,7 +16123,8 @@
         this.vsKoDefeated = false;
         this.vsItemCharges = 0;
         this.vsItemPerfectProgress = 0;
-        this.vsAutoUsesLeft = 3;
+        this.vsAutoUsesLeft = 2;
+        this.vsAutoCooldownPerfects = 0;
         this.vsStunUsesLeft = 3;
         this.vsTrayJamUsesLeft = 3;
         this.vsStunTimeLeft = 0;
@@ -16495,7 +16477,10 @@
         return Boolean(this.isVersusJammerMode() && this.vsSettings && this.vsSettings.itemsEnabled !== false);
       }
 
-      getVersusItemCost() {
+      getVersusItemCost(type = 'default') {
+        if (type === 'auto') {
+          return (this.vsAutoUsesLeft || 0) >= 2 ? 20000 : 40000;
+        }
         return 20000;
       }
 
@@ -16852,17 +16837,21 @@
         if (stunUsesEl) stunUsesEl.textContent = `残${stunLeft}`;
         if (trayJamUsesEl) trayJamUsesEl.textContent = `残${trayJamLeft}`;
 
-        const cost = this.getVersusItemCost();
-        const costLabel = '20,000pt';
+        const cost = this.getVersusItemCost('default');
+        const costLabel = `${cost.toLocaleString()}pt`;
+        const autoCost = this.getVersusItemCost('auto');
+        const autoCostLabel = `${autoCost.toLocaleString()}pt`;
         const canAfford = (this.score || 0) >= cost;
+        const canAffordAuto = (this.score || 0) >= autoCost;
         const hasCharge = (this.vsItemCharges || 0) >= 1;
+        const autoCooldown = Math.max(0, this.vsAutoCooldownPerfects || 0);
         const notStunned = (this.vsStunTimeLeft || 0) <= 0;
         const noScreenJammer = this.getScreenJammerCount() === 0;
         const canUseBase = this.state === 'PLAYING' && hasCharge && canAfford && notStunned && noScreenJammer;
 
         const hasTarget = this.versus ? this.versus.hasAttackableOpponent() : false;
         const isAutoRunning = (this.vsAutoTimeLeft || 0) > 0 || Boolean(this.vsAutoFinishingTurn);
-        const canAuto = canUseBase && autoLeft > 0 && !isAutoRunning;
+        const canAuto = this.state === 'PLAYING' && hasCharge && canAffordAuto && notStunned && noScreenJammer && autoLeft > 0 && autoCooldown <= 0 && !isAutoRunning;
         const canStun = canUseBase && stunLeft > 0 && hasTarget;
         const canTrayJam = canUseBase && trayJamLeft > 0 && hasTarget;
 
@@ -16874,10 +16863,11 @@
         if (autoSub) {
           if (!noScreenJammer) autoSub.textContent = 'お邪魔除去中';
           else if (isAutoRunning) autoSub.textContent = this.vsAutoTimeLeft > 0 ? `発動中 ${this.vsAutoTimeLeft.toFixed(1)}s` : '会計完了中';
-          else if (autoLeft <= 0) autoSub.textContent = '使用上限';
+          else if (autoLeft <= 0) autoSub.textContent = '使用上限(2回)';
+          else if (autoCooldown > 0) autoSub.textContent = `あと${Math.max(autoCooldown, hasCharge ? 0 : remPerfect)}回神`;
           else if (!hasCharge) autoSub.textContent = `あと${remPerfect}回神`;
-          else if (!canAfford) autoSub.textContent = `要${costLabel}`;
-          else autoSub.textContent = `3秒自動 (${costLabel})`;
+          else if (!canAffordAuto) autoSub.textContent = `要${autoCostLabel}`;
+          else autoSub.textContent = `3秒自動 (${autoCostLabel})`;
         }
         if (stunSub) {
           if (!noScreenJammer) stunSub.textContent = 'お邪魔除去中';
@@ -16924,18 +16914,19 @@
           this.showVersusJammerToast(`💣 お邪魔コイン残り${this.getScreenJammerCount()}枚！すべて消すまでアイテム不可！`, true);
           return;
         }
-        const cost = this.getVersusItemCost();
+        const cost = this.getVersusItemCost(type);
         if ((this.vsItemCharges || 0) < 1 || (this.score || 0) < cost) {
           sound.playBadBuzzer();
           return;
         }
 
         if (type === 'auto') {
-          if ((this.vsAutoUsesLeft || 0) <= 0 || (this.vsAutoTimeLeft || 0) > 0 || this.vsAutoFinishingTurn) {
+          if ((this.vsAutoUsesLeft || 0) <= 0 || (this.vsAutoCooldownPerfects || 0) > 0 || (this.vsAutoTimeLeft || 0) > 0 || this.vsAutoFinishingTurn) {
             sound.playBadBuzzer();
             return;
           }
           this.vsAutoUsesLeft -= 1;
+          this.vsAutoCooldownPerfects = 3; // 使用後、自力PERFECTを3回出すまで再使用不可（連続使用禁止）
           this.vsItemCharges = 0;
           this.vsItemPerfectProgress = 0;
           this.score = Math.max(0, (this.score || 0) - cost);
@@ -18225,19 +18216,24 @@
             billBonusInfo = null;
           }
           if (this.isVersusJammerMode() && this.versus) {
-            if (
-              this.isVersusJammerItemsEnabled() &&
-              (this.vsItemCharges || 0) < 1 &&
-              ((this.vsAutoUsesLeft || 0) > 0 || (this.vsStunUsesLeft || 0) > 0 || (this.vsTrayJamUsesLeft || 0) > 0)
-            ) {
-              this.vsItemPerfectProgress = (this.vsItemPerfectProgress || 0) + 1;
-              if (this.vsItemPerfectProgress >= 3) {
-                this.vsItemPerfectProgress = 0;
-                this.vsItemCharges = 1;
+            const isAutoNow = (this.vsAutoTimeLeft || 0) > 0 || Boolean(this.vsAutoFinishingTurn);
+            // オート発動中の自動PERFECTではアイテムチャージ＆オート再使用クールダウンを進めない
+            if (!isAutoNow && this.isVersusJammerItemsEnabled()) {
+              if ((this.vsAutoCooldownPerfects || 0) > 0) {
+                this.vsAutoCooldownPerfects = Math.max(0, this.vsAutoCooldownPerfects - 1);
+              }
+              if (
+                (this.vsItemCharges || 0) < 1 &&
+                ((this.vsAutoUsesLeft || 0) > 0 || (this.vsStunUsesLeft || 0) > 0 || (this.vsTrayJamUsesLeft || 0) > 0)
+              ) {
+                this.vsItemPerfectProgress = (this.vsItemPerfectProgress || 0) + 1;
+                if (this.vsItemPerfectProgress >= 3) {
+                  this.vsItemPerfectProgress = 0;
+                  this.vsItemCharges = 1;
+                }
               }
             }
             const withCoins = this.perfectCount > 0 && this.perfectCount % 3 === 0;
-            const isAutoNow = (this.vsAutoTimeLeft || 0) > 0 || Boolean(this.vsAutoFinishingTurn);
             this.versus.sendJammerToOpponent(this.combo, Boolean(this.scene3D.isZoneActive), withCoins, isAutoNow);
             this.updateVersusHpBar();
           }

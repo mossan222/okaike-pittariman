@@ -2874,9 +2874,14 @@
           <div class="text-[10px] font-black text-amber-300">ルームコード（友達に共有）</div>
           <div id="vs-room-code-display" class="font-digital text-3xl sm:text-4xl font-black text-white tracking-[0.25em] leading-none mt-0.5">0000</div>
         </div>
-        <button id="btn-vs-copy-code" class="btn-3d bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs px-3 py-2 rounded-xl border-b-4 border-amber-700">
-          📋 コピー
-        </button>
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 shrink-0">
+          <button id="btn-vs-copy-code" type="button" class="btn-3d bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-400/70 font-black text-[11px] px-2.5 py-1.5 rounded-xl">
+            📋 コード
+          </button>
+          <button id="btn-vs-copy-invite" type="button" class="btn-3d bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-slate-950 font-black text-xs px-3 py-2 rounded-xl border-b-4 border-amber-700 shadow">
+            🔗 招待URLコピー
+          </button>
+        </div>
       </div>
 
       <!-- Random Match Bot Auto-Fill Countdown Bar (Shown only in Random Match waiting room) -->
@@ -3014,6 +3019,18 @@
             <button data-vs-set="showChange" data-vs-val="false" class="vs-opt-btn btn-3d py-1.5 px-2 rounded-xl text-[11px] font-black border-2">🙈 お釣り非表示（暗算）</button>
           </div>
         </div>
+
+        <!-- 5. High-Score Handicap (Host Selectable) -->
+        <div>
+          <div class="text-[10px] font-bold text-slate-400 mb-1">⚖️ 自己ベストハンデ（高スコア経験者への調整）</div>
+          <div class="grid grid-cols-2 gap-1.5">
+            <button data-vs-set="handicapEnabled" data-vs-val="false" class="vs-opt-btn btn-3d py-1.5 px-2 rounded-xl text-[11px] font-black border-2">🚫 ハンデなし</button>
+            <button data-vs-set="handicapEnabled" data-vs-val="true" class="vs-opt-btn btn-3d py-1.5 px-2 rounded-xl text-[11px] font-black border-2">⚖️ ハンデあり</button>
+          </div>
+          <p id="vs-handicap-explain" class="hidden text-[10px] text-amber-200 font-bold mt-1 leading-snug">
+            ⚖️ 自己ベストptに応じて自動調整：200万+(Lv1: 0.85倍/HP1350/+1神) / 500万+(Lv2: 0.70倍/HP1200/+2神) / 1,000万+(Lv3: 0.55倍/HP1050/+3神)
+          </p>
+        </div>
       </div>
 
       <!-- Quick Stamps (Waiting Room) -->
@@ -3149,6 +3166,9 @@
             <span id="tourney-rule-badge" class="text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-800 text-cyan-300 border border-cyan-400/50">
               スコア対決
             </span>
+            <span id="tourney-header-pred-badge" class="hidden text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500/25 text-amber-200 border border-amber-400/70">
+              🎯 予想的中 0/0
+            </span>
           </div>
           <h2 id="tourney-header-title" class="text-base sm:text-2xl font-black text-white leading-tight mt-0.5">
             🏆 お会計ピッタリマン トーナメント表
@@ -3233,6 +3253,25 @@
                 <span id="tourney-spec-p2-sub" class="text-[10px] font-bold text-slate-300 truncate">神:0回 / 処理:0人</span>
                 <span class="text-[9px] font-black text-fuchsia-300 shrink-0">👁️ 視点を見る ▶</span>
               </div>
+            </div>
+          </div>
+
+          <!-- 観戦ミニゲーム：勝敗予想（ワンタップ投票） -->
+          <div id="tourney-predict-box" class="mt-2 rounded-xl border border-amber-400/60 bg-slate-950/90 p-2 text-left">
+            <div class="flex items-center justify-between gap-2 mb-1.5">
+              <span class="text-[10px] sm:text-xs font-black text-amber-300">🔮 観戦ミニゲーム：どっちが勝つ？</span>
+              <span id="tourney-predict-stats" class="text-[10px] font-black text-emerald-300">🎯 的中 0/0</span>
+            </div>
+            <div class="grid grid-cols-2 gap-1.5">
+              <button id="btn-tourney-predict-p1" type="button" class="btn-3d py-1.5 px-2 rounded-lg text-[11px] font-black border-2 bg-slate-800 hover:bg-cyan-950/80 border-cyan-400/70 text-cyan-200 truncate">
+                🔵 P1 が勝つ！
+              </button>
+              <button id="btn-tourney-predict-p2" type="button" class="btn-3d py-1.5 px-2 rounded-lg text-[11px] font-black border-2 bg-slate-800 hover:bg-fuchsia-950/80 border-fuchsia-400/70 text-fuchsia-200 truncate">
+                🟣 P2 が勝つ！
+              </button>
+            </div>
+            <div id="tourney-predict-status" class="text-[10px] font-bold text-slate-300 mt-1 text-center">
+              タップで勝者を予想！的中すると連勝カウントが増えます
             </div>
           </div>
 
@@ -3525,6 +3564,7 @@
         <div class="bg-slate-950/90 border border-slate-700 rounded-2xl p-2.5">
           <div class="text-[10px] font-bold text-slate-400">平均回答スピード</div>
           <div id="stats-avg-speed" class="font-digital text-lg sm:text-xl font-black text-cyan-300 mt-0.5">--.-秒/人</div>
+          <div id="stats-fastest-perfect" class="text-[9px] sm:text-[10px] text-amber-300 font-black mt-0.5">⚡ 最速神: --.--秒</div>
         </div>
         <div class="bg-slate-950/90 border border-slate-700 rounded-2xl p-2.5">
           <div class="text-[10px] font-bold text-slate-400">通算PERFECT率</div>
@@ -4621,6 +4661,7 @@
           totalPerfect: 0,
           totalAnswerSec: 0,
           totalAnswersCount: 0,
+          fastestPerfectSec: null,
           recentRuns: [],
           vsStats: { played: 0, wins: 0, losses: 0, draws: 0, koWins: 0 },
           digitMistakes: { 1: 0, 5: 0, 10: 0, 50: 0, 100: 0, 500: 0 },
@@ -4656,6 +4697,24 @@
 
       static reset() {
         StatsManager.save(StatsManager.getEmpty());
+      }
+
+      static recordFastestPerfect(elapsedSec) {
+        const sec = Number(elapsedSec);
+        if (!isFinite(sec) || sec <= 0.05 || sec >= 60) {
+          return { isNewRecord: false, sec: null, prevSec: null };
+        }
+        const rounded = Math.round(sec * 100) / 100;
+        const stats = StatsManager.load();
+        const prev = (typeof stats.fastestPerfectSec === 'number' && stats.fastestPerfectSec > 0)
+          ? stats.fastestPerfectSec
+          : null;
+        if (prev === null || rounded < prev) {
+          stats.fastestPerfectSec = rounded;
+          StatsManager.save(stats);
+          return { isNewRecord: true, sec: rounded, prevSec: prev };
+        }
+        return { isNewRecord: false, sec: prev, prevSec: prev };
       }
 
       static analyzeAndAppendMistakes(stats, mistakeLogs) {
@@ -4778,6 +4837,11 @@
 
         const avgSec = stats.totalAnswersCount > 0 ? (stats.totalAnswerSec / stats.totalAnswersCount) : null;
         if (avgSpeedEl) avgSpeedEl.textContent = avgSec !== null ? `${avgSec.toFixed(2)}秒/人` : '--.-秒/人';
+        const fastEl = document.getElementById('stats-fastest-perfect');
+        if (fastEl) {
+          const fSec = (typeof stats.fastestPerfectSec === 'number' && stats.fastestPerfectSec > 0) ? stats.fastestPerfectSec : null;
+          fastEl.textContent = fSec !== null ? `⚡ 最速神: ${fSec.toFixed(2)}秒` : '⚡ 最速神: --.--秒';
+        }
 
         const totalPerfRate = stats.totalServed > 0 ? Math.round((stats.totalPerfect / stats.totalServed) * 100) : null;
         if (perfRateEl) perfRateEl.textContent = totalPerfRate !== null ? `${totalPerfRate}%` : '--%';
@@ -9342,6 +9406,7 @@
           lunaticTaxRate: 8,
           showChange: true,
           itemsEnabled: itemsEnabled !== false,
+          handicapEnabled: false,
           maxPlayers: clamped
         };
       }
@@ -9572,11 +9637,39 @@
             navigator.clipboard.writeText(this.roomCode).catch(() => {});
             const btn = document.getElementById('btn-vs-copy-code');
             if (btn) {
-              btn.textContent = '✅ コピー済!';
-              setTimeout(() => { btn.textContent = '📋 コピー'; }, 1200);
+              btn.textContent = '✅ コピー済';
+              setTimeout(() => { btn.textContent = '📋 コード'; }, 1200);
             }
           }
         });
+
+        const btnCopyInvite = document.getElementById('btn-vs-copy-invite');
+        if (btnCopyInvite) {
+          btnCopyInvite.addEventListener('click', () => {
+            sound.playClick();
+            if (!this.roomCode) return;
+            const baseUrl = (window.location.protocol === 'http:' || window.location.protocol === 'https:')
+              ? (window.location.origin + window.location.pathname)
+              : 'https://okane-lyart.vercel.app/';
+            const inviteUrl = `${baseUrl}?room=${this.roomCode}`;
+            const onCopied = () => {
+              btnCopyInvite.textContent = '✅ URLコピー済!';
+              setTimeout(() => { btnCopyInvite.textContent = '🔗 招待URLコピー'; }, 1400);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(inviteUrl).then(onCopied).catch(() => {
+                window.prompt('この招待URLをコピーして友達に送ってください:', inviteUrl);
+              });
+            } else {
+              window.prompt('この招待URLをコピーして友達に送ってください:', inviteUrl);
+            }
+          });
+        }
+
+        const btnPredP1 = document.getElementById('btn-tourney-predict-p1');
+        const btnPredP2 = document.getElementById('btn-tourney-predict-p2');
+        if (btnPredP1) btnPredP1.addEventListener('click', () => this.castTournamentPrediction('p1'));
+        if (btnPredP2) btnPredP2.addEventListener('click', () => this.castTournamentPrediction('p2'));
 
         document.querySelectorAll('.vs-opt-btn').forEach((btn) => {
           btn.addEventListener('click', () => {
@@ -9585,7 +9678,7 @@
             const key = btn.getAttribute('data-vs-set');
             let val = btn.getAttribute('data-vs-val');
             if (key === 'raceTarget' || key === 'lunaticTaxRate' || key === 'maxPlayers') val = Number(val);
-            if (key === 'showChange' || key === 'itemsEnabled' || key === 'thirdPlaceMatch') val = (val === 'true');
+            if (key === 'showChange' || key === 'itemsEnabled' || key === 'thirdPlaceMatch' || key === 'handicapEnabled') val = (val === 'true');
             if (key === 'maxPlayers') {
               const humans = this.getConnectedHumanEntries(this.lastRoomData).length;
               if (val < Math.max(2, humans)) {
@@ -9794,11 +9887,39 @@
         return String(1000 + Math.floor(Math.random() * 9000));
       }
 
-      makeEmptyPlayer(name, isBot = false, uidOverride = null, pref = null) {
+      getMyBestScore(name = null) {
+        const overall = RankingManager.getOverallMaxScore();
+        const byName = name ? RankingManager.getPlayerMaxScore(name) : 0;
+        const byNameLun = name ? RankingManager.getPlayerLunaticMaxScore(name) : 0;
+        return Math.max(0, Number(overall) || 0, Number(byName) || 0, Number(byNameLun) || 0);
+      }
+
+      getHandicapInfo(bestScore, enabled = false) {
+        if (!enabled) {
+          return { level: 0, scoreMult: 1.0, maxHp: this.VS_JAMMER_MAX_HP, raceExtra: 0, label: '' };
+        }
+        const bs = Math.max(0, Number(bestScore) || 0);
+        if (bs >= 10000000) {
+          return { level: 3, scoreMult: 0.55, maxHp: 1050, raceExtra: 3, label: 'ハンデLv.3' };
+        }
+        if (bs >= 5000000) {
+          return { level: 2, scoreMult: 0.70, maxHp: 1200, raceExtra: 2, label: 'ハンデLv.2' };
+        }
+        if (bs >= 2000000) {
+          return { level: 1, scoreMult: 0.85, maxHp: 1350, raceExtra: 1, label: 'ハンデLv.1' };
+        }
+        return { level: 0, scoreMult: 1.0, maxHp: this.VS_JAMMER_MAX_HP, raceExtra: 0, label: '' };
+      }
+
+      makeEmptyPlayer(name, isBot = false, uidOverride = null, pref = null, bestScoreOverride = null) {
+        const resolvedBest = isBot
+          ? 0
+          : (typeof bestScoreOverride === 'number' ? Math.max(0, Math.floor(bestScoreOverride)) : this.getMyBestScore(name));
         const obj = {
           uid: uidOverride || this.myUid,
           name: name,
           isBot: Boolean(isBot),
+          bestScore: resolvedBest,
           connected: true,
           score: 0,
           combo: 0,
@@ -10001,6 +10122,149 @@
         this.tourneyMatchLaunchedId = null;
         this.tourneyAdvancingMatchId = null;
         this.tourneyChampFxPlayedId = null;
+        this.tourneyPredictions = {};
+        this.tourneyPredHits = 0;
+        this.tourneyPredTotal = 0;
+        this.tourneyPredStreak = 0;
+      }
+
+      castTournamentPrediction(side) {
+        if (!this.lastRoomData || this.lastRoomData.status !== 'tournament_playing') return;
+        const t = this.lastRoomData.tournament;
+        if (!t || !t.activeMatchId || !t.matches) return;
+        const m = t.matches[t.activeMatchId];
+        if (!m || !m.p1 || !m.p2) return;
+        if (this.mySlot === m.p1 || this.mySlot === m.p2) return;
+
+        const matchKey = `${t.id}:${m.id}`;
+        if (!this.tourneyPredictions) this.tourneyPredictions = {};
+        if (this.tourneyPredictions[matchKey]) return;
+
+        const pickSlot = side === 'p1' ? m.p1 : m.p2;
+        const players = this.lastRoomData.players || {};
+        const pickName = (players[pickSlot] && players[pickSlot].name) || pickSlot;
+        this.tourneyPredictions[matchKey] = { pickSlot, pickName, resolved: false };
+        sound.playClick();
+        this.renderTournamentPredictionUI(this.lastRoomData, m);
+      }
+
+      resolveTournamentPredictions(data) {
+        const t = data && data.tournament;
+        if (!t || !t.matches || !this.tourneyPredictions) return;
+        let changed = false;
+        Object.values(t.matches).forEach((m) => {
+          if (!m || m.status !== 'done' || !m.winner) return;
+          const matchKey = `${t.id}:${m.id}`;
+          const pred = this.tourneyPredictions[matchKey];
+          if (!pred || pred.resolved) return;
+          pred.resolved = true;
+          this.tourneyPredTotal = (this.tourneyPredTotal || 0) + 1;
+          changed = true;
+          const isHit = pred.pickSlot === m.winner;
+          if (isHit) {
+            this.tourneyPredHits = (this.tourneyPredHits || 0) + 1;
+            this.tourneyPredStreak = (this.tourneyPredStreak || 0) + 1;
+            sound.playPerfectFanfare();
+            const streakStr = this.tourneyPredStreak >= 2 ? ` 🔥${this.tourneyPredStreak}連勝!` : '';
+            this.showPredictionToast(`🎯 勝敗予想的中!! ${pred.pickName} 勝利！${streakStr}`, true);
+          } else {
+            this.tourneyPredStreak = 0;
+            this.showPredictionToast(`😢 予想ハズレ…（予想: ${pred.pickName}）`, false);
+          }
+        });
+        if (changed) {
+          this.updateTournamentPredictionHeaderBadge();
+        }
+      }
+
+      showPredictionToast(msg, isHit) {
+        const layer = document.getElementById('vs-stamp-layer');
+        if (!layer) return;
+        const toast = document.createElement('div');
+        toast.className = `vs-jammer-toast text-xs sm:text-base border-2 shadow-2xl ${
+          isHit
+            ? 'border-amber-300 bg-gradient-to-r from-emerald-900/95 via-teal-900/95 to-amber-900/95 text-amber-200'
+            : 'border-slate-500 bg-slate-900/95 text-slate-200'
+        }`;
+        toast.style.top = '18%';
+        toast.textContent = msg;
+        layer.appendChild(toast);
+        setTimeout(() => toast.remove(), 2200);
+      }
+
+      updateTournamentPredictionHeaderBadge() {
+        const badge = document.getElementById('tourney-header-pred-badge');
+        if (!badge) return;
+        const total = this.tourneyPredTotal || 0;
+        const hits = this.tourneyPredHits || 0;
+        const streak = this.tourneyPredStreak || 0;
+        if (total <= 0) {
+          badge.classList.add('hidden');
+          return;
+        }
+        badge.classList.remove('hidden');
+        badge.textContent = streak >= 2
+          ? `🎯 予想 ${hits}/${total} 🔥${streak}連勝`
+          : `🎯 予想的中 ${hits}/${total}`;
+      }
+
+      renderTournamentPredictionUI(data, activeMatch) {
+        const box = document.getElementById('tourney-predict-box');
+        const btnP1 = document.getElementById('btn-tourney-predict-p1');
+        const btnP2 = document.getElementById('btn-tourney-predict-p2');
+        const statsEl = document.getElementById('tourney-predict-stats');
+        const statusEl = document.getElementById('tourney-predict-status');
+        if (!box || !btnP1 || !btnP2) return;
+
+        const t = data && data.tournament;
+        const players = (data && data.players) || {};
+        if (!t || !activeMatch || data.status !== 'tournament_playing') {
+          box.classList.add('hidden');
+          return;
+        }
+        box.classList.remove('hidden');
+
+        const p1Name = (players[activeMatch.p1] && players[activeMatch.p1].name) || 'P1';
+        const p2Name = (players[activeMatch.p2] && players[activeMatch.p2].name) || 'P2';
+        const matchKey = `${t.id}:${activeMatch.id}`;
+        const pred = this.tourneyPredictions ? this.tourneyPredictions[matchKey] : null;
+
+        const hits = this.tourneyPredHits || 0;
+        const total = this.tourneyPredTotal || 0;
+        const streak = this.tourneyPredStreak || 0;
+        if (statsEl) {
+          statsEl.textContent = streak >= 2
+            ? `🎯 的中 ${hits}/${total} ｜ 🔥${streak}連勝中`
+            : `🎯 的中 ${hits}/${total}`;
+        }
+
+        btnP1.textContent = `🔵 ${p1Name} が勝つ！`;
+        btnP2.textContent = `🟣 ${p2Name} が勝つ！`;
+
+        if (pred) {
+          btnP1.disabled = true;
+          btnP2.disabled = true;
+          const pickedP1 = pred.pickSlot === activeMatch.p1;
+          btnP1.className = pickedP1
+            ? 'btn-3d py-1.5 px-2 rounded-lg text-[11px] font-black border-2 bg-cyan-400 text-slate-950 border-white shadow truncate'
+            : 'btn-3d py-1.5 px-2 rounded-lg text-[11px] font-black border-2 bg-slate-900 border-slate-700 text-slate-500 opacity-60 truncate';
+          btnP2.className = !pickedP1
+            ? 'btn-3d py-1.5 px-2 rounded-lg text-[11px] font-black border-2 bg-fuchsia-400 text-slate-950 border-white shadow truncate'
+            : 'btn-3d py-1.5 px-2 rounded-lg text-[11px] font-black border-2 bg-slate-900 border-slate-700 text-slate-500 opacity-60 truncate';
+          if (statusEl) {
+            statusEl.textContent = `🔮 予想ロック中：「${pred.pickName}」の勝利に投票済み！`;
+            statusEl.className = 'text-[10px] font-black text-amber-300 mt-1 text-center';
+          }
+        } else {
+          btnP1.disabled = false;
+          btnP2.disabled = false;
+          btnP1.className = 'btn-3d py-1.5 px-2 rounded-lg text-[11px] font-black border-2 bg-slate-800 hover:bg-cyan-950/80 border-cyan-400/70 text-cyan-200 truncate';
+          btnP2.className = 'btn-3d py-1.5 px-2 rounded-lg text-[11px] font-black border-2 bg-slate-800 hover:bg-fuchsia-950/80 border-fuchsia-400/70 text-fuchsia-200 truncate';
+          if (statusEl) {
+            statusEl.textContent = 'タップで勝者を予想！的中すると連勝カウントが増えます';
+            statusEl.className = 'text-[10px] font-bold text-slate-300 mt-1 text-center';
+          }
+        }
       }
 
       stopBotTimers() {
@@ -11040,6 +11304,8 @@
       handleTournamentRoomUpdate(data) {
         const t = data.tournament;
         if (!t || !t.matches) return;
+        this.resolveTournamentPredictions(data);
+        this.updateTournamentPredictionHeaderBadge();
 
         if (data.status === 'tournament_playing') {
           const activeMatch = t.activeMatchId ? t.matches[t.activeMatchId] : null;
@@ -11367,10 +11633,15 @@
         const p2Orig = data.players[m.p2];
         if (!p1Orig || !p2Orig) return;
 
-        const freshP1 = this.makeEmptyPlayer(p1Orig.name, Boolean(p1Orig.isBot), p1Orig.uid);
-        const freshP2 = this.makeEmptyPlayer(p2Orig.name, Boolean(p2Orig.isBot), p2Orig.uid);
+        const s = { ...this.getDefaultSettings(), ...(data.settings || {}) };
+        const freshP1 = this.makeEmptyPlayer(p1Orig.name, Boolean(p1Orig.isBot), p1Orig.uid, null, Number(p1Orig.bestScore || 0));
+        const freshP2 = this.makeEmptyPlayer(p2Orig.name, Boolean(p2Orig.isBot), p2Orig.uid, null, Number(p2Orig.bestScore || 0));
         freshP1.connected = p1Orig.isBot ? true : (p1Orig.connected !== false);
         freshP2.connected = p2Orig.isBot ? true : (p2Orig.connected !== false);
+        const h1 = this.getHandicapInfo(freshP1.bestScore, Boolean(s.handicapEnabled));
+        const h2 = this.getHandicapInfo(freshP2.bestScore, Boolean(s.handicapEnabled));
+        freshP1.maxHp = h1.maxHp; freshP1.hp = h1.maxHp; freshP1.handicapLevel = h1.level;
+        freshP2.maxHp = h2.maxHp; freshP2.hp = h2.maxHp; freshP2.handicapLevel = h2.level;
         const freshJam = { seq: 0, c1: 0, c10: 0, damage: 0, totalDamage: 0, isZone: false, stunSec: 0, trayJamCoins: null, fromCombo: 0, fromName: '' };
 
         const seed = Math.floor(Math.random() * 2147483640) + 1;
@@ -11823,6 +12094,7 @@
             if (povP1Btn) povP1Btn.className = this.spectatePovSlot === activeMatch.p1 ? activeBtnCls : idleP1Cls;
             if (povP2Btn) povP2Btn.className = this.spectatePovSlot === activeMatch.p2 ? activeBtnCls : idleP2Cls;
 
+            this.renderTournamentPredictionUI(data, activeMatch);
             this.renderSpectatePovPanel(data, activeMatch, s);
             this.renderSpectateItemLog();
           } else {
@@ -12631,11 +12903,17 @@
             const roleTag = i === 1 ? '👑 HOST' : (occupied && p.isBot ? '🤖 BOT' : `${i}P`);
             const nameText = occupied ? escapeHtml(p.name) : '空き枠';
             const statusText = occupied ? (isMe ? '● あなた' : '● 準備OK') : '待機中...';
+            const pBest = occupied && !p.isBot ? Number(p.bestScore || 0) : 0;
+            const hInfo = occupied ? this.getHandicapInfo(pBest, Boolean(s.handicapEnabled)) : { level: 0 };
+            const handicapBadgeHtml = (occupied && hInfo.level > 0)
+              ? `<div class="mt-0.5 inline-block text-[8px] font-black px-1.5 py-0.2 rounded-full bg-amber-400 text-slate-950">⚖️ Lv.${hInfo.level}</div>`
+              : (occupied && !p.isBot && s.handicapEnabled ? `<div class="mt-0.5 text-[8px] font-bold text-slate-400">最高 ${pBest.toLocaleString()}</div>` : '');
 
             card.innerHTML = `
               <div class="text-[9px] font-black ${i === 1 ? 'text-cyan-300' : (occupied && p.isBot ? 'text-amber-300' : 'text-fuchsia-300')}">${roleTag}</div>
               <div class="text-[11px] sm:text-xs font-black truncate mt-0.5 ${occupied ? 'text-white' : 'text-slate-500'}">${nameText}</div>
               <div class="text-[9px] font-bold mt-0.5 ${occupied ? 'text-emerald-300' : 'text-slate-500'}">${statusText}</div>
+              ${handicapBadgeHtml}
             `;
             grid.appendChild(card);
           }
@@ -12671,6 +12949,8 @@
         if (itemsRow) itemsRow.classList.toggle('hidden', s.vsRule !== 'jammer');
         const lunRow = document.getElementById('vs-lunatic-tax-row');
         if (lunRow) lunRow.classList.toggle('hidden', s.difficulty !== 'LUNATIC');
+        const hcExp = document.getElementById('vs-handicap-explain');
+        if (hcExp) hcExp.classList.toggle('hidden', !s.handicapEnabled);
 
         const expEl = document.getElementById('vs-rule-explain');
         if (expEl) {
@@ -12738,7 +13018,12 @@
           const slot = 'p' + i;
           const existing = data.players ? data.players[slot] : null;
           if (existing && !existing.isBot && existing.connected !== false) {
-            nextPlayers[slot] = this.makeEmptyPlayer(existing.name, false, existing.uid);
+            const pFresh = this.makeEmptyPlayer(existing.name, false, existing.uid, null, Number(existing.bestScore || 0));
+            const hInfo = this.getHandicapInfo(pFresh.bestScore, Boolean(s.handicapEnabled));
+            pFresh.maxHp = hInfo.maxHp;
+            pFresh.hp = hInfo.maxHp;
+            pFresh.handicapLevel = hInfo.level;
+            nextPlayers[slot] = pFresh;
             nextJammers[slot] = { seq: 0, c1: 0, c10: 0, damage: 0, totalDamage: 0, isZone: false, stunSec: 0, trayJamCoins: null, fromCombo: 0, fromName: '' };
           } else if (fillWithBots) {
             const bName = this.BOT_NAMES[botIdx % this.BOT_NAMES.length];
@@ -13140,9 +13425,13 @@
             : 'text-[10px] sm:text-xs font-black px-1.5 py-0.5 rounded bg-fuchsia-500 text-white shrink-0 leading-none';
         }
         if (rulePillEl) {
-          rulePillEl.textContent = s.vsRule === 'jammer'
+          const baseRuleTxt = s.vsRule === 'jammer'
             ? '❤️HPお邪魔バトル'
             : (s.vsRule === 'race' ? `⚡${s.raceTarget || 7}人先取` : '🏆スコア対決');
+          const hcTag = (this.game && this.game.vsHandicap && this.game.vsHandicap.level > 0)
+            ? ` ⚖️Lv.${this.game.vsHandicap.level}`
+            : '';
+          rulePillEl.textContent = baseRuleTxt + hcTag;
         }
 
         // 注目ライバル（1位なら2位、2位以下なら1位）
@@ -13173,19 +13462,24 @@
             }
           }
         } else if (s.vsRule === 'race') {
-          const target = s.raceTarget || 7;
-          if (oppScoreEl) oppScoreEl.textContent = `${oppPerfect}/${target}神`;
+          const baseTarget = s.raceTarget || 7;
+          const myTarget = baseTarget + ((this.game.vsHandicap && this.game.vsHandicap.raceExtra) || 0);
+          const oppExtra = focusTarget && s.handicapEnabled
+            ? this.getHandicapInfo(focusTarget.bestScore || 0, true).raceExtra
+            : 0;
+          const oppTarget = baseTarget + oppExtra;
+          if (oppScoreEl) oppScoreEl.textContent = `${oppPerfect}/${oppTarget}神`;
           if (oppSubEl) oppSubEl.textContent = `${oppScore.toLocaleString()}pt`;
           const myP = meObj ? meObj.perfectCount : (this.game.perfectCount || 0);
           if (leadBadge) {
-            if (myP > oppPerfect) {
-              leadBadge.textContent = `首位 (${myP}/${target})`;
+            if ((myTarget - myP) < (oppTarget - oppPerfect)) {
+              leadBadge.textContent = `首位 (${myP}/${myTarget})`;
               leadBadge.className = 'text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded bg-emerald-400 text-slate-950 leading-none';
-            } else if (myP < oppPerfect) {
-              leadBadge.textContent = `追撃 (${myP}/${target})`;
+            } else if ((myTarget - myP) > (oppTarget - oppPerfect)) {
+              leadBadge.textContent = `追撃 (${myP}/${myTarget})`;
               leadBadge.className = 'text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded bg-rose-500 text-white leading-none';
             } else {
-              leadBadge.textContent = `互角 (${myP}/${target})`;
+              leadBadge.textContent = `互角 (${myP}/${myTarget})`;
               leadBadge.className = 'text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 leading-none';
             }
           }
@@ -13269,8 +13563,9 @@
 
         if (this.lastRoomData) {
           const s = this.lastRoomData.settings || this.getDefaultSettings();
-          if (s.vsRule === 'race' && (this.game.perfectCount || 0) >= (s.raceTarget || 7)) {
-            this.claimWinner(this.mySlot, `⚡ ${this.game.playerName} が先に ${s.raceTarget || 7}人 PERFECTを達成！`);
+          const myRaceTarget = (s.raceTarget || 7) + ((this.game.vsHandicap && this.game.vsHandicap.raceExtra) || 0);
+          if (s.vsRule === 'race' && (this.game.perfectCount || 0) >= myRaceTarget) {
+            this.claimWinner(this.mySlot, `⚡ ${this.game.playerName} が先に ${myRaceTarget}人 PERFECTを達成！`);
             updatePromise.catch(() => {});
             return;
           }
@@ -13895,7 +14190,7 @@
                   delete data.players[sl];
                 } else {
                   const wasConn = p.connected !== false;
-                  data.players[sl] = this.makeEmptyPlayer(p.name, false, p.uid);
+                  data.players[sl] = this.makeEmptyPlayer(p.name, false, p.uid, null, Number(p.bestScore || 0));
                   data.players[sl].connected = wasConn;
                 }
               }
@@ -16120,7 +16415,13 @@
         this.isRankingRun = false; // ランキングには一切影響させない
         this.isVersusRun = true;
         this.vsSettings = s;
-        this.vsMaxHp = this.versus ? this.versus.VS_JAMMER_MAX_HP : 1500;
+        const myRoomP = (roomData && roomData.players && this.versus && this.versus.mySlot)
+          ? roomData.players[this.versus.mySlot]
+          : null;
+        this.vsHandicap = this.versus
+          ? this.versus.getHandicapInfo(myRoomP ? myRoomP.bestScore : 0, Boolean(s.handicapEnabled))
+          : { level: 0, scoreMult: 1.0, maxHp: 1500, raceExtra: 0, label: '' };
+        this.vsMaxHp = this.vsHandicap.maxHp;
         this.vsHp = this.vsMaxHp;
         this.vsKoDefeated = false;
         this.vsItemCharges = 0;
@@ -16906,6 +17207,20 @@
           scoreBox.classList.add('border-rose-400');
           setTimeout(() => scoreBox.classList.remove('border-rose-400'), 550);
         }
+      }
+
+      showFastestPerfectPopup(newSec, prevSec = null) {
+        const layer = document.getElementById('vs-stamp-layer');
+        if (!layer) return;
+        const el = document.createElement('div');
+        el.className = 'vs-jammer-toast text-xs sm:text-sm border-2 border-amber-300 bg-gradient-to-r from-slate-950/95 via-indigo-950/95 to-amber-900/95 text-amber-200 shadow-2xl';
+        el.style.top = '15%';
+        const diffTxt = (typeof prevSec === 'number' && prevSec > newSec)
+          ? ` (-${(prevSec - newSec).toFixed(2)}s)`
+          : '';
+        el.textContent = `⚡ 最速神会計 NEW RECORD!! ${newSec.toFixed(2)}秒${diffTxt}`;
+        layer.appendChild(el);
+        setTimeout(() => el.remove(), 1700);
       }
 
       useVersusItem(type) {
@@ -18205,14 +18520,25 @@
           if (!isAutoCheckout) {
             const comboMult = Math.min(4.8, 1 + (this.combo - 1) * ((!isJammerNormScore && isExOrLun) ? 0.5 : 0.35));
             const basePt = isJammerNormScore ? 1760 : (isLunatic ? 2750 : (isEx ? 2420 : 1760));
-            earnedScore = Math.round((basePt + Math.max(0, netDiff) * 275) * comboMult * modeMultiplier * noChangeMult * zoneMult);
+            const handicapScoreMult = (this.isVersusRun && !isJammerNormScore && this.vsHandicap && typeof this.vsHandicap.scoreMult === 'number')
+              ? this.vsHandicap.scoreMult
+              : 1.0;
+            earnedScore = Math.round((basePt + Math.max(0, netDiff) * 275) * comboMult * modeMultiplier * noChangeMult * zoneMult * handicapScoreMult);
 
             if (isBillBonus) {
-              const billBonusPt = Math.round(billSavedCount * 440 * comboMult * modeMultiplier * noChangeMult * zoneMult);
+              const billBonusPt = Math.round(billSavedCount * 440 * comboMult * modeMultiplier * noChangeMult * zoneMult * handicapScoreMult);
               earnedScore += billBonusPt;
               billBonusInfo = { savedBills: billSavedCount, bonusPt: billBonusPt };
             }
             this.score += earnedScore;
+
+            // 1問ごとの最速神会計タイム更新チェック（手動PERFECTのみ・チュートリアル除外）
+            if (!this.isTutorial && this.turnElapsed > 0.05) {
+              const fastRes = StatsManager.recordFastestPerfect(this.turnElapsed);
+              if (fastRes.isNewRecord) {
+                this.showFastestPerfectPopup(fastRes.sec, fastRes.prevSec);
+              }
+            }
           } else {
             earnedScore = 0;
             billBonusInfo = null;
@@ -19706,6 +20032,23 @@
 
       switchScreen('screen-title');
       sound.tryAutoStartBGM();
+
+      // 招待URL (?room=XXXX) が指定されている場合はワンタップで自動入室
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const inviteRoom = (urlParams.get('room') || '').trim();
+        if (/^\d{4}$/.test(inviteRoom) && game.versus) {
+          try {
+            window.history.replaceState({}, '', window.location.pathname + window.location.hash);
+          } catch (e) {}
+          game.versus.openLobby();
+          const codeInput = document.getElementById('input-vs-room-code');
+          if (codeInput) codeInput.value = inviteRoom;
+          setTimeout(() => {
+            game.versus.joinRoomByCode(inviteRoom);
+          }, 300);
+        }
+      } catch (e) {}
 
       let lastTime = performance.now();
       let lite3DAccum = 0;

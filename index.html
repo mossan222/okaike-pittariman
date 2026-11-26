@@ -3749,7 +3749,7 @@
 
   <!-- APP VERSION BADGE (Bottom-Left, Non-Interactive, iPhone Safe-Area Adjusted) -->
   <div id="app-version-badge" class="fixed z-[60] pointer-events-none select-none font-digital text-[10px] sm:text-[11px] font-bold tracking-wider text-slate-300/80 bg-slate-950/55 border border-slate-700/50 rounded-md px-1.5 py-0.5 leading-none" style="z-index: 60; left: calc(env(safe-area-inset-left, 0px) + 18px); bottom: calc(env(safe-area-inset-bottom, 0px) + 6px);">
-    ver.1.93
+    ver.1.94
   </div>
 
   <!-- =========================================================================
@@ -3759,7 +3759,7 @@
     /*************************************************************************
      * 1. 定数・金種データ・2種類ランキング初期データ定義
      *************************************************************************/
-    const APP_VERSION = 'ver.1.93';
+    const APP_VERSION = 'ver.1.94';
     (() => {
       const vb = document.getElementById('app-version-badge');
       if (vb) vb.textContent = APP_VERSION;
@@ -10112,17 +10112,17 @@
         const isJammer = vsRule === 'jammer';
         const isExOrLun = (diff === 'EX' || diff === 'LUNATIC');
 
-        // Lv.1〜9の段階テーブル（全レベルZONEなし・Lv.9の高速ペースを基準にLv.1〜8を滑らかに配分）
+        // Lv.1〜9の段階テーブル（全レベルZONEなし・お邪魔モードのLv.9強化＆Lv.1〜8連動調整＋アイテム攻撃対応）
         const table = {
-          1: { pace: 6400, jamPace: 7600, perf: 0.34, exPerf: 0.52,  scoreScale: 0.52, useZone: false, jamResist: 1.00, jamCd: 15500 },
-          2: { pace: 5450, jamPace: 6550, perf: 0.44, exPerf: 0.62,  scoreScale: 0.62, useZone: false, jamResist: 1.00, jamCd: 14200 },
-          3: { pace: 4550, jamPace: 5550, perf: 0.54, exPerf: 0.70,  scoreScale: 0.72, useZone: false, jamResist: 0.96, jamCd: 13000 },
-          4: { pace: 3750, jamPace: 4650, perf: 0.63, exPerf: 0.78,  scoreScale: 0.82, useZone: false, jamResist: 0.92, jamCd: 11800 },
-          5: { pace: 3050, jamPace: 3850, perf: 0.72, exPerf: 0.84,  scoreScale: 0.92, useZone: false, jamResist: 0.85, jamCd: 10500 },
-          6: { pace: 2450, jamPace: 3150, perf: 0.80, exPerf: 0.90,  scoreScale: 1.02, useZone: false, jamResist: 0.76, jamCd: 9200  },
-          7: { pace: 1920, jamPace: 2520, perf: 0.86, exPerf: 0.94,  scoreScale: 1.10, useZone: false, jamResist: 0.66, jamCd: 8000  },
-          8: { pace: 1480, jamPace: 1980, perf: 0.92, exPerf: 0.965, scoreScale: 1.19, useZone: false, jamResist: 0.56, jamCd: 6700  },
-          9: { pace: 1080, jamPace: 1500, perf: 0.96, exPerf: 0.985, scoreScale: 1.28, useZone: false, jamResist: 0.45, jamCd: 5500  }
+          1: { pace: 6400, jamPace: 6900, perf: 0.34, exPerf: 0.52,  scoreScale: 0.52, useZone: false, jamResist: 1.00, jamCd: 14500, jamAtkScale: 0.62, itemCd: 22000, itemChance: 0.25 },
+          2: { pace: 5450, jamPace: 5900, perf: 0.44, exPerf: 0.62,  scoreScale: 0.62, useZone: false, jamResist: 0.98, jamCd: 13200, jamAtkScale: 0.70, itemCd: 19500, itemChance: 0.32 },
+          3: { pace: 4550, jamPace: 4950, perf: 0.54, exPerf: 0.70,  scoreScale: 0.72, useZone: false, jamResist: 0.93, jamCd: 11800, jamAtkScale: 0.78, itemCd: 17000, itemChance: 0.40 },
+          4: { pace: 3750, jamPace: 4100, perf: 0.63, exPerf: 0.78,  scoreScale: 0.82, useZone: false, jamResist: 0.87, jamCd: 10500, jamAtkScale: 0.86, itemCd: 15000, itemChance: 0.48 },
+          5: { pace: 3050, jamPace: 3350, perf: 0.72, exPerf: 0.84,  scoreScale: 0.92, useZone: false, jamResist: 0.79, jamCd: 9200,  jamAtkScale: 0.95, itemCd: 13000, itemChance: 0.56 },
+          6: { pace: 2450, jamPace: 2700, perf: 0.80, exPerf: 0.90,  scoreScale: 1.02, useZone: false, jamResist: 0.70, jamCd: 8000,  jamAtkScale: 1.05, itemCd: 11200, itemChance: 0.65 },
+          7: { pace: 1920, jamPace: 2140, perf: 0.86, exPerf: 0.94,  scoreScale: 1.10, useZone: false, jamResist: 0.60, jamCd: 6800,  jamAtkScale: 1.16, itemCd: 9500,  itemChance: 0.74 },
+          8: { pace: 1480, jamPace: 1660, perf: 0.92, exPerf: 0.965, scoreScale: 1.19, useZone: false, jamResist: 0.50, jamCd: 5600,  jamAtkScale: 1.28, itemCd: 8000,  itemChance: 0.84 },
+          9: { pace: 1080, jamPace: 1260, perf: 0.96, exPerf: 0.985, scoreScale: 1.28, useZone: false, jamResist: 0.38, jamCd: 4500,  jamAtkScale: 1.42, itemCd: 6600,  itemChance: 0.94 }
         };
         const cfg = table[lv] || table[5];
         const jitter = lv >= 8 ? (0.94 + Math.random() * 0.12) : (0.90 + Math.random() * 0.20);
@@ -10133,7 +10133,10 @@
           scoreScale: cfg.scoreScale,
           useZone: cfg.useZone,
           jamResist: cfg.jamResist,
-          jamCd: cfg.jamCd
+          jamCd: cfg.jamCd,
+          jamAtkScale: cfg.jamAtkScale,
+          itemCd: cfg.itemCd,
+          itemChance: cfg.itemChance
         };
       }
 
@@ -10172,13 +10175,14 @@
         return obj;
       }
 
-      calcJammerAttackDamage(comboCount = 1, isZoneActive = false, isFromBot = false, isAutoActive = false) {
+      calcJammerAttackDamage(comboCount = 1, isZoneActive = false, isFromBot = false, isAutoActive = false, botAtkScale = 1.0) {
         const c = Math.max(1, Number(comboCount) || 1);
-        const base = isFromBot ? 28 : 65;
-        const comboMult = 1 + (c - 1) * (isFromBot ? 0.12 : 0.22);
+        const base = isFromBot ? 38 : 65;
+        const comboMult = 1 + (c - 1) * (isFromBot ? 0.15 : 0.22);
         const zoneMult = isZoneActive ? 1.5 : 1.0;
         const autoMult = isAutoActive ? 0.45 : 1.0; // オート発動中は攻撃力を0.45倍に調整
-        return Math.max(10, Math.round(base * comboMult * zoneMult * autoMult));
+        const botScale = isFromBot ? Math.max(0.5, Number(botAtkScale) || 1.0) : 1.0;
+        return Math.max(10, Math.round(base * comboMult * zoneMult * autoMult * botScale));
       }
 
       getEffectiveHp(data, slot, playerObj = null) {
@@ -13407,7 +13411,8 @@
 
         this.botStates = {};
         this.botLastJammerSeqs = {};
-        this.lastGlobalBotJammerAt = playStartMs + 2500;
+        this.lastGlobalBotJammerAt = playStartMs + 1800;
+        this.lastGlobalBotItemAt = playStartMs + 3200;
         botEntries.forEach(({ slot, player }, idx) => {
           const prof = this.getBotProfile(player.cpuLevel || 5, diff, s.vsRule || 'score');
           const firstDelay = prof.level >= 9
@@ -13437,8 +13442,14 @@
             useZone: prof.useZone,
             jamResist: prof.jamResist,
             jamCd: prof.jamCd,
+            jamAtkScale: prof.jamAtkScale,
+            itemCd: prof.itemCd,
+            itemChance: prof.itemChance,
+            itemTrayJamUses: 3,
+            itemStunUses: 3,
             nextActionAt: playStartMs + firstDelay,
-            nextJammerAt: playStartMs + Math.max(3000, prof.jamCd - 2000) + idx * 900 + Math.random() * 1800
+            nextJammerAt: playStartMs + Math.max(2400, prof.jamCd - 2200) + idx * 800 + Math.random() * 1400,
+            nextItemAt: playStartMs + Math.max(4500, prof.itemCd - 2500) + idx * 1200 + Math.random() * 2000
           };
           this.botLastJammerSeqs[slot] = 0;
         });
@@ -13457,6 +13468,7 @@
               if (!st.finished) {
                 st.nextActionAt += 350;
                 st.nextJammerAt += 350;
+                if (st.nextItemAt) st.nextItemAt += 350;
               }
             }
             return;
@@ -13536,23 +13548,63 @@
                   : ((diff === 'LUNATIC' ? 2750 : (diff === 'EX' ? 2420 : 1760)) + Math.floor(Math.random() * 825));
                 st.score += Math.round(rawBase * comboMult * diffMult * noChangeMult * zoneMult * (st.scoreScale || 1.0));
 
-                // お邪魔モード時はPERFECTごとにHP攻撃！（3回PERFECTごとにお邪魔小銭も同時送信）
+                // お邪魔モード時はPERFECTごとにHP攻撃＆お邪魔小銭送信！（アイテムあり時はお邪魔送り・スタンも使用）
                 if (s.vsRule === 'jammer') {
-                  const minGlobalGap = st.cpuLevel >= 9 ? 5200 : (st.cpuLevel >= 7 ? 6200 : 7500);
+                  const minGlobalGap = st.cpuLevel >= 9 ? 3600 : (st.cpuLevel >= 7 ? 4800 : 6200);
+                  const coinStep = st.cpuLevel >= 7 ? 2 : 3;
                   const withCoins = (
                     st.perfectCount > 0 &&
-                    st.perfectCount % 3 === 0 &&
+                    st.perfectCount % coinStep === 0 &&
                     now >= (st.nextJammerAt || 0) &&
                     (now - (this.lastGlobalBotJammerAt || 0)) >= minGlobalGap
                   );
                   if (withCoins) {
                     this.lastGlobalBotJammerAt = now;
-                    st.nextJammerAt = now + (st.jamCd || 9500) + Math.random() * 2500;
+                    st.nextJammerAt = now + (st.jamCd || 9200) + Math.random() * 1800;
                   }
-                  const atkRes = this.sendJammerFromSlot(st.slot, st.name, st.combo, true, botInZone, withCoins);
+                  const atkRes = this.sendJammerFromSlot(st.slot, st.name, st.combo, true, botInZone, withCoins, false, st.jamAtkScale || 1.0);
                   if (atkRes) {
                     st.damageDealt += (atkRes.damage || 0);
                     st.jammerSentCount += (atkRes.coins || 0);
+                  }
+
+                  // アイテムあり設定時はCPUも「💣お邪魔送り（画面5〜7枚）」や「⚡スタン（100DMG+2秒痺れ）」を発動！
+                  const itemsEnabled = (s.itemsEnabled !== false);
+                  const minGlobalItemGap = st.cpuLevel >= 9 ? 5500 : (st.cpuLevel >= 7 ? 7200 : 9000);
+                  const canTryItem = (
+                    itemsEnabled &&
+                    st.perfectCount >= 3 &&
+                    ((st.itemTrayJamUses || 0) > 0 || (st.itemStunUses || 0) > 0) &&
+                    now >= (st.nextItemAt || 0) &&
+                    (now - (this.lastGlobalBotItemAt || 0)) >= minGlobalItemGap
+                  );
+                  if (canTryItem) {
+                    if (Math.random() < (st.itemChance || 0.5)) {
+                      const canTray = (st.itemTrayJamUses || 0) > 0;
+                      const canStun = (st.itemStunUses || 0) > 0;
+                      let chosenItem = null;
+                      if (canTray && canStun) {
+                        chosenItem = Math.random() < 0.62 ? 'trayjam' : 'stun';
+                      } else if (canTray) {
+                        chosenItem = 'trayjam';
+                      } else if (canStun) {
+                        chosenItem = 'stun';
+                      }
+                      if (chosenItem) {
+                        const itemRes = this.sendBotItemAttack(st, chosenItem);
+                        if (itemRes) {
+                          if (chosenItem === 'trayjam') st.itemTrayJamUses = Math.max(0, (st.itemTrayJamUses || 0) - 1);
+                          if (chosenItem === 'stun') st.itemStunUses = Math.max(0, (st.itemStunUses || 0) - 1);
+                          st.damageDealt += (itemRes.damage || 0);
+                          st.jammerSentCount += (itemRes.coins || 0);
+                          this.lastGlobalBotItemAt = now;
+                          st.nextItemAt = now + (st.itemCd || 12000) + Math.random() * 2500;
+                        }
+                      }
+                    } else {
+                      // 抽選を外しても少し待ってから再判定
+                      st.nextItemAt = now + 2600 + Math.random() * 1400;
+                    }
                   }
                 }
 
@@ -13859,7 +13911,7 @@
         }
       }
 
-      sendJammerFromSlot(fromSlot, fromName, comboCount, isFromBot = false, isZoneActive = false, withCoins = true, isAutoActive = false) {
+      sendJammerFromSlot(fromSlot, fromName, comboCount, isFromBot = false, isZoneActive = false, withCoins = true, isAutoActive = false, botAtkScale = 1.0) {
         if (!this.roomRef || !this.lastRoomData) return null;
         const s = this.lastRoomData.settings || {};
         if (s.vsRule !== 'jammer') return null;
@@ -13873,7 +13925,7 @@
         if (candidates.length === 0) return null;
 
         const target = candidates[Math.floor(Math.random() * candidates.length)];
-        const damage = this.calcJammerAttackDamage(comboCount, isZoneActive, isFromBot, isAutoActive);
+        const damage = this.calcJammerAttackDamage(comboCount, isZoneActive, isFromBot, isAutoActive, botAtkScale);
 
         let c1 = 0;
         let c10 = 0;
@@ -14045,14 +14097,83 @@
         this.sendSpectateItemEvent('auto', '🤖オート', '', '3秒間オート神会計・攻撃0.45倍');
       }
 
-      sendSpectateItemEvent(itemType, itemLabel, targetName = '', detail = '') {
-        if (!this.roomRef || !this.mySlot) return;
-        const senderName = this.game.playerName || 'プレイヤー';
+      sendBotItemAttack(st, itemType) {
+        if (!this.roomRef || !this.lastRoomData || !st || !st.slot) return null;
+        const s = this.lastRoomData.settings || {};
+        if (s.vsRule !== 'jammer' || s.itemsEnabled === false) return null;
+
+        const candidates = this.getActiveParticipants(this.lastRoomData)
+          .filter(({ slot, player }) => {
+            const hpVal = this.getEffectiveHp(this.lastRoomData, slot, player);
+            return slot !== st.slot && !player.finished && !player.koDefeated && hpVal > 0;
+          });
+        if (candidates.length === 0) return null;
+
+        const target = candidates[Math.floor(Math.random() * candidates.length)];
+        const botName = st.name || 'CPU';
+
+        if (itemType === 'stun') {
+          const stunDmg = 100;
+          const stunSec = 2.0;
+          this.roomRef.child('jammers/' + target.slot).transaction((cur) => {
+            const nextSeq = (cur && typeof cur.seq === 'number' ? cur.seq : 0) + 1;
+            const prevTotalDmg = (cur && typeof cur.totalDamage === 'number') ? cur.totalDamage : 0;
+            return {
+              seq: nextSeq,
+              c1: 0,
+              c10: 0,
+              damage: stunDmg,
+              totalDamage: prevTotalDmg + stunDmg,
+              isZone: false,
+              stunSec: stunSec,
+              trayJamCoins: null,
+              fromCombo: st.combo || 1,
+              fromName: botName
+            };
+          }).catch(() => {});
+          this.sendSpectateItemEvent('stun', '⚡スタン', target.player.name || '相手', '100 DMG ＆ 2秒痺れ', st.slot, botName);
+          return { damage: stunDmg, coins: 0, targetSlot: target.slot };
+        }
+
+        if (itemType === 'trayjam') {
+          const count = 5 + Math.floor(Math.random() * 3); // 5〜7枚
+          const pool = [1, 5, 10, 50, 100, 500];
+          const trayJamCoins = [];
+          for (let i = 0; i < count; i++) {
+            trayJamCoins.push(pool[Math.floor(Math.random() * pool.length)]);
+          }
+          this.roomRef.child('jammers/' + target.slot).transaction((cur) => {
+            const nextSeq = (cur && typeof cur.seq === 'number' ? cur.seq : 0) + 1;
+            const prevTotalDmg = (cur && typeof cur.totalDamage === 'number') ? cur.totalDamage : 0;
+            return {
+              seq: nextSeq,
+              c1: 0,
+              c10: 0,
+              damage: 0,
+              totalDamage: prevTotalDmg,
+              isZone: false,
+              stunSec: 0,
+              trayJamCoins: trayJamCoins,
+              fromCombo: st.combo || 1,
+              fromName: botName
+            };
+          }).catch(() => {});
+          this.sendSpectateItemEvent('trayjam', '💣お邪魔送り', target.player.name || '相手', `画面に${count}枚ばらまき`, st.slot, botName);
+          return { damage: 0, coins: count, targetSlot: target.slot };
+        }
+        return null;
+      }
+
+      sendSpectateItemEvent(itemType, itemLabel, targetName = '', detail = '', fromSlotOverride = null, fromNameOverride = null) {
+        if (!this.roomRef) return;
+        const senderSlot = fromSlotOverride || this.mySlot;
+        if (!senderSlot) return;
+        const senderName = fromNameOverride || (this.game && this.game.playerName) || 'プレイヤー';
         this.roomRef.child('itemEvent').transaction((cur) => {
           const nextSeq = (cur && typeof cur.seq === 'number' ? cur.seq : 0) + 1;
           return {
             seq: nextSeq,
-            fromSlot: this.mySlot,
+            fromSlot: senderSlot,
             fromName: senderName,
             itemType: String(itemType || ''),
             itemLabel: String(itemLabel || 'アイテム'),

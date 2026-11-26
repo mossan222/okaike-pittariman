@@ -1482,7 +1482,7 @@
         <div class="bg-slate-800/90 border border-slate-700 rounded-2xl px-3 py-2 flex items-center justify-between gap-2 min-w-0">
           <div class="text-left min-w-0 flex-1">
             <div class="text-xs font-black text-amber-300 flex items-center gap-1 truncate">
-              <span>👨‍🍳 お助け店長ガイド</span>
+              <span>👨‍🍳 店長ガイド(フリー用)</span>
             </div>
             <p class="text-[10px] text-slate-400 leading-tight">
               最適な出し方を光ってナビ！
@@ -3778,7 +3778,7 @@
 
   <!-- APP VERSION BADGE (Bottom-Left, Non-Interactive, iPhone Safe-Area Adjusted) -->
   <div id="app-version-badge" class="fixed z-[60] pointer-events-none select-none font-digital text-[10px] sm:text-[11px] font-bold tracking-wider text-slate-300/80 bg-slate-950/55 border border-slate-700/50 rounded-md px-1.5 py-0.5 leading-none" style="z-index: 60; left: calc(env(safe-area-inset-left, 0px) + 18px); bottom: calc(env(safe-area-inset-bottom, 0px) + 6px);">
-    ver.1.96
+    ver.1.97
   </div>
 
   <!-- =========================================================================
@@ -3788,7 +3788,7 @@
     /*************************************************************************
      * 1. 定数・金種データ・2種類ランキング初期データ定義
      *************************************************************************/
-    const APP_VERSION = 'ver.1.96';
+    const APP_VERSION = 'ver.1.97';
     (() => {
       const vb = document.getElementById('app-version-badge');
       if (vb) vb.textContent = APP_VERSION;
@@ -15226,7 +15226,7 @@
         const btnHudHelper = document.getElementById('btn-hud-helper-toggle');
         if (btnHudHelper) {
           btnHudHelper.addEventListener('click', () => {
-            if (this.isVersusRun) {
+            if (this.isRankingRun || this.isVersusRun) {
               sound.playClick();
               return;
             }
@@ -16128,13 +16128,14 @@
         const hudIcon = document.getElementById('hud-helper-icon');
         const hudLabel = document.getElementById('hud-helper-label');
         if (hudBtn && hudIcon && hudLabel) {
-          const lockMark = this.isVersusRun ? '🔒' : '';
-          if (this.aiHelperEnabled && !this.isVersusRun) {
+          const isLocked = this.isRankingRun || this.isVersusRun;
+          const lockMark = isLocked ? '🔒' : '';
+          if (this.aiHelperEnabled && !isLocked) {
             hudBtn.className = 'btn-3d bg-amber-900/90 hover:bg-amber-800 border-2 border-amber-400 text-amber-200 font-extrabold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow';
             hudIcon.textContent = '💡';
             hudLabel.textContent = '店長ガイド ON';
           } else {
-            hudBtn.className = 'btn-3d bg-slate-800 hover:bg-slate-700 border-2 border-slate-600 text-slate-300 font-extrabold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow';
+            hudBtn.className = `btn-3d bg-slate-800 ${isLocked ? 'opacity-65 cursor-not-allowed' : 'hover:bg-slate-700'} border-2 border-slate-600 text-slate-300 font-extrabold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow`;
             hudIcon.textContent = '👨‍🍳';
             hudLabel.textContent = `店長ガイド OFF${lockMark}`;
           }
@@ -16927,8 +16928,10 @@
           this.lunaticTaxRate = lunaticTaxRate;
         }
         this.playerName = RankingManager.normalizeName(playerName);
-        // ランキングモードはお釣り表示を統一（暗算固定）し、フリープレイでお釣り表示あり/なしを選択させる
+        // ランキングモードはお釣り表示を統一（暗算固定）＆お助け店長ガイドを完全無効化
         this.showChangeDisplay = false;
+        this.aiHelperEnabled = false;
+        this.syncHelperToggleUI();
         this._launchGameplayWithCountdown();
       }
 
@@ -19625,7 +19628,7 @@
       }
 
       getHelperGuideTargets() {
-        if (!this.aiHelperEnabled || this.isTutorial || !this.bestSolution) {
+        if (!this.aiHelperEnabled || this.isTutorial || this.isRankingRun || this.isVersusRun || !this.bestSolution) {
           return { denoms: new Set(), checkout: false };
         }
         const trayCounts = this.getTrayCountsByDenom();
@@ -19757,9 +19760,10 @@
         const checkoutBtn = document.getElementById('btn-checkout');
         if (checkoutBtn) {
           checkoutBtn.classList.remove('tutorial-highlight', 'helper-guide-highlight');
+          const helperActive = this.aiHelperEnabled && !this.isTutorial && !this.isRankingRun && !this.isVersusRun;
           if (this.isTutorial && tutTargets.checkout) {
             checkoutBtn.classList.add('tutorial-highlight');
-          } else if (this.aiHelperEnabled && helperTargets.checkout) {
+          } else if (helperActive && helperTargets.checkout) {
             checkoutBtn.classList.add('helper-guide-highlight');
           }
           const jamLocked = this.getScreenJammerCount() > 0;
@@ -19776,7 +19780,7 @@
           const count = this.wallet[d] || 0;
           const inTray = trayCounts[d] || 0;
           const isHighlight = this.isTutorial && tutTargets.denoms.has(d) && count > 0;
-          const isHelperGlow = !this.isTutorial && this.aiHelperEnabled && helperTargets.denoms.has(d) && count > 0;
+          const isHelperGlow = !this.isTutorial && !this.isRankingRun && !this.isVersusRun && this.aiHelperEnabled && helperTargets.denoms.has(d) && count > 0;
 
           const wrap = document.createElement('div');
           wrap.className = 'flex items-center gap-1 min-w-0';
@@ -19819,7 +19823,7 @@
           const count = this.wallet[d] || 0;
           const inTray = trayCounts[d] || 0;
           const isHighlight = this.isTutorial && tutTargets.denoms.has(d) && count > 0;
-          const isHelperGlow = !this.isTutorial && this.aiHelperEnabled && helperTargets.denoms.has(d) && count > 0;
+          const isHelperGlow = !this.isTutorial && !this.isRankingRun && !this.isVersusRun && this.aiHelperEnabled && helperTargets.denoms.has(d) && count > 0;
 
           const col = document.createElement('div');
           col.className = 'flex flex-col items-center gap-1';

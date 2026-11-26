@@ -18168,7 +18168,7 @@
           const change = paidTotal - this.currentPrice;
           const changeInfo = getChangeBreakdown(change);
           const expectedAfterCoins = countWalletCoins(this.wallet) + changeInfo.coinCount;
-          if (expectedAfterCoins <= this.bestSolution.finalCoins) {
+          if (change === 0 || expectedAfterCoins <= this.bestSolution.finalCoins) {
             this.setClerkComment('optimalReady');
             if (this.dopagakiMode) {
               sound.playPachinkoKyupin();
@@ -18387,9 +18387,10 @@
                               (changeAmount >= 5000 && trayCounts[5000] > 0);
 
         const minPossibleChangeCoins = this.bestSolution ? this.bestSolution.changeCoinCount : changeInfo.coinCount;
+        const isExactPayment = (changeAmount === 0);
         const coinsOptimal = this.ruleType === 'change'
           ? (changeInfo.coinCount <= minPossibleChangeCoins)
-          : (coinsAfter <= minPossibleCoins);
+          : (isExactPayment || coinsAfter <= minPossibleCoins);
 
         // 最適解よりもお札の枚数が減って返ってくる出し方（例：1000円札を足して5000円札でお釣りをもらう）をボーナス判定
         const billsBefore = countWalletBills(walletBefore);
@@ -18429,8 +18430,8 @@
             grade = 'GOOD';
           }
         } else {
-          // ルール①：財布の小銭枚数最小ルール
-          if (coinsAfter <= minPossibleCoins && !wastedBill && !overpaidWhenExact && !hasCoinOverlap) {
+          // ルール①：財布の小銭枚数最小ルール（ピッタリ払いもPERFECT）
+          if ((isExactPayment || coinsAfter <= minPossibleCoins) && !wastedBill && !overpaidWhenExact && !hasCoinOverlap) {
             grade = 'PERFECT';
           } else if (coinsAfter > coinsBefore || wastedBill || overpaidWhenExact || coinsAfter >= minPossibleCoins + 3) {
             grade = 'BAD';

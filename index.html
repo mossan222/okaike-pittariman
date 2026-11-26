@@ -1227,6 +1227,8 @@
   <div id="dopa-rainbow-frame" aria-hidden="true"></div>
   <div id="dopa-fx-layer" class="popup-opacity-target fixed inset-0 z-30 pointer-events-none overflow-hidden" aria-hidden="true"></div>
   <div id="vs-fx-layer" class="popup-opacity-target fixed inset-0 z-[70] pointer-events-none overflow-hidden" style="z-index: 70;" aria-hidden="true"></div>
+  <!-- QUICK STAMP LAYER (Always 100% opaque, unaffected by popup opacity setting) -->
+  <div id="vs-stamp-layer" class="fixed inset-0 z-[72] pointer-events-none overflow-hidden" style="z-index: 72;" aria-hidden="true"></div>
   <!-- SCREEN-WIDE INTERACTIVE JAMMER COINS LAYER (Always 100% opaque so player can tap to remove) -->
   <div id="vs-screen-jammer-layer" class="fixed inset-0 z-[68] pointer-events-none overflow-hidden" style="z-index: 68;"></div>
   <!-- DOPAGAKI ZONE 5-SECOND PACHINKO BLACKOUT FREEZE OVERLAY (100% Opaque, Full Screen) -->
@@ -13653,7 +13655,7 @@
         if (resLatest) resLatest.textContent = label;
         if (tourneyLatest) tourneyLatest.textContent = label;
 
-        const layer = document.getElementById('vs-fx-layer');
+        const layer = document.getElementById('vs-stamp-layer');
         if (layer) {
           const toast = document.createElement('div');
           toast.className = 'vs-jammer-toast text-xs sm:text-base border-2 border-fuchsia-300 bg-slate-900/95 text-white shadow-2xl';

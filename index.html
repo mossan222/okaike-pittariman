@@ -10102,17 +10102,17 @@
         const isJammer = vsRule === 'jammer';
         const isExOrLun = (diff === 'EX' || diff === 'LUNATIC');
 
-        // Lv.1〜9の段階テーブル（Lv.9は1,000万pt級プレイヤーと互角〜ギリギリ勝負できる極限仕様）
+        // Lv.1〜9の段階テーブル（旧Lv.8基準を新Lv.9とし、Lv.1〜8を滑らかに再配分）
         const table = {
-          1: { pace: 6400, jamPace: 7600, perf: 0.36, exPerf: 0.55, scoreScale: 0.55, useZone: false, jamResist: 1.0,  jamCd: 15000 },
-          2: { pace: 5300, jamPace: 6400, perf: 0.48, exPerf: 0.66, scoreScale: 0.68, useZone: false, jamResist: 1.0,  jamCd: 13500 },
-          3: { pace: 4400, jamPace: 5400, perf: 0.58, exPerf: 0.74, scoreScale: 0.80, useZone: false, jamResist: 0.95, jamCd: 12000 },
-          4: { pace: 3600, jamPace: 4600, perf: 0.68, exPerf: 0.82, scoreScale: 0.92, useZone: false, jamResist: 0.90, jamCd: 10500 },
-          5: { pace: 2950, jamPace: 3900, perf: 0.77, exPerf: 0.88, scoreScale: 1.00, useZone: true,  jamResist: 0.82, jamCd: 9200  },
-          6: { pace: 2350, jamPace: 3150, perf: 0.85, exPerf: 0.93, scoreScale: 1.08, useZone: true,  jamResist: 0.72, jamCd: 8000  },
-          7: { pace: 1820, jamPace: 2450, perf: 0.91, exPerf: 0.96, scoreScale: 1.18, useZone: true,  jamResist: 0.60, jamCd: 6800  },
-          8: { pace: 1360, jamPace: 1850, perf: 0.96, exPerf: 0.985, scoreScale: 1.28, useZone: true, jamResist: 0.45, jamCd: 5500  },
-          9: { pace: 920,  jamPace: 1220, perf: 0.992, exPerf: 0.996, scoreScale: 1.45, useZone: true, jamResist: 0.28, jamCd: 4200 }
+          1: { pace: 6800, jamPace: 8000, perf: 0.34, exPerf: 0.52,  scoreScale: 0.52, useZone: false, jamResist: 1.00, jamCd: 15500 },
+          2: { pace: 5900, jamPace: 7000, perf: 0.44, exPerf: 0.62,  scoreScale: 0.62, useZone: false, jamResist: 1.00, jamCd: 14200 },
+          3: { pace: 5000, jamPace: 6000, perf: 0.54, exPerf: 0.70,  scoreScale: 0.72, useZone: false, jamResist: 0.96, jamCd: 13000 },
+          4: { pace: 4200, jamPace: 5150, perf: 0.63, exPerf: 0.78,  scoreScale: 0.82, useZone: false, jamResist: 0.92, jamCd: 11800 },
+          5: { pace: 3450, jamPace: 4350, perf: 0.72, exPerf: 0.84,  scoreScale: 0.92, useZone: true,  jamResist: 0.85, jamCd: 10500 },
+          6: { pace: 2800, jamPace: 3600, perf: 0.80, exPerf: 0.90,  scoreScale: 1.02, useZone: true,  jamResist: 0.76, jamCd: 9200  },
+          7: { pace: 2250, jamPace: 2950, perf: 0.86, exPerf: 0.94,  scoreScale: 1.10, useZone: true,  jamResist: 0.66, jamCd: 8000  },
+          8: { pace: 1750, jamPace: 2350, perf: 0.92, exPerf: 0.965, scoreScale: 1.19, useZone: true,  jamResist: 0.56, jamCd: 6700  },
+          9: { pace: 1360, jamPace: 1850, perf: 0.96, exPerf: 0.985, scoreScale: 1.28, useZone: true,  jamResist: 0.45, jamCd: 5500  }
         };
         const cfg = table[lv] || table[5];
         const jitter = lv >= 8 ? (0.94 + Math.random() * 0.12) : (0.90 + Math.random() * 0.20);
@@ -11821,8 +11821,8 @@
 
         const lv1 = Math.max(1, Math.min(9, Number(p1.cpuLevel) || 5));
         const lv2 = Math.max(1, Math.min(9, Number(p2.cpuLevel) || 5));
-        const scale1 = 0.45 + lv1 * 0.24 + (lv1 === 9 ? 0.95 : 0);
-        const scale2 = 0.45 + lv2 * 0.24 + (lv2 === 9 ? 0.95 : 0);
+        const scale1 = 0.45 + lv1 * 0.22 + (lv1 === 9 ? 0.35 : 0);
+        const scale2 = 0.45 + lv2 * 0.22 + (lv2 === 9 ? 0.35 : 0);
         let step = 0;
         let s1 = 0, s2 = 0;
         this.tourneyBotClashTimer = setInterval(() => {
@@ -13401,8 +13401,8 @@
         botEntries.forEach(({ slot, player }, idx) => {
           const prof = this.getBotProfile(player.cpuLevel || 5, diff, s.vsRule || 'score');
           const firstDelay = prof.level >= 9
-            ? (750 + Math.random() * 350)
-            : (prof.level >= 7 ? (1050 + Math.random() * 650) : (1600 + Math.random() * 2000));
+            ? (1050 + Math.random() * 550)
+            : (prof.level >= 7 ? (1300 + Math.random() * 750) : (1650 + Math.random() * 2000));
           this.botStates[slot] = {
             slot,
             name: player.name,
@@ -13528,7 +13528,7 @@
 
                 // お邪魔モード時はPERFECTごとにHP攻撃！（3回PERFECTごとにお邪魔小銭も同時送信）
                 if (s.vsRule === 'jammer') {
-                  const minGlobalGap = st.cpuLevel >= 9 ? 3500 : (st.cpuLevel >= 7 ? 5200 : 7500);
+                  const minGlobalGap = st.cpuLevel >= 9 ? 5200 : (st.cpuLevel >= 7 ? 6200 : 7500);
                   const withCoins = (
                     st.perfectCount > 0 &&
                     st.perfectCount % 3 === 0 &&

@@ -3675,6 +3675,77 @@
     </div>
   </div>
 
+  <!-- =========================================================================
+       MODAL: VERSUS BOT CPU LEVEL SELECT (#modal-vs-cpu-level)
+       ========================================================================= -->
+  <div id="modal-vs-cpu-level" class="fixed inset-0 z-[85] hidden items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md" style="z-index: 85;">
+    <div class="max-w-md w-full bg-slate-900/95 border-2 border-amber-400 rounded-3xl p-4 sm:p-5 shadow-2xl max-h-[94vh] overflow-y-auto custom-scroll text-center">
+      <div class="inline-block bg-amber-400/20 border border-amber-400/70 text-amber-300 text-[10px] sm:text-xs font-black px-3 py-0.5 rounded-full mb-1">
+        HOST BOT SETTING
+      </div>
+      <h3 class="text-lg sm:text-2xl font-black text-white mb-0.5">🤖 CPUレベルを選択</h3>
+      <p class="text-[11px] sm:text-xs text-slate-300 mb-3">
+        残りの空き枠を埋めるBOTの強さを選んでスタート！
+      </p>
+
+      <!-- Levels 1 - 9 (3x3 Grid) -->
+      <div class="grid grid-cols-3 gap-2 mb-2.5">
+        <button type="button" data-vs-cpu-lv="1" class="vs-cpu-lv-btn btn-3d bg-slate-800 hover:bg-slate-700 border-2 border-emerald-400/70 rounded-2xl py-2 px-1.5 text-center shadow">
+          <div class="font-digital text-lg sm:text-xl font-black text-emerald-300 leading-none">Lv.1</div>
+          <div class="text-[10px] font-bold text-slate-300 mt-0.5">見習い</div>
+        </button>
+        <button type="button" data-vs-cpu-lv="2" class="vs-cpu-lv-btn btn-3d bg-slate-800 hover:bg-slate-700 border-2 border-emerald-400/70 rounded-2xl py-2 px-1.5 text-center shadow">
+          <div class="font-digital text-lg sm:text-xl font-black text-emerald-300 leading-none">Lv.2</div>
+          <div class="text-[10px] font-bold text-slate-300 mt-0.5">初心者</div>
+        </button>
+        <button type="button" data-vs-cpu-lv="3" class="vs-cpu-lv-btn btn-3d bg-slate-800 hover:bg-slate-700 border-2 border-teal-400/70 rounded-2xl py-2 px-1.5 text-center shadow">
+          <div class="font-digital text-lg sm:text-xl font-black text-teal-300 leading-none">Lv.3</div>
+          <div class="text-[10px] font-bold text-slate-300 mt-0.5">駆け出し</div>
+        </button>
+
+        <button type="button" data-vs-cpu-lv="4" class="vs-cpu-lv-btn btn-3d bg-slate-800 hover:bg-slate-700 border-2 border-sky-400/70 rounded-2xl py-2 px-1.5 text-center shadow">
+          <div class="font-digital text-lg sm:text-xl font-black text-sky-300 leading-none">Lv.4</div>
+          <div class="text-[10px] font-bold text-slate-300 mt-0.5">一人前</div>
+        </button>
+        <button type="button" data-vs-cpu-lv="5" class="vs-cpu-lv-btn btn-3d bg-slate-800 hover:bg-slate-700 border-2 border-cyan-400/80 rounded-2xl py-2 px-1.5 text-center shadow">
+          <div class="font-digital text-lg sm:text-xl font-black text-cyan-300 leading-none">Lv.5</div>
+          <div class="text-[10px] font-bold text-slate-300 mt-0.5">中級</div>
+        </button>
+        <button type="button" data-vs-cpu-lv="6" class="vs-cpu-lv-btn btn-3d bg-slate-800 hover:bg-slate-700 border-2 border-amber-400/80 rounded-2xl py-2 px-1.5 text-center shadow">
+          <div class="font-digital text-lg sm:text-xl font-black text-amber-300 leading-none">Lv.6</div>
+          <div class="text-[10px] font-bold text-slate-300 mt-0.5">熟練</div>
+        </button>
+
+        <button type="button" data-vs-cpu-lv="7" class="vs-cpu-lv-btn btn-3d bg-slate-800 hover:bg-slate-700 border-2 border-orange-400/90 rounded-2xl py-2 px-1.5 text-center shadow">
+          <div class="font-digital text-lg sm:text-xl font-black text-orange-300 leading-none">Lv.7</div>
+          <div class="text-[10px] font-bold text-orange-200 mt-0.5">達人</div>
+        </button>
+        <button type="button" data-vs-cpu-lv="8" class="vs-cpu-lv-btn btn-3d bg-rose-950/80 hover:bg-rose-900/80 border-2 border-rose-400 rounded-2xl py-2 px-1.5 text-center shadow">
+          <div class="font-digital text-lg sm:text-xl font-black text-rose-300 leading-none">Lv.8</div>
+          <div class="text-[10px] font-bold text-rose-200 mt-0.5">鬼・超上級</div>
+        </button>
+        <button type="button" data-vs-cpu-lv="9" class="vs-cpu-lv-btn btn-3d bg-gradient-to-b from-fuchsia-950 via-rose-950 to-slate-950 hover:from-fuchsia-900 border-2 border-fuchsia-400 rounded-2xl py-2 px-1.5 text-center shadow-[0_0_14px_rgba(232,121,249,0.6)]">
+          <div class="font-digital text-lg sm:text-xl font-black text-amber-300 leading-none">🔥 Lv.9</div>
+          <div class="text-[9px] font-black text-fuchsia-200 mt-0.5">神・極限</div>
+        </button>
+      </div>
+
+      <!-- Random Level Option -->
+      <button type="button" data-vs-cpu-lv="random" class="vs-cpu-lv-btn btn-3d w-full mb-3 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-amber-500 hover:from-violet-500 hover:to-amber-400 text-white font-black text-sm sm:text-base py-2.5 px-3 rounded-2xl border-b-4 border-fuchsia-950 shadow-lg flex items-center justify-center gap-1.5">
+        <span>🎲</span>
+        <span>ランダム（各BOTにLv.1〜9をランダム）</span>
+      </button>
+
+      <div class="text-[10px] text-rose-300/90 font-bold mb-3 bg-rose-950/50 border border-rose-500/40 rounded-xl px-2.5 py-1.5">
+        ⚠️ Lv.9 は超高速＆ほぼノーミスで神域ZONE連打する最強CPUです（1,000万pt級プレイヤー向け）
+      </div>
+
+      <button id="btn-vs-cpu-lv-cancel" type="button" class="btn-3d w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-extrabold text-xs sm:text-sm py-2.5 rounded-xl border border-slate-600">
+        ◀ ルームに戻る
+      </button>
+    </div>
+  </div>
+
 
   <!-- =========================================================================
        MAIN GAME SCRIPT
@@ -9701,7 +9772,29 @@
           btnStartWithBots.addEventListener('click', () => {
             if (!this.isHost || !this.roomRef) return;
             sound.playClick();
-            this.hostStartMatch(true);
+            this.openCpuLevelModal();
+          });
+        }
+
+        document.querySelectorAll('.vs-cpu-lv-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            if (!this.isHost || !this.roomRef) {
+              this.closeCpuLevelModal();
+              return;
+            }
+            sound.playClick();
+            const rawLv = btn.getAttribute('data-vs-cpu-lv');
+            const parsedLv = rawLv === 'random' ? 'random' : Math.max(1, Math.min(9, Number(rawLv) || 5));
+            this.closeCpuLevelModal();
+            this.hostStartMatch(true, parsedLv);
+          });
+        });
+
+        const btnCpuCancel = document.getElementById('btn-vs-cpu-lv-cancel');
+        if (btnCpuCancel) {
+          btnCpuCancel.addEventListener('click', () => {
+            sound.playReturn();
+            this.closeCpuLevelModal();
           });
         }
 
@@ -9911,7 +10004,51 @@
         return { level: 0, scoreMult: 1.0, maxHp: this.VS_JAMMER_MAX_HP, raceExtra: 0, label: '' };
       }
 
-      makeEmptyPlayer(name, isBot = false, uidOverride = null, pref = null, bestScoreOverride = null) {
+      openCpuLevelModal() {
+        const modal = document.getElementById('modal-vs-cpu-level');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+
+      closeCpuLevelModal() {
+        const modal = document.getElementById('modal-vs-cpu-level');
+        if (!modal) return;
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+
+      getBotProfile(cpuLevel, diff = 'NORMAL', vsRule = 'score') {
+        const lv = Math.max(1, Math.min(9, Number(cpuLevel) || 5));
+        const isJammer = vsRule === 'jammer';
+        const isExOrLun = (diff === 'EX' || diff === 'LUNATIC');
+
+        // Lv.1〜9の段階テーブル（Lv.9は1,000万pt級プレイヤーと互角〜ギリギリ勝負できる極限仕様）
+        const table = {
+          1: { pace: 6400, jamPace: 7600, perf: 0.36, exPerf: 0.55, scoreScale: 0.55, useZone: false, jamResist: 1.0,  jamCd: 15000 },
+          2: { pace: 5300, jamPace: 6400, perf: 0.48, exPerf: 0.66, scoreScale: 0.68, useZone: false, jamResist: 1.0,  jamCd: 13500 },
+          3: { pace: 4400, jamPace: 5400, perf: 0.58, exPerf: 0.74, scoreScale: 0.80, useZone: false, jamResist: 0.95, jamCd: 12000 },
+          4: { pace: 3600, jamPace: 4600, perf: 0.68, exPerf: 0.82, scoreScale: 0.92, useZone: false, jamResist: 0.90, jamCd: 10500 },
+          5: { pace: 2950, jamPace: 3900, perf: 0.77, exPerf: 0.88, scoreScale: 1.00, useZone: true,  jamResist: 0.82, jamCd: 9200  },
+          6: { pace: 2350, jamPace: 3150, perf: 0.85, exPerf: 0.93, scoreScale: 1.08, useZone: true,  jamResist: 0.72, jamCd: 8000  },
+          7: { pace: 1820, jamPace: 2450, perf: 0.91, exPerf: 0.96, scoreScale: 1.18, useZone: true,  jamResist: 0.60, jamCd: 6800  },
+          8: { pace: 1360, jamPace: 1850, perf: 0.96, exPerf: 0.985, scoreScale: 1.28, useZone: true, jamResist: 0.45, jamCd: 5500  },
+          9: { pace: 920,  jamPace: 1220, perf: 0.992, exPerf: 0.996, scoreScale: 1.45, useZone: true, jamResist: 0.28, jamCd: 4200 }
+        };
+        const cfg = table[lv] || table[5];
+        const jitter = lv >= 8 ? (0.94 + Math.random() * 0.12) : (0.90 + Math.random() * 0.20);
+        return {
+          level: lv,
+          paceBase: Math.round((isJammer ? cfg.jamPace : cfg.pace) * jitter),
+          perfRate: isExOrLun ? cfg.exPerf : cfg.perf,
+          scoreScale: cfg.scoreScale,
+          useZone: cfg.useZone,
+          jamResist: cfg.jamResist,
+          jamCd: cfg.jamCd
+        };
+      }
+
+      makeEmptyPlayer(name, isBot = false, uidOverride = null, pref = null, bestScoreOverride = null, cpuLevel = null) {
         const resolvedBest = isBot
           ? 0
           : (typeof bestScoreOverride === 'number' ? Math.max(0, Math.floor(bestScoreOverride)) : this.getMyBestScore(name));
@@ -9919,6 +10056,7 @@
           uid: uidOverride || this.myUid,
           name: name,
           isBot: Boolean(isBot),
+          cpuLevel: isBot ? Math.max(1, Math.min(9, Number(cpuLevel) || 5)) : null,
           bestScore: resolvedBest,
           connected: true,
           score: 0,
@@ -10862,6 +11000,7 @@
       }
 
       leaveRoom() {
+        this.closeCpuLevelModal();
         this.stopBotTimers();
         if (this.queueRef && this.queueRoomCode) {
           if (this.isHost) {
@@ -11588,13 +11727,17 @@
         if (titleEl) titleEl.textContent = `${p1.name} ⚔️ ${p2.name}`;
         if (subEl) subEl.textContent = 'BOT同士が白熱の暗算バトルを展開中...！';
 
+        const lv1 = Math.max(1, Math.min(9, Number(p1.cpuLevel) || 5));
+        const lv2 = Math.max(1, Math.min(9, Number(p2.cpuLevel) || 5));
+        const scale1 = 0.45 + lv1 * 0.24 + (lv1 === 9 ? 0.95 : 0);
+        const scale2 = 0.45 + lv2 * 0.24 + (lv2 === 9 ? 0.95 : 0);
         let step = 0;
         let s1 = 0, s2 = 0;
         this.tourneyBotClashTimer = setInterval(() => {
           step++;
           sound.playRouletteTick(step);
-          s1 += 1800 + Math.floor(Math.random() * 4500);
-          s2 += 1800 + Math.floor(Math.random() * 4500);
+          s1 += Math.round((1400 + Math.floor(Math.random() * 3400)) * scale1);
+          s2 += Math.round((1400 + Math.floor(Math.random() * 3400)) * scale2);
           if (subEl) {
             subEl.textContent = `⚡ ${p1.name}: ${s1.toLocaleString()}pt  VS  ${p2.name}: ${s2.toLocaleString()}pt`;
           }
@@ -11634,8 +11777,8 @@
         if (!p1Orig || !p2Orig) return;
 
         const s = { ...this.getDefaultSettings(), ...(data.settings || {}) };
-        const freshP1 = this.makeEmptyPlayer(p1Orig.name, Boolean(p1Orig.isBot), p1Orig.uid, null, Number(p1Orig.bestScore || 0));
-        const freshP2 = this.makeEmptyPlayer(p2Orig.name, Boolean(p2Orig.isBot), p2Orig.uid, null, Number(p2Orig.bestScore || 0));
+        const freshP1 = this.makeEmptyPlayer(p1Orig.name, Boolean(p1Orig.isBot), p1Orig.uid, null, Number(p1Orig.bestScore || 0), p1Orig.cpuLevel);
+        const freshP2 = this.makeEmptyPlayer(p2Orig.name, Boolean(p2Orig.isBot), p2Orig.uid, null, Number(p2Orig.bestScore || 0), p2Orig.cpuLevel);
         freshP1.connected = p1Orig.isBot ? true : (p1Orig.connected !== false);
         freshP2.connected = p2Orig.isBot ? true : (p2Orig.connected !== false);
         const h1 = this.getHandicapInfo(freshP1.bestScore, Boolean(s.handicapEnabled));
@@ -13003,8 +13146,9 @@
         }
       }
 
-      hostStartMatch(fillWithBots = false) {
+      hostStartMatch(fillWithBots = false, cpuLevelOpt = 'random') {
         if (!this.roomRef || !this.lastRoomData) return;
+        this.closeCpuLevelModal();
         const data = this.lastRoomData;
         const s = { ...this.getDefaultSettings(), ...(data.settings || {}) };
         const maxP = Math.max(2, Math.min(10, Number(s.maxPlayers) || 4));
@@ -13030,7 +13174,11 @@
             botIdx++;
             const uniqueName = usedBotNames.has(bName) ? `${bName}#${botIdx}` : bName;
             usedBotNames.add(uniqueName);
-            nextPlayers[slot] = this.makeEmptyPlayer(uniqueName, true, `bot_${slot}_${Date.now()}`);
+            const assignedLv = (cpuLevelOpt === 'random' || cpuLevelOpt == null)
+              ? (Math.floor(Math.random() * 9) + 1)
+              : Math.max(1, Math.min(9, Number(cpuLevelOpt) || 5));
+            const displayBotName = `${uniqueName}[Lv.${assignedLv}]`;
+            nextPlayers[slot] = this.makeEmptyPlayer(displayBotName, true, `bot_${slot}_${Date.now()}`, null, 0, assignedLv);
             nextJammers[slot] = { seq: 0, c1: 0, c10: 0, damage: 0, totalDamage: 0, isZone: false, stunSec: 0, trayJamCoins: null, fromCombo: 0, fromName: '' };
           }
         }
@@ -13148,25 +13296,25 @@
 
         const s = { ...this.getDefaultSettings(), ...(roomData.settings || {}) };
         const diff = s.difficulty || 'NORMAL';
+        const isExOrLun = (diff === 'EX' || diff === 'LUNATIC');
         const diffMult = s.vsRule === 'jammer' ? 1.0 : (diff === 'LUNATIC' ? 100 : (diff === 'EX' ? 10 : (diff === 'HARD' ? 1.5 : 1.0)));
+        const noChangeMult = s.vsRule === 'jammer' ? 1.0 : (s.showChange === false ? 1.25 : 1.0);
         const matchDurMs = s.vsRule === 'race' ? 180000 : (s.vsRule === 'jammer' ? 60000 : ((diff === 'HARD' || diff === 'EX') ? 45000 : 60000));
         const rouletteCount = Array.isArray(roomData && roomData.rouletteConflicts) ? roomData.rouletteConflicts.length : 0;
         const playStartMs = Date.now() + 5750 + rouletteCount * 3200; // ルーレット＋VSイントロ＋3秒カウントダウン完了後
 
         this.botStates = {};
         this.botLastJammerSeqs = {};
-        this.lastGlobalBotJammerAt = playStartMs + 3500; // 開始直後はお邪魔を飛ばさない
+        this.lastGlobalBotJammerAt = playStartMs + 2500;
         botEntries.forEach(({ slot, player }, idx) => {
-          const isJammerHp = s.vsRule === 'jammer';
-          const paceBase = isJammerHp
-            ? (4400 + (idx % 4) * 650 + Math.random() * 1100)
-            : (2900 + (idx % 4) * 550 + Math.random() * 950);
-          const perfRate = isJammerHp
-            ? ((diff === 'EX' || diff === 'LUNATIC') ? (0.74 + Math.random() * 0.10) : (0.56 + Math.random() * 0.16))
-            : ((diff === 'EX' || diff === 'LUNATIC') ? (0.90 + Math.random() * 0.08) : (0.72 + Math.random() * 0.18));
+          const prof = this.getBotProfile(player.cpuLevel || 5, diff, s.vsRule || 'score');
+          const firstDelay = prof.level >= 9
+            ? (750 + Math.random() * 350)
+            : (prof.level >= 7 ? (1050 + Math.random() * 650) : (1600 + Math.random() * 2000));
           this.botStates[slot] = {
             slot,
             name: player.name,
+            cpuLevel: prof.level,
             score: 0,
             combo: 0,
             maxCombo: 0,
@@ -13181,10 +13329,14 @@
             jammerSentCount: 0,
             jammerHitCount: 0,
             lastReceivedDamage: 0,
-            paceBase,
-            perfRate,
-            nextActionAt: playStartMs + 1600 + Math.random() * 2400,
-            nextJammerAt: playStartMs + 7500 + idx * 1800 + Math.random() * 4500
+            paceBase: prof.paceBase,
+            perfRate: prof.perfRate,
+            scoreScale: prof.scoreScale,
+            useZone: prof.useZone,
+            jamResist: prof.jamResist,
+            jamCd: prof.jamCd,
+            nextActionAt: playStartMs + firstDelay,
+            nextJammerAt: playStartMs + Math.max(3000, prof.jamCd - 2000) + idx * 900 + Math.random() * 1800
           };
           this.botLastJammerSeqs[slot] = 0;
         });
@@ -13230,9 +13382,10 @@
                 const deltaDmg = Math.max(0, totalDmg > 0 ? (totalDmg - (st.lastReceivedDamage || 0)) : Number(jam.damage || 0));
                 if (totalDmg > (st.lastReceivedDamage || 0)) st.lastReceivedDamage = totalDmg;
 
+                const resist = typeof st.jamResist === 'number' ? st.jamResist : 0.85;
                 if ((jam.c1 || 0) > 0 || (jam.c10 || 0) > 0) {
                   st.jammerHitCount += (jam.c1 || 0) + (jam.c10 || 0);
-                  st.nextActionAt = Math.max(st.nextActionAt, now) + 1200 + Math.random() * 800;
+                  st.nextActionAt = Math.max(st.nextActionAt, now) + Math.round((1200 + Math.random() * 800) * resist);
                   updates[`players/${st.slot}/jammerHitCount`] = st.jammerHitCount;
                 }
                 if ((jam.stunSec || 0) > 0) {
@@ -13240,7 +13393,7 @@
                 }
                 if (Array.isArray(jam.trayJamCoins) && jam.trayJamCoins.length > 0) {
                   st.jammerHitCount += jam.trayJamCoins.length;
-                  st.nextActionAt = Math.max(st.nextActionAt, now) + 2600;
+                  st.nextActionAt = Math.max(st.nextActionAt, now) + Math.round(2600 * resist);
                   updates[`players/${st.slot}/jammerHitCount`] = st.jammerHitCount;
                 }
                 if (deltaDmg > 0) {
@@ -13273,21 +13426,26 @@
                 st.perfectCount += 1;
                 st.combo += 1;
                 if (st.combo > st.maxCombo) st.maxCombo = st.combo;
-                const basePt = 1100 + Math.floor(Math.random() * 450) + st.combo * 180;
-                st.score += Math.round(basePt * diffMult);
+                const botInZone = Boolean(st.useZone && st.combo >= 7);
+                const zoneMult = botInZone ? 2.5 : 1.0;
+                const comboMult = Math.min(4.8, 1 + (st.combo - 1) * ((s.vsRule !== 'jammer' && isExOrLun) ? 0.5 : 0.35));
+                const rawBase = s.vsRule === 'jammer'
+                  ? (1760 + Math.floor(Math.random() * 550))
+                  : ((diff === 'LUNATIC' ? 2750 : (diff === 'EX' ? 2420 : 1760)) + Math.floor(Math.random() * 825));
+                st.score += Math.round(rawBase * comboMult * diffMult * noChangeMult * zoneMult * (st.scoreScale || 1.0));
 
                 // お邪魔モード時はPERFECTごとにHP攻撃！（3回PERFECTごとにお邪魔小銭も同時送信）
                 if (s.vsRule === 'jammer') {
-                  const botInZone = st.combo >= 7;
+                  const minGlobalGap = st.cpuLevel >= 9 ? 3500 : (st.cpuLevel >= 7 ? 5200 : 7500);
                   const withCoins = (
                     st.perfectCount > 0 &&
                     st.perfectCount % 3 === 0 &&
                     now >= (st.nextJammerAt || 0) &&
-                    (now - (this.lastGlobalBotJammerAt || 0)) >= 7500
+                    (now - (this.lastGlobalBotJammerAt || 0)) >= minGlobalGap
                   );
                   if (withCoins) {
                     this.lastGlobalBotJammerAt = now;
-                    st.nextJammerAt = now + 10000 + Math.random() * 5000;
+                    st.nextJammerAt = now + (st.jamCd || 9500) + Math.random() * 2500;
                   }
                   const atkRes = this.sendJammerFromSlot(st.slot, st.name, st.combo, true, botInZone, withCoins);
                   if (atkRes) {
@@ -13303,6 +13461,7 @@
                     uid: `bot_${st.slot}`,
                     name: st.name,
                     isBot: true,
+                    cpuLevel: st.cpuLevel || 5,
                     connected: true,
                     score: st.score,
                     combo: st.combo,
@@ -13328,11 +13487,13 @@
                 }
               }
 
-              st.nextActionAt = now + st.paceBase * (0.75 + Math.random() * 0.55);
+              const paceJitter = st.cpuLevel >= 8 ? (0.85 + Math.random() * 0.30) : (0.75 + Math.random() * 0.55);
+              st.nextActionAt = now + Math.round(st.paceBase * paceJitter);
               updates[`players/${st.slot}`] = {
                 uid: `bot_${st.slot}`,
                 name: st.name,
                 isBot: true,
+                cpuLevel: st.cpuLevel || 5,
                 connected: true,
                 score: st.score,
                 combo: st.combo,
@@ -13355,7 +13516,7 @@
           if (dirty) {
             this.roomRef.update(updates).catch(() => {});
           }
-        }, 250);
+        }, 150);
       }
 
       getSortedStandings(data) {
